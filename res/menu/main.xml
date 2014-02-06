@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    <item android:id="@+id/gallery"
+          android:icon="@drawable/gallery"
+          android:showAsAction="collapseActionView|ifRoom"
+           />
+    <item android:id="@+id/camera"
+          android:icon="@drawable/camera"
+          android:showAsAction="collapseActionView|ifRoom"
+         />
+    <item android:id="@+id/search"
+          android:icon="@drawable/search"
+          android:showAsAction="collapseActionView|ifRoom"
+          android:actionViewClass="android.widget.SearchView" />
+   <item android:id="@+id/rowadd"
+          android:icon="@drawable/add"
+          android:showAsAction="collapseActionView|ifRoom"
+         />
+    <item android:id="@+id/saveoh"
+          android:icon="@drawable/upload"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+    
+
+    
+
+</menu>
