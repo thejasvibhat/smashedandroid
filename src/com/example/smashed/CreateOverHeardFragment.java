@@ -3,6 +3,7 @@ import com.example.smashed.NumberPicker.OnChangedListener;
 import com.example.smashedin.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Dialog;
@@ -23,10 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class CreateOverHeardFragment extends Fragment {
@@ -79,10 +83,45 @@ public class CreateOverHeardFragment extends Fragment {
             
 	        }
 	    });
-
-         
+	    
+	    SetSpinner(rootView);
         return rootView;
     }
+	private void SetSpinner(View view)
+	{
+		String[] data = new String[gAdapter.mThumbIds.size()];
+		for(int i = 0; i < gAdapter.mThumbIds.size();i++)
+		{
+			data[i] = String.valueOf(i + 1);
+		}
+		 
+		Spinner spinner = (Spinner) view.findViewById(R.id.spinner1);
+		
+       // adapter.setDropDownViewResource(android.R.layout.simple_selectable_list_item);
+        
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),android.R.layout.simple_spinner_item, data) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setTextColor(0xff00ff00);
+
+                return textView;
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setTextColor(0xff00ff00);
+
+                return textView;
+            }
+
+            
+        };
+
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_multiple_choice);
+        spinner.setAdapter(adapter);
+
+	}
 	public void AddFromCamera()
 	{
 		takePhoto();
@@ -104,6 +143,7 @@ public class CreateOverHeardFragment extends Fragment {
 		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
 	    gridView.setAdapter(gAdapter);
+	    SetSpinner(getView());
 	}
 	public void AddRowDialog()
 	{
