@@ -66,8 +66,8 @@ public class CreateOverHeardFragment extends Fragment {
         	gAdapter = new GridImageAdapter(getActivity());
         	gAdapter.AddArgument(m_createFragment);
         }
-		if(gAdapter.mThumbIds.size() == 0)
-			gAdapter.mThumbIds.add("local");
+		if(gAdapter.m_overheardData.mThumbIds.size() == 0)
+			gAdapter.m_overheardData.AddLocalOverheard();
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -97,15 +97,19 @@ public class CreateOverHeardFragment extends Fragment {
 	public void AddOverheardText(int position,int width,int height)
 	{
 		m_fEachTextView = new EachOhTextView();
-		m_fEachTextView.setArguments(m_createFragment,position,gAdapter.mThumbIds.get(position),width,height);
+		m_fEachTextView.setArguments(m_createFragment,position,gAdapter.m_overheardData,width,height);
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction()
 				.add(R.id.frame_container, m_fEachTextView).addToBackStack( "frameview" ).commit();
 	}
 	public void ReturnText(String text1,String text2,int position)
 	{
+		Singleton.getInstance().m_bRowAddMenuItem = false;
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.popBackStack();
+		gAdapter.m_overheardData.AddTexts(text1,text2,position);
+		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
+	    gridView.setAdapter(gAdapter);
 	}
 	public void AddFromCamera()
 	{
@@ -120,10 +124,10 @@ public class CreateOverHeardFragment extends Fragment {
 	}
 	public void RefreshRows(int numRows)
 	{
-		gAdapter.mThumbIds.clear();
+		gAdapter.m_overheardData.Clear();
 		for(int i=0; i < numRows;i++)
 		{
-			gAdapter.mThumbIds.add("local");
+			gAdapter.m_overheardData.AddLocalOverheard();
 		}
 		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
@@ -169,9 +173,9 @@ public class CreateOverHeardFragment extends Fragment {
             {
             	selectedImageUri = Uri.parse(path);
             }
-            if(gAdapter.mThumbIds.get(selectedPosition) != null)
-    			gAdapter.mThumbIds.remove(selectedPosition);
-    		gAdapter.mThumbIds.add(selectedPosition,"uritheju"+selectedImageUri.toString());
+            if(gAdapter.m_overheardData.mThumbIds.get(selectedPosition) != null)
+    			gAdapter.m_overheardData.Remove(selectedPosition);
+    		gAdapter.m_overheardData.AddImage(selectedPosition,"uritheju"+selectedImageUri.toString());
 
         	FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction()
@@ -215,9 +219,9 @@ public class CreateOverHeardFragment extends Fragment {
 	     super.onResume();
 	  }
 	public void UpdateSkel(String id, String url) {
-		if(gAdapter.mThumbIds.get(selectedPosition) != null)
-			gAdapter.mThumbIds.remove(selectedPosition);
-		gAdapter.mThumbIds.add(selectedPosition,url);
+		if(gAdapter.m_overheardData.mThumbIds.get(selectedPosition) != null)
+			gAdapter.m_overheardData.Remove(selectedPosition);
+		gAdapter.m_overheardData.AddImage(selectedPosition,url);
 		Singleton.getInstance().m_bCameraMenuItem = true;
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
@@ -231,8 +235,8 @@ public class CreateOverHeardFragment extends Fragment {
         	gAdapter = new GridImageAdapter(getActivity());
         	gAdapter.AddArgument(m_createFragment);
         }
-		if(gAdapter.mThumbIds.size() == 0)
-			gAdapter.mThumbIds.add("local");
+		if(gAdapter.m_overheardData.mThumbIds.size() == 0)
+			gAdapter.m_overheardData.AddLocalOverheard();
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

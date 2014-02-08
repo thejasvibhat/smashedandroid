@@ -3,6 +3,7 @@ package com.example.smashed;
 import android.app.Fragment;
 import android.graphics.Typeface;
 
+import com.example.config.OverheardData;
 import com.example.smashedin.*;
 
 import android.net.Uri;
@@ -187,9 +188,9 @@ public class EachOhTextView extends Fragment {
 	  }
 	
 	public void setArguments(Fragment m_createFragment, int position,
-			String string,int width,int height) {
+			OverheardData m_overheardData,int width,int height) {
 		 m_cFragment = m_createFragment;
-		 m_strUrl = string;
+		 m_strUrl = m_overheardData.mThumbIds.get(position);
 		 m_iPosition = position;
 		oWidth = width;
 		oHeight = height;
