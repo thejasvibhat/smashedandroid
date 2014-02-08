@@ -3,6 +3,7 @@ package com.example.smashedin;
 
 
 import com.example.smashed.*;
+import com.example.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnHeadlineSelectedListener {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -163,6 +164,9 @@ public class MainActivity extends Activity {
 		MenuItem m_oSaveMenuItem = menu.findItem(R.id.saveoh);
 		if(Singleton.getInstance().m_bSaveMenuItem == true)
 			m_oSaveMenuItem.setVisible(false);
+		MenuItem m_oSearchMenuItem = menu.findItem(R.id.search);
+		if(Singleton.getInstance().m_bSearchMenuItem == true)
+			m_oSearchMenuItem.setVisible(false);
 		
 		return true;
 	}
@@ -202,7 +206,41 @@ public class MainActivity extends Activity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	@Override
+	public void onBackPressed() {
+		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
+		   if (fragment instanceof CreateOverHeardFragment) {
+		          
+				  Singleton.getInstance().m_bCameraMenuItem = true;
+				  Singleton.getInstance().m_bGalleryMenuItem = true;
+				  Singleton.getInstance().m_bRowAddMenuItem = false;
+				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  this.invalidateOptionsMenu();
 
+		   }
+		   if(fragment instanceof GridOverheardSkeletonFragment)
+		   {
+				  Singleton.getInstance().m_bCameraMenuItem = true;
+				  Singleton.getInstance().m_bGalleryMenuItem = true;
+				  Singleton.getInstance().m_bRowAddMenuItem = false;
+				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  this.invalidateOptionsMenu();
+			   
+		   }
+		   if(fragment instanceof EachOhTextView)
+		   {
+				  Singleton.getInstance().m_bCameraMenuItem = true;
+				  Singleton.getInstance().m_bGalleryMenuItem = true;
+				  Singleton.getInstance().m_bRowAddMenuItem = false;
+				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  this.invalidateOptionsMenu();
+			   
+		   }		   
+		   super.onBackPressed();
+		}
 	/**
 	 * Diplaying fragment view for selected nav drawer list item
 	 * */
@@ -212,6 +250,7 @@ public class MainActivity extends Activity {
 		Singleton.getInstance().m_bGalleryMenuItem = false;
 		Singleton.getInstance().m_bRowAddMenuItem = true;
 		Singleton.getInstance().m_bSaveMenuItem = true;
+		Singleton.getInstance().m_bSearchMenuItem = false;
 		Fragment fragment = null;
 		switch (position) {
 		case 0:
@@ -223,7 +262,6 @@ public class MainActivity extends Activity {
 		case 1:
 			Singleton.getInstance().m_bRowAddMenuItem = true;
 			Singleton.getInstance().m_bSaveMenuItem = true;
-
 			fragment = new Reviews();
 			Toast.makeText(getBaseContext(),
                     "Please wait, connecting to server.",
@@ -298,6 +336,7 @@ public class MainActivity extends Activity {
 			Singleton.getInstance().m_bGalleryMenuItem = true;
 			Singleton.getInstance().m_bRowAddMenuItem = false;
 			Singleton.getInstance().m_bSaveMenuItem = false;
+			Singleton.getInstance().m_bSearchMenuItem = true;
 			if(m_oCreateOverHeard == null)
 			{
 				fragment = new CreateOverHeardFragment();
@@ -324,7 +363,7 @@ public class MainActivity extends Activity {
 		if (fragment != null) {
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, fragment).commit();
+					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
 
 			// update selected item and title, then close the drawer
 			mDrawerList.setItemChecked(position, true);
@@ -336,7 +375,9 @@ public class MainActivity extends Activity {
 			Log.e("MainActivity", "Error in creating fragment");
 		}
 	}
-
+	public void onArticleSelected(String id,String url) {
+		((CreateOverHeardFragment) m_oCreateOverHeard).UpdateSkel(id,url);
+    }
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
@@ -412,5 +453,5 @@ public class MainActivity extends Activity {
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-
+	
 }

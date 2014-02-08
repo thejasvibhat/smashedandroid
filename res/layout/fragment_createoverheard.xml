@@ -17,63 +17,6 @@
 	 
 	</GridView>
 
-	<TextView
-	    android:id="@+id/textView2"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_marginBottom="10dp"
-	    android:layout_alignParentLeft="true"
-	    android:text="Bottom Text"
-	    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-	<EditText
-	    android:id="@+id/editText2"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_marginBottom="10dp"
-	    android:layout_alignParentRight="true"
-	    android:ems="10" />
-
-	<TextView
-	    android:id="@+id/textView1"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_above="@+id/textView2"
-	    android:layout_alignParentLeft="true"
-	    android:layout_marginBottom="10dp"
-	    android:text="Top Text"
-	    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-	<TextView
-	    android:id="@+id/textView3"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_above="@+id/textView1"
-	    android:layout_alignParentLeft="true"
-	    android:layout_marginBottom="10dp"
-	    android:text="Row Selected"
-	    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-	<Spinner
-	    android:id="@+id/spinner1"
-	    android:layout_width="100dp"
-	    android:background="@color/grey"
-	    android:layout_height="wrap_content"
-	    android:layout_marginBottom="30dp"
-	    android:layout_above="@+id/editText2"
-	    android:layout_alignParentRight="true" />
-
-	<EditText
-	    android:id="@+id/editText1"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignBottom="@+id/textView1"
-	    android:layout_alignParentRight="true"
-	    android:ems="10" >
-
-	    <requestFocus />
-	</EditText>
 
 </RelativeLayout>

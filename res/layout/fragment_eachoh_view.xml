@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"    
+    android:layout_height="match_parent">
+
+	    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+	>
+    
+    <FrameLayout
+        android:id="@+id/m_eachFrameView"
+        android:layout_width="fill_parent"
+        android:layout_height="400dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="bottom" >
+
+	<RelativeLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_margin="5dp"
+	    android:layout_alignParentBottom="true" 
+	    android:background="@color/grey"
+	    
+	    android:id="@+id/m_eachRelView" >
+
+	
+	</RelativeLayout>
+		<TextView
+		    android:id="@+id/textViewTop"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="15dp"
+		    android:layout_marginLeft="15dp"
+		    android:fontFamily="impact.eot"
+		    android:textSize="16pt" />
+
+		<TextView
+		    android:id="@+id/TextViewBottom"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="15dp"
+		    android:layout_marginLeft="15dp"
+		    android:textSize="16pt" />
+		
+		
+	
+    </FrameLayout>
+    	<TextView
+	    android:id="@+id/textView2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginTop="50dp"
+	    android:layout_alignParentLeft="true"
+	    android:text="Bottom Text"
+	    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	<EditText
+	    android:id="@+id/editText2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_gravity="top"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginTop="40dp"
+	    android:ems="10" />
+
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/textView2"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginTop="10dp"
+	    android:text="Top Text"
+	    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	<EditText
+	    android:id="@+id/editText1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginRight="0dp"
+	    android:ems="10" >
+
+	    <requestFocus />
+	</EditText>
+    
+    </FrameLayout>
+	
+</RelativeLayout>

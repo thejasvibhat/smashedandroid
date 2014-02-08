@@ -25,17 +25,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class CreateOverHeardFragment extends Fragment {
 	public Fragment m_createFragment;
 	private GridImageAdapter gAdapter = null;
+	private EachOhTextView m_fEachTextView;
 	public CreateOverHeardFragment(){
 		m_createFragment = this;
 	}
@@ -46,6 +48,7 @@ public class CreateOverHeardFragment extends Fragment {
 	private Fragment gridSkelView = null;
 	String path = "";
 	private Dialog dialog;
+
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -53,18 +56,22 @@ public class CreateOverHeardFragment extends Fragment {
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bSearchMenuItem = true;
 		getActivity().invalidateOptionsMenu();
         View rootView = inflater.inflate(R.layout.fragment_createoverheard, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
         if(gAdapter == null)
+        {
         	gAdapter = new GridImageAdapter(getActivity());
+        	gAdapter.AddArgument(m_createFragment);
+        }
 		if(gAdapter.mThumbIds.size() == 0)
 			gAdapter.mThumbIds.add("local");
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	selectedImage = (SmartImageView)(((RelativeLayout)v).getChildAt(0));
+	        	selectedImage = (SmartImageView)((RelativeLayout)((FrameLayout)v).getChildAt(0)).getChildAt(0);
 	        	selectedPosition = position;
 	        	if(gridSkelView == null)
 	        	{
@@ -75,52 +82,30 @@ public class CreateOverHeardFragment extends Fragment {
 				Singleton.getInstance().m_bGalleryMenuItem = false;
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
+				Singleton.getInstance().m_bSearchMenuItem = false;
 				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
-						.replace(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
+						.add(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
 				
             
 	        }
 	    });
 	    
-	    SetSpinner(rootView);
         return rootView;
     }
-	private void SetSpinner(View view)
+	public void AddOverheardText(int position,int width,int height)
 	{
-		String[] data = new String[gAdapter.mThumbIds.size()];
-		for(int i = 0; i < gAdapter.mThumbIds.size();i++)
-		{
-			data[i] = String.valueOf(i + 1);
-		}
-		 
-		Spinner spinner = (Spinner) view.findViewById(R.id.spinner1);
-		
-       // adapter.setDropDownViewResource(android.R.layout.simple_selectable_list_item);
-        
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),android.R.layout.simple_spinner_item, data) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                TextView textView = (TextView) super.getView(position, convertView, parent);
-                textView.setTextColor(0xff00ff00);
-
-                return textView;
-            }
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                TextView textView = (TextView) super.getView(position, convertView, parent);
-                textView.setTextColor(0xff00ff00);
-
-                return textView;
-            }
-
-            
-        };
-
-        adapter.setDropDownViewResource(android.R.layout.simple_list_item_multiple_choice);
-        spinner.setAdapter(adapter);
-
+		m_fEachTextView = new EachOhTextView();
+		m_fEachTextView.setArguments(m_createFragment,position,gAdapter.mThumbIds.get(position),width,height);
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction()
+				.add(R.id.frame_container, m_fEachTextView).addToBackStack( "frameview" ).commit();
+	}
+	public void ReturnText(String text1,String text2,int position)
+	{
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.popBackStack();
 	}
 	public void AddFromCamera()
 	{
@@ -143,7 +128,6 @@ public class CreateOverHeardFragment extends Fragment {
 		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
 	    gridView.setAdapter(gAdapter);
-	    SetSpinner(getView());
 	}
 	public void AddRowDialog()
 	{
@@ -220,10 +204,57 @@ public class CreateOverHeardFragment extends Fragment {
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
+    @Override
+	public void onResume() {
+		  Singleton.getInstance().m_bCameraMenuItem = true;
+		  Singleton.getInstance().m_bGalleryMenuItem = true;
+		  Singleton.getInstance().m_bRowAddMenuItem = false;
+		  Singleton.getInstance().m_bSaveMenuItem = false;
+		  Singleton.getInstance().m_bSearchMenuItem = true;
+		  getActivity().invalidateOptionsMenu();
+	     super.onResume();
+	  }
 	public void UpdateSkel(String id, String url) {
 		if(gAdapter.mThumbIds.get(selectedPosition) != null)
 			gAdapter.mThumbIds.remove(selectedPosition);
 		gAdapter.mThumbIds.add(selectedPosition,url);
-		
+		Singleton.getInstance().m_bCameraMenuItem = true;
+		Singleton.getInstance().m_bGalleryMenuItem = true;
+		Singleton.getInstance().m_bRowAddMenuItem = false;
+		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bSearchMenuItem = true;
+		getActivity().invalidateOptionsMenu();
+        GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
+        // Instance of ImageAdapter Class
+        if(gAdapter == null)
+        {
+        	gAdapter = new GridImageAdapter(getActivity());
+        	gAdapter.AddArgument(m_createFragment);
+        }
+		if(gAdapter.mThumbIds.size() == 0)
+			gAdapter.mThumbIds.add("local");
+	    gridView.setAdapter(gAdapter);
+	    gridView.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	        	selectedImage = (SmartImageView)((RelativeLayout)((FrameLayout)v).getChildAt(0)).getChildAt(0);
+	        	selectedPosition = position;
+	        	if(gridSkelView == null)
+	        	{
+	        		gridSkelView = new GridOverheardSkeletonFragment();	    
+	        		((GridOverheardSkeletonFragment) gridSkelView).AddArgument(m_createFragment);
+	        	}
+	        	Singleton.getInstance().m_bCameraMenuItem = false;
+				Singleton.getInstance().m_bGalleryMenuItem = false;
+				Singleton.getInstance().m_bRowAddMenuItem = true;
+				Singleton.getInstance().m_bSaveMenuItem = true;
+				getActivity().invalidateOptionsMenu();
+	        	FragmentManager fragmentManager = getFragmentManager();
+				fragmentManager.beginTransaction()
+						.add(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
+				
+            
+	        }
+	    });
+	   
 	}
 }

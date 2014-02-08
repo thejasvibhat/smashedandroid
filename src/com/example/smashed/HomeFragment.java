@@ -19,4 +19,14 @@ public class HomeFragment extends Fragment {
          
         return rootView;
     }
+
+	  @Override
+	  public void onResume() {
+		  Singleton.getInstance().m_bCameraMenuItem = false;
+		  Singleton.getInstance().m_bGalleryMenuItem = false;
+		  Singleton.getInstance().m_bRowAddMenuItem = true;
+		  Singleton.getInstance().m_bSaveMenuItem = true;
+		  getActivity().invalidateOptionsMenu();
+	     super.onResume();
+	  }
 }
