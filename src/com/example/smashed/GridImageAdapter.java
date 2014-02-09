@@ -101,7 +101,7 @@ public class GridImageAdapter extends BaseAdapter {
         //imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
         oRelLayout.addView(imageView);
         ImageView imageView2 = new ImageView(mContext);
-        imageView2.setImageResource(R.drawable.edit);
+        imageView2.setImageResource(R.drawable.ic_edit1);
         imageView2.setTag(new Integer(position));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,Gravity.RIGHT | Gravity.TOP);
         imageView2.setLayoutParams(params);
