@@ -1,4 +1,5 @@
 package com.example.smashed;
+import com.example.config.OverheardData;
 import com.example.smashed.NumberPicker.OnChangedListener;
 import com.example.smashedin.*;
 
@@ -20,6 +21,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -56,7 +60,9 @@ public class CreateOverHeardFragment extends Fragment {
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
+		Singleton.getInstance().m_bSearchOverheardSkel = true;
 		getActivity().invalidateOptionsMenu();
         View rootView = inflater.inflate(R.layout.fragment_createoverheard, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.grid_view);
@@ -82,7 +88,9 @@ public class CreateOverHeardFragment extends Fragment {
 				Singleton.getInstance().m_bGalleryMenuItem = false;
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
-				Singleton.getInstance().m_bSearchMenuItem = false;
+				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
+				Singleton.getInstance().m_bSearchMenuItem = true;
+				Singleton.getInstance().m_bSearchOverheardSkel = false;
 				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
@@ -91,9 +99,17 @@ public class CreateOverHeardFragment extends Fragment {
             
 	        }
 	    });
-	    
+	    setHasOptionsMenu(true);
         return rootView;
     }
+	@Override
+	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+	@Override 
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return super.onOptionsItemSelected(item);
+	}
 	public void AddOverheardText(int position,int width,int height)
 	{
 		m_fEachTextView = new EachOhTextView();
@@ -111,16 +127,10 @@ public class CreateOverHeardFragment extends Fragment {
 		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
 	    gridView.setAdapter(gAdapter);
 	}
-	public void AddFromCamera()
+	private void UploadOh()
 	{
-		takePhoto();
-	}
-	public void AddFromGallery()
-	{
-		Intent intent = new Intent();
-		intent.setType("image/*");
-		intent.setAction(Intent.ACTION_GET_CONTENT);
-      	startActivityForResult(Intent.createChooser(intent,"Select Picture"), SELECT_PICTURE);
+		OverheardData oData = OverheardData.getInstance();
+		
 	}
 	public void RefreshRows(int numRows)
 	{
@@ -159,62 +169,15 @@ public class CreateOverHeardFragment extends Fragment {
 		dialog.show();
 		
 	}
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == -1) {
-        	Uri selectedImageUri;
-            if (requestCode == SELECT_PICTURE) {
-	        	FragmentManager fragmentManager = getFragmentManager();
-				fragmentManager.beginTransaction()
-						.replace(R.id.frame_container, m_createFragment).commit();
-				selectedImageUri = data.getData();
-            }
-            else
-            {
-            	selectedImageUri = Uri.parse(path);
-            }
-            if(gAdapter.m_overheardData.mThumbIds.get(selectedPosition) != null)
-    			gAdapter.m_overheardData.Remove(selectedPosition);
-    		gAdapter.m_overheardData.AddImage(selectedPosition,"uritheju"+selectedImageUri.toString());
-
-        	FragmentManager fragmentManager = getFragmentManager();
-			fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, m_createFragment).commit();
-
-        }
-    }
-	 public void takePhoto()
-    {
-         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-         File folder = new File(Environment.getExternalStorageDirectory() + "/LoadImg");
-
-         if(!folder.exists())
-         {
-             folder.mkdir();
-         }        
-         final Calendar c = Calendar.getInstance();
-         String new_Date= c.get(Calendar.DAY_OF_MONTH)+"-"+((c.get(Calendar.MONTH))+1)   +"-"+c.get(Calendar.YEAR) +" " + c.get(Calendar.HOUR) + "-" + c.get(Calendar.MINUTE)+ "-"+ c.get(Calendar.SECOND);
-         path=String.format(Environment.getExternalStorageDirectory() +"/LoadImg/%s.png","LoadImg("+new_Date+")");
-         File photo = new File(path);
-         intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photo));
-         startActivityForResult(intent, 2);
-    }
-	    
-    public String getPath(Uri uri) {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getActivity().getContentResolver().query(uri, filePathColumn, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
     @Override
 	public void onResume() {
 		  Singleton.getInstance().m_bCameraMenuItem = true;
 		  Singleton.getInstance().m_bGalleryMenuItem = true;
 		  Singleton.getInstance().m_bRowAddMenuItem = false;
 		  Singleton.getInstance().m_bSaveMenuItem = false;
+		  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		  Singleton.getInstance().m_bSearchMenuItem = true;
+		  Singleton.getInstance().m_bSearchOverheardSkel = true;
 		  getActivity().invalidateOptionsMenu();
 	     super.onResume();
 	  }
@@ -226,7 +189,9 @@ public class CreateOverHeardFragment extends Fragment {
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
+		Singleton.getInstance().m_bSearchOverheardSkel = true;
 		getActivity().invalidateOptionsMenu();
         GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
@@ -251,6 +216,7 @@ public class CreateOverHeardFragment extends Fragment {
 				Singleton.getInstance().m_bGalleryMenuItem = false;
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
+				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()

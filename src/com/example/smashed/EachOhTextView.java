@@ -171,7 +171,7 @@ public class EachOhTextView extends Fragment {
 	@Override 
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-	    case R.id.saveoh:
+	    case R.id.saveohtext:
 	    	((CreateOverHeardFragment) m_cFragment).ReturnText(oTextTop.getText().toString(),oTextBottom.getText().toString(),m_iPosition);
 	    	break;
 	    }
@@ -182,7 +182,8 @@ public class EachOhTextView extends Fragment {
 		  Singleton.getInstance().m_bCameraMenuItem = true;
 		  Singleton.getInstance().m_bGalleryMenuItem = true;
 		  Singleton.getInstance().m_bRowAddMenuItem = true;
-		  Singleton.getInstance().m_bSaveMenuItem = false;
+		  Singleton.getInstance().m_bSaveMenuItem = true;
+		  Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 		  getActivity().invalidateOptionsMenu();
 	     super.onResume();
 	  }

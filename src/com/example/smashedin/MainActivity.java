@@ -164,9 +164,15 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		MenuItem m_oSaveMenuItem = menu.findItem(R.id.saveoh);
 		if(Singleton.getInstance().m_bSaveMenuItem == true)
 			m_oSaveMenuItem.setVisible(false);
+		MenuItem m_oSaveOhTextMenuItem = menu.findItem(R.id.saveohtext);
+		if(Singleton.getInstance().m_bSaveOhTextMenuItem == true)
+			m_oSaveOhTextMenuItem.setVisible(false);		
 		MenuItem m_oSearchMenuItem = menu.findItem(R.id.search);
 		if(Singleton.getInstance().m_bSearchMenuItem == true)
 			m_oSearchMenuItem.setVisible(false);
+		MenuItem m_oSearchOhSkelMenuItem = menu.findItem(R.id.searchoverskel);
+		if(Singleton.getInstance().m_bSearchOverheardSkel == true)
+			m_oSearchOhSkelMenuItem.setVisible(false);
 		
 		return true;
 	}
@@ -183,12 +189,6 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			return true;
 		case R.id.rowadd:
 			((CreateOverHeardFragment) m_oCreateOverHeard).AddRowDialog();
-			return true;
-		case R.id.gallery:
-			((CreateOverHeardFragment) m_oCreateOverHeard).AddFromGallery();
-			return true;
-		case R.id.camera:
-			((CreateOverHeardFragment) m_oCreateOverHeard).AddFromCamera();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -215,7 +215,9 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
 
 		   }
@@ -225,7 +227,9 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
 			   
 		   }
@@ -235,7 +239,9 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
+				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
 			   
 		   }		   
@@ -250,6 +256,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		Singleton.getInstance().m_bGalleryMenuItem = false;
 		Singleton.getInstance().m_bRowAddMenuItem = true;
 		Singleton.getInstance().m_bSaveMenuItem = true;
+		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = false;
 		Fragment fragment = null;
 		switch (position) {
@@ -262,6 +269,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		case 1:
 			Singleton.getInstance().m_bRowAddMenuItem = true;
 			Singleton.getInstance().m_bSaveMenuItem = true;
+			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 			fragment = new Reviews();
 			Toast.makeText(getBaseContext(),
                     "Please wait, connecting to server.",
@@ -336,6 +344,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			Singleton.getInstance().m_bGalleryMenuItem = true;
 			Singleton.getInstance().m_bRowAddMenuItem = false;
 			Singleton.getInstance().m_bSaveMenuItem = false;
+			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 			Singleton.getInstance().m_bSearchMenuItem = true;
 			if(m_oCreateOverHeard == null)
 			{

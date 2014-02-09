@@ -48,7 +48,7 @@ public class GridImageSkelAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
     	RelativeLayout oRelLayout = new RelativeLayout(mContext);
-    	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,120),(int)dipToPixels(mContext,120)));
+    	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,110),(int)dipToPixels(mContext,110)));
     	oRelLayout.setBackgroundColor(0xffcccccc);
     	oRelLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
         CSmartImageView imageView = new CSmartImageView(mContext);

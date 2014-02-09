@@ -17,10 +17,20 @@
           android:icon="@drawable/search"
           android:showAsAction="collapseActionView|ifRoom"
           android:actionViewClass="android.widget.SearchView" />
+    <item android:id="@+id/searchoverskel"
+          android:icon="@drawable/search"
+          android:showAsAction="collapseActionView|ifRoom"
+          android:actionViewClass="android.widget.SearchView" />
+    
    <item android:id="@+id/rowadd"
           android:icon="@drawable/add"
           android:showAsAction="collapseActionView|ifRoom"
          />
+    <item android:id="@+id/saveohtext"
+          android:icon="@drawable/upload"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+   
     <item android:id="@+id/saveoh"
           android:icon="@drawable/upload"
           android:showAsAction="collapseActionView|ifRoom"

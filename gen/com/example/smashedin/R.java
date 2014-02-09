@@ -108,9 +108,11 @@ public final class R {
         public static final int m_oRevIcon=0x7f0a0016;
         public static final int m_oRevTitle=0x7f0a0017;
         public static final int m_oReviewsList=0x7f0a0011;
-        public static final int rowadd=0x7f0a001d;
-        public static final int saveoh=0x7f0a001e;
+        public static final int rowadd=0x7f0a001e;
+        public static final int saveoh=0x7f0a0020;
+        public static final int saveohtext=0x7f0a001f;
         public static final int search=0x7f0a001c;
+        public static final int searchoverskel=0x7f0a001d;
         public static final int textView1=0x7f0a000f;
         public static final int textView2=0x7f0a000d;
         public static final int textViewTop=0x7f0a000b;
