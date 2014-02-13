@@ -1,7 +1,8 @@
 package com.example.smashedin;
 
-
-
+import com.example.async.SmashedAsyncClient;
+import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.smashed.*;
 import com.example.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
@@ -25,6 +26,7 @@ import android.os.Message;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -39,7 +41,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnHeadlineSelectedListener {
+public class MainActivity extends Activity implements OnHeadlineSelectedListener,OnResponseListener {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -63,10 +65,12 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 	
 	
 	private Fragment m_oCreateOverHeard;
+	private String m_oType = "init";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		m_oMainACtivity = this;
 		super.onCreate(savedInstanceState);
+		Singleton.getInstance().SetApplicationContext(getApplicationContext());
 		setContentView(R.layout.activity_main);
 		mTitle = mDrawerTitle = getTitle();
 
@@ -187,9 +191,6 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		switch (item.getItemId()) {
 		case R.id.action_settings:
 			return true;
-		case R.id.rowadd:
-			((CreateOverHeardFragment) m_oCreateOverHeard).AddRowDialog();
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -247,6 +248,56 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		   }		   
 		   super.onBackPressed();
 		}
+	private void Login(String type)
+	{
+		m_oType = type;
+		String accessToken = Singleton.getInstance().getAccessToken(); 
+		if(accessToken == "NOT_FOUND")
+		{
+            Intent intent = new Intent(m_oMainACtivity, HelloFacebookSampleActivity.class);
+            startActivity(intent);
+            return;
+		}
+		else
+		{
+        	String url = "http://www.smashed.in/auth/post/facebook?access_token="+accessToken;
+        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        	oAsyncClient.Attach(this);
+        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        	oAsyncClient.MakeCall(url);        	
+		}
+	}
+	private void ShowCreateOverheard()
+	{
+		Singleton.getInstance().loggedIn = true;
+		Fragment fragment = null;
+		Singleton.getInstance().m_bCameraMenuItem = true;
+		Singleton.getInstance().m_bGalleryMenuItem = true;
+		Singleton.getInstance().m_bRowAddMenuItem = false;
+		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
+		Singleton.getInstance().m_bSearchMenuItem = true;
+		if(m_oCreateOverHeard == null)
+		{
+			fragment = new CreateOverHeardFragment();
+			m_oCreateOverHeard = fragment;
+		}
+		else
+		{
+			fragment = m_oCreateOverHeard;
+		}
+		if (fragment != null) {
+			FragmentManager fragmentManager = getFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
+
+		} else {
+			// error in creating fragment
+			Log.e("MainActivity", "Error in creating fragment");
+		}
+
+
+	}
 	/**
 	 * Diplaying fragment view for selected nav drawer list item
 	 * */
@@ -340,24 +391,21 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			fragment = new OverHeardFragment();
 			break;
 		case 3:
-			Singleton.getInstance().m_bCameraMenuItem = true;
-			Singleton.getInstance().m_bGalleryMenuItem = true;
-			Singleton.getInstance().m_bRowAddMenuItem = false;
-			Singleton.getInstance().m_bSaveMenuItem = false;
-			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-			Singleton.getInstance().m_bSearchMenuItem = true;
-			if(m_oCreateOverHeard == null)
+			if(Singleton.getInstance().loggedIn != true)
 			{
-				fragment = new CreateOverHeardFragment();
-				m_oCreateOverHeard = fragment;
-			}
+				Login("create");
+			}		
 			else
 			{
-				fragment = m_oCreateOverHeard;
+				ShowCreateOverheard();
 			}
-			
-			
-			break;
+			// update selected item and title, then close the drawer
+			mDrawerList.setItemChecked(position, true);
+			mDrawerList.setSelection(position);
+			setTitle(navMenuTitles[position]);
+			mDrawerLayout.closeDrawer(mDrawerList);
+			return;
+
 		case 4:
 		//	fragment = new PagesFragment();
 			break;
@@ -461,6 +509,24 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
+	}
+	@Override
+    protected void onResume() {
+        super.onResume();
+  	  if(m_oType == "create") {
+	    	ShowCreateOverheard();
+	    } 
+
+    }
+
+	@Override
+	public void OnResponse(String response) {
+		Singleton.getInstance().loggedIn = true;
+		if(m_oType == "create")
+		{
+			ShowCreateOverheard();
+		}
+		
 	}
 	
 }

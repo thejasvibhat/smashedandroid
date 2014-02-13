@@ -37,6 +37,9 @@
 		    android:layout_marginTop="15dp"
 		    android:layout_marginLeft="15dp"
 		    android:fontFamily="impact.eot"
+		    android:textColor="#FFFFFF"
+		    android:gravity="center_horizontal"
+		    android:layout_gravity="center_horizontal"
 		    android:textSize="16pt" />
 
 		<TextView
@@ -45,6 +48,9 @@
 		    android:layout_height="wrap_content"
 		    android:layout_marginTop="15dp"
 		    android:layout_marginLeft="15dp"
+		    android:gravity="center_horizontal"
+		    android:layout_gravity="center_horizontal"
+		    android:textColor="#FFFFFF"
 		    android:textSize="16pt" />
 		
 		

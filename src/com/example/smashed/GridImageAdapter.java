@@ -89,7 +89,7 @@ public class GridImageAdapter extends BaseAdapter {
         	imageView.setImageURI(Uri.parse(arrUrl[1]));
         }
         else if(m_overheardData.mThumbIds.get(position) == "local")
-        	imageView.setImageResource(R.drawable.ic_home);
+        	imageView.setImageResource(R.drawable.addpicstooh);
         else
         {
         	imageView.LoadScaleView(imageView,oWidth);
@@ -104,6 +104,7 @@ public class GridImageAdapter extends BaseAdapter {
         imageView2.setImageResource(R.drawable.ic_edit1);
         imageView2.setTag(new Integer(position));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,Gravity.RIGHT | Gravity.TOP);
+        params.rightMargin = (int) Singleton.getInstance().dipToPixels(mContext, 10);	
         imageView2.setLayoutParams(params);
         imageView2.setOnClickListener(new OnClickListener() {
 			
@@ -115,6 +116,8 @@ public class GridImageAdapter extends BaseAdapter {
 		});
         
         TextView oTopText = new TextView(mContext);
+        oTopText.setGravity(Gravity.CENTER_HORIZONTAL);
+        oTopText.setTextColor(0xffffffff);
         oTopText.setTextSize(36);
         oTopText.setText(m_overheardData.mTopTexts.get(position));
         oFrameLayout.addView(oTopText);
@@ -124,7 +127,9 @@ public class GridImageAdapter extends BaseAdapter {
         oTopText.setLayoutParams(paramsText);
         
         TextView oBottomText = new TextView(mContext);
+        oBottomText.setGravity(Gravity.CENTER_HORIZONTAL);
         oBottomText.setTextSize(36);
+        oBottomText.setTextColor(0xffffffff);
         oBottomText.setText(m_overheardData.mBottomTexts.get(position));
         oFrameLayout.addView(oBottomText);
         android.widget.FrameLayout.LayoutParams paramsText1 = (android.widget.FrameLayout.LayoutParams) oBottomText.getLayoutParams();

@@ -2,6 +2,8 @@ package com.example.config;
 
 import java.util.ArrayList;
 
+import com.example.async.SmashedAsyncClient;
+
 
 public class OverheardData {
     private static OverheardData mInstance = null;
@@ -9,7 +11,7 @@ public class OverheardData {
     public  ArrayList<String> mThumbIds = new ArrayList<String>();
     public  ArrayList<String> mTopTexts = new ArrayList<String>();
     public  ArrayList<String> mBottomTexts = new ArrayList<String>();
-
+    public  ArrayList<String> mResIds = new ArrayList<String>();
     private OverheardData(){
         
     }
@@ -40,6 +42,10 @@ public class OverheardData {
     	mBottomTexts.add("");
 
     }
+    public void AddImageId(int position,String id)
+    {
+    	mResIds.add(position, id);
+    }    
     public void AddTexts(String top,String bottom,int position)
     {
     	mTopTexts.add(position, top);

@@ -26,6 +26,7 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -77,6 +78,7 @@ public class EachOhTextView extends Fragment {
         paramsTv.topMargin = (int) (oHeight - Singleton.getInstance().dipToPixels(getActivity(), 80));
         oTextBottom.setLayoutParams(paramsTv);
         EditText topOne = (EditText) rootView.findViewById(R.id.editText1);
+        topOne.setFocusable(true);
         EditText bottomOne = (EditText) rootView.findViewById(R.id.editText2);
         topOne.addTextChangedListener(new TextWatcher() {
 			
@@ -162,6 +164,8 @@ public class EachOhTextView extends Fragment {
 			}
 		});
         setHasOptionsMenu(true);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 		return rootView;
     }
 	@Override
