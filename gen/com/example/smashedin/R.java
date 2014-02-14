@@ -175,6 +175,7 @@ containing a value of this type.
         public static final int list_background_pressed=0x7f060009;
         public static final int list_divider=0x7f06000a;
         public static final int list_item_title=0x7f060007;
+        public static final int orange=0x7f060011;
         public static final int red=0x7f06000d;
         public static final int white=0x7f06000f;
     }
@@ -223,7 +224,7 @@ containing a value of this type.
         public static final int com_facebook_list_section_header_background=0x7f020012;
         public static final int com_facebook_loginbutton_silver=0x7f020013;
         public static final int com_facebook_logo=0x7f020014;
-        public static final int com_facebook_picker_default_separator_color=0x7f020056;
+        public static final int com_facebook_picker_default_separator_color=0x7f020059;
         public static final int com_facebook_picker_item_background=0x7f020015;
         public static final int com_facebook_picker_list_focused=0x7f020016;
         public static final int com_facebook_picker_list_longpressed=0x7f020017;
@@ -252,43 +253,46 @@ containing a value of this type.
         public static final int ic_drawer=0x7f02002e;
         public static final int ic_edit=0x7f02002f;
         public static final int ic_edit1=0x7f020030;
-        public static final int ic_home=0x7f020031;
-        public static final int ic_launcher=0x7f020032;
-        public static final int ic_pages=0x7f020033;
-        public static final int ic_people=0x7f020034;
-        public static final int ic_photos=0x7f020035;
-        public static final int ic_rowadd=0x7f020036;
-        public static final int ic_save=0x7f020037;
-        public static final int ic_search=0x7f020038;
-        public static final int ic_upload=0x7f020039;
-        public static final int ic_whats_hot=0x7f02003a;
-        public static final int list_item_bg_normal=0x7f02003b;
-        public static final int list_item_bg_pressed=0x7f02003c;
-        public static final int list_selector=0x7f02003d;
-        public static final int recordoh=0x7f02003e;
-        public static final int reviews=0x7f02003f;
-        public static final int rowadd=0x7f020040;
-        public static final int saveoh=0x7f020041;
-        public static final int search=0x7f020042;
-        public static final int slogosmall=0x7f020043;
-        public static final int timepicker_down_btn=0x7f020044;
-        public static final int timepicker_down_disabled=0x7f020045;
-        public static final int timepicker_down_disabled_focused=0x7f020046;
-        public static final int timepicker_down_normal=0x7f020047;
-        public static final int timepicker_down_pressed=0x7f020048;
-        public static final int timepicker_down_selected=0x7f020049;
-        public static final int timepicker_input=0x7f02004a;
-        public static final int timepicker_input_disabled=0x7f02004b;
-        public static final int timepicker_input_normal=0x7f02004c;
-        public static final int timepicker_input_pressed=0x7f02004d;
-        public static final int timepicker_input_selected=0x7f02004e;
-        public static final int timepicker_up_btn=0x7f02004f;
-        public static final int timepicker_up_disabled=0x7f020050;
-        public static final int timepicker_up_disabled_focused=0x7f020051;
-        public static final int timepicker_up_normal=0x7f020052;
-        public static final int timepicker_up_pressed=0x7f020053;
-        public static final int timepicker_up_selected=0x7f020054;
-        public static final int upload=0x7f020055;
+        public static final int ic_gallery=0x7f020031;
+        public static final int ic_home=0x7f020032;
+        public static final int ic_launcher=0x7f020033;
+        public static final int ic_pages=0x7f020034;
+        public static final int ic_people=0x7f020035;
+        public static final int ic_photos=0x7f020036;
+        public static final int ic_rowadd=0x7f020037;
+        public static final int ic_save=0x7f020038;
+        public static final int ic_search=0x7f020039;
+        public static final int ic_share=0x7f02003a;
+        public static final int ic_upload=0x7f02003b;
+        public static final int ic_whats_hot=0x7f02003c;
+        public static final int list_item_bg_normal=0x7f02003d;
+        public static final int list_item_bg_pressed=0x7f02003e;
+        public static final int list_selector=0x7f02003f;
+        public static final int recordoh=0x7f020040;
+        public static final int reviews=0x7f020041;
+        public static final int rowadd=0x7f020042;
+        public static final int saveoh=0x7f020043;
+        public static final int search=0x7f020044;
+        public static final int slogo=0x7f020045;
+        public static final int slogosmall=0x7f020046;
+        public static final int timepicker_down_btn=0x7f020047;
+        public static final int timepicker_down_disabled=0x7f020048;
+        public static final int timepicker_down_disabled_focused=0x7f020049;
+        public static final int timepicker_down_normal=0x7f02004a;
+        public static final int timepicker_down_pressed=0x7f02004b;
+        public static final int timepicker_down_selected=0x7f02004c;
+        public static final int timepicker_input=0x7f02004d;
+        public static final int timepicker_input_disabled=0x7f02004e;
+        public static final int timepicker_input_normal=0x7f02004f;
+        public static final int timepicker_input_pressed=0x7f020050;
+        public static final int timepicker_input_selected=0x7f020051;
+        public static final int timepicker_up_btn=0x7f020052;
+        public static final int timepicker_up_disabled=0x7f020053;
+        public static final int timepicker_up_disabled_focused=0x7f020054;
+        public static final int timepicker_up_normal=0x7f020055;
+        public static final int timepicker_up_pressed=0x7f020056;
+        public static final int timepicker_up_selected=0x7f020057;
+        public static final int upload=0x7f020058;
     }
     public static final class id {
         public static final int TextViewBottom=0x7f040027;
@@ -347,6 +351,7 @@ containing a value of this type.
         public static final int saveohtext=0x7f04003e;
         public static final int search=0x7f04003b;
         public static final int searchoverskel=0x7f04003c;
+        public static final int shareoh=0x7f040040;
         public static final int small=0x7f040000;
         public static final int textView1=0x7f04002a;
         public static final int textView2=0x7f040028;
@@ -357,39 +362,42 @@ containing a value of this type.
         public static final int txtLabel=0x7f040022;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int com_facebook_friendpickerfragment=0x7f030001;
-        public static final int com_facebook_login_activity_layout=0x7f030002;
-        public static final int com_facebook_picker_activity_circle_row=0x7f030003;
-        public static final int com_facebook_picker_checkbox=0x7f030004;
-        public static final int com_facebook_picker_image=0x7f030005;
-        public static final int com_facebook_picker_list_row=0x7f030006;
-        public static final int com_facebook_picker_list_section_header=0x7f030007;
-        public static final int com_facebook_picker_search_box=0x7f030008;
-        public static final int com_facebook_picker_title_bar=0x7f030009;
-        public static final int com_facebook_picker_title_bar_stub=0x7f03000a;
-        public static final int com_facebook_placepickerfragment=0x7f03000b;
-        public static final int com_facebook_placepickerfragment_list_row=0x7f03000c;
-        public static final int com_facebook_search_bar_layout=0x7f03000d;
-        public static final int com_facebook_usersettingsfragment=0x7f03000e;
-        public static final int custom_fragment_activity=0x7f03000f;
-        public static final int drawer_list_item=0x7f030010;
-        public static final int fragment=0x7f030011;
-        public static final int fragment_bar_view=0x7f030012;
-        public static final int fragment_community=0x7f030013;
-        public static final int fragment_createoverheard=0x7f030014;
-        public static final int fragment_eachoh_view=0x7f030015;
-        public static final int fragment_home=0x7f030016;
-        public static final int fragment_overheard=0x7f030017;
-        public static final int fragment_pages=0x7f030018;
-        public static final int fragment_photos=0x7f030019;
-        public static final int fragment_reviews=0x7f03001a;
-        public static final int fragment_skelview=0x7f03001b;
-        public static final int fragment_whats_hot=0x7f03001c;
-        public static final int main=0x7f03001d;
-        public static final int number_picker=0x7f03001e;
-        public static final int reviews_list_item=0x7f03001f;
-        public static final int row_spinner_item=0x7f030020;
+        public static final int actionbar_indefinite_progress=0x7f030000;
+        public static final int actionbar_share=0x7f030001;
+        public static final int activity_main=0x7f030002;
+        public static final int com_facebook_friendpickerfragment=0x7f030003;
+        public static final int com_facebook_login_activity_layout=0x7f030004;
+        public static final int com_facebook_picker_activity_circle_row=0x7f030005;
+        public static final int com_facebook_picker_checkbox=0x7f030006;
+        public static final int com_facebook_picker_image=0x7f030007;
+        public static final int com_facebook_picker_list_row=0x7f030008;
+        public static final int com_facebook_picker_list_section_header=0x7f030009;
+        public static final int com_facebook_picker_search_box=0x7f03000a;
+        public static final int com_facebook_picker_title_bar=0x7f03000b;
+        public static final int com_facebook_picker_title_bar_stub=0x7f03000c;
+        public static final int com_facebook_placepickerfragment=0x7f03000d;
+        public static final int com_facebook_placepickerfragment_list_row=0x7f03000e;
+        public static final int com_facebook_search_bar_layout=0x7f03000f;
+        public static final int com_facebook_usersettingsfragment=0x7f030010;
+        public static final int custom_fragment_activity=0x7f030011;
+        public static final int custom_tab=0x7f030012;
+        public static final int drawer_list_item=0x7f030013;
+        public static final int fragment=0x7f030014;
+        public static final int fragment_bar_view=0x7f030015;
+        public static final int fragment_community=0x7f030016;
+        public static final int fragment_createoverheard=0x7f030017;
+        public static final int fragment_eachoh_view=0x7f030018;
+        public static final int fragment_home=0x7f030019;
+        public static final int fragment_overheard=0x7f03001a;
+        public static final int fragment_pages=0x7f03001b;
+        public static final int fragment_photos=0x7f03001c;
+        public static final int fragment_reviews=0x7f03001d;
+        public static final int fragment_skelview=0x7f03001e;
+        public static final int fragment_whats_hot=0x7f03001f;
+        public static final int main=0x7f030020;
+        public static final int number_picker=0x7f030021;
+        public static final int reviews_list_item=0x7f030022;
+        public static final int row_spinner_item=0x7f030023;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;
@@ -451,11 +459,6 @@ containing a value of this type.
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     
 
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        
-
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     
@@ -469,15 +472,13 @@ containing a value of this type.
          */
         public static final int AppBaseTheme=0x7f080002;
         /**  Application theme. 
- All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f080003;
-        /**  the theme applied to the application or activity 
-         */
-        public static final int CustomActionBarTheme=0x7f080004;
-        /**  ActionBar styles 
-         */
         public static final int MyActionBar=0x7f080005;
+        public static final int MyActionBarTab=0x7f080006;
+        /**  ActionBar title text 
+         */
+        public static final int MyActionBarTitleText=0x7f080004;
         public static final int com_facebook_loginview_default_style=0x7f080000;
         public static final int com_facebook_loginview_silver_style=0x7f080001;
     }

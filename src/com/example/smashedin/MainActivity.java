@@ -23,9 +23,14 @@ import org.w3c.dom.NodeList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentManager.BackStackEntry;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -138,7 +143,67 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			// on first time display view for first nav item
 			displayView(0);
 		}
+		final ActionBar actionBar = this.getActionBar();
+	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+	    // for each of the sections in the app, add a tab to the action bar.
+	    actionBar.addTab(actionBar.newTab().setText("Gallery")
+	    		.setTabListener(new TabListener() {
+					
+					@Override
+					public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void onTabSelected(Tab tab, FragmentTransaction ft) {
+						// TODO Auto-generated method stub
+						String x = "";
+						if(getFragmentManager().getBackStackEntryCount() > 1)
+						{
+						BackStackEntry i = getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1);
+						
+						Fragment curFragment = getFragmentManager().findFragmentByTag("skel");
+						if(curFragment instanceof GridOverheardSkeletonFragment)
+						{
+							((GridOverheardSkeletonFragment)curFragment).UpdateTab("Gallery");
+						}
+						}
+						
+					}
+					
+					@Override
+					public void onTabReselected(Tab tab, FragmentTransaction ft) {
+						// TODO Auto-generated method stub
+						
+					}
+				}));
+	    actionBar.addTab(actionBar.newTab().setText("My Uploads")
+	        .setTabListener(new TabListener() {
+				
+				@Override
+				public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onTabSelected(Tab tab, FragmentTransaction ft) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onTabReselected(Tab tab, FragmentTransaction ft) {
+					// TODO Auto-generated method stub
+					
+				}
+			}));
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
+	
+	
 
 	/**
 	 * Slide menu item click listener
@@ -168,6 +233,9 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		MenuItem m_oSaveMenuItem = menu.findItem(R.id.saveoh);
 		if(Singleton.getInstance().m_bSaveMenuItem == true)
 			m_oSaveMenuItem.setVisible(false);
+		MenuItem m_oShareMenuItem = menu.findItem(R.id.shareoh);
+		if(Singleton.getInstance().m_bShareMenuItem == true)
+			m_oShareMenuItem.setVisible(false);
 		MenuItem m_oSaveOhTextMenuItem = menu.findItem(R.id.saveohtext);
 		if(Singleton.getInstance().m_bSaveOhTextMenuItem == true)
 			m_oSaveOhTextMenuItem.setVisible(false);		
@@ -216,6 +284,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bShareMenuItem = true;
 				  Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
 				  Singleton.getInstance().m_bSearchOverheardSkel = true;
@@ -228,6 +297,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bShareMenuItem = true;
 				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
 				  Singleton.getInstance().m_bSearchOverheardSkel = true;
@@ -240,6 +310,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 				  Singleton.getInstance().m_bGalleryMenuItem = true;
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
+				  Singleton.getInstance().m_bShareMenuItem = true;
 				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 				  Singleton.getInstance().m_bSearchMenuItem = true;
 				  Singleton.getInstance().m_bSearchOverheardSkel = true;
@@ -275,6 +346,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
 		if(m_oCreateOverHeard == null)
@@ -307,6 +379,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		Singleton.getInstance().m_bGalleryMenuItem = false;
 		Singleton.getInstance().m_bRowAddMenuItem = true;
 		Singleton.getInstance().m_bSaveMenuItem = true;
+		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = false;
 		Fragment fragment = null;
@@ -320,6 +393,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		case 1:
 			Singleton.getInstance().m_bRowAddMenuItem = true;
 			Singleton.getInstance().m_bSaveMenuItem = true;
+			Singleton.getInstance().m_bShareMenuItem = true;
 			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 			fragment = new Reviews();
 			Toast.makeText(getBaseContext(),

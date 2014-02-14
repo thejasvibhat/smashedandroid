@@ -26,6 +26,7 @@ public class HomeFragment extends Fragment {
 		  Singleton.getInstance().m_bGalleryMenuItem = false;
 		  Singleton.getInstance().m_bRowAddMenuItem = true;
 		  Singleton.getInstance().m_bSaveMenuItem = true;
+		  Singleton.getInstance().m_bShareMenuItem = true;
 		  getActivity().invalidateOptionsMenu();
 	     super.onResume();
 	  }

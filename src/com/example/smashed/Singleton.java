@@ -15,6 +15,7 @@ public class Singleton {
 	public boolean m_bCameraMenuItem  = true;
 	public boolean m_bRowAddMenuItem = true;
 	public boolean m_bSaveMenuItem = true;
+	public boolean m_bShareMenuItem = true;
 	public boolean m_bSearchMenuItem = true;
 	public boolean m_bSaveOhTextMenuItem = true;
 	public boolean m_bSearchOverheardSkel = true;

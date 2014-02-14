@@ -6,9 +6,14 @@ import com.example.smashed.NumberPicker.OnChangedListener;
 import com.example.smashedin.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +30,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 
 import com.example.smashedin.*;
 import com.loopj.android.http.RequestParams;
@@ -48,6 +54,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
 import android.widget.RelativeLayout;
@@ -69,7 +76,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	private Fragment gridSkelView = null;
 	String path = "";
 	private Dialog dialog;
-
+	public Menu optionsMenu;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -77,6 +84,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
 		Singleton.getInstance().m_bSearchOverheardSkel = true;
@@ -105,6 +113,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 				Singleton.getInstance().m_bGalleryMenuItem = false;
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
+				Singleton.getInstance().m_bShareMenuItem = true;
 				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 				Singleton.getInstance().m_bSearchMenuItem = true;
 				Singleton.getInstance().m_bSearchOverheardSkel = false;
@@ -121,6 +130,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
     }
 	@Override
 	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
+		this.optionsMenu = menu;
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -128,12 +138,17 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	    case R.id.saveoh:
+	    	setRefreshActionButtonState(true);
 	    	try {
 				UploadOh();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				setRefreshActionButtonState(false);
 			}
+	    	break;
+	    case R.id.shareoh:
+	    	ShareOverheard();
 	    	break;
 	    case R.id.rowadd:
 	    	AddRowDialog();
@@ -142,6 +157,20 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    	return super.onOptionsItemSelected(item);
 	    }
 		return true;
+	}
+	public void setRefreshActionButtonState(final boolean refreshing) {
+	    if (optionsMenu != null) {
+	        final MenuItem refreshItem = optionsMenu.findItem(R.id.saveoh);
+	        if (refreshItem != null) {
+	            if (refreshing) {
+	                refreshItem.setActionView(R.layout.actionbar_indefinite_progress);
+	            } else {
+	                refreshItem.setActionView(null);
+	                Singleton.getInstance().m_bShareMenuItem = false;
+	                getActivity().invalidateOptionsMenu();
+	            }
+	        }
+	    }
 	}
 	public void AddOverheardText(int position,int width,int height)
 	{
@@ -155,6 +184,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	{
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.popBackStack();
@@ -301,6 +331,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
+		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
 		Singleton.getInstance().m_bSearchOverheardSkel = true;
@@ -328,21 +359,95 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 				Singleton.getInstance().m_bGalleryMenuItem = false;
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
+				Singleton.getInstance().m_bShareMenuItem = true;
 				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
 				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
-						.add(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
+						.add(R.id.frame_container, gridSkelView).addToBackStack( "skel" ).commit();
 				
             
 	        }
 	    });
 	   
 	}
+	private void ShareOverheard()
+	{
+		View u = getActivity().findViewById(R.id.grid_view);
+	    GridView mGridView = (GridView) getActivity().findViewById(R.id.grid_view);
+	    ArrayList<ImageView> oImageViews = new ArrayList<ImageView>();
+	    final int size = mGridView.getChildCount();
+	    for(int i = 0; i < size; i++) {
+	      ViewGroup gridChild = (ViewGroup) mGridView.getChildAt(i);
+	      int childSize = gridChild.getChildCount();
+	      for(int k = 0; k < childSize; k++) {
+	    	  if(gridChild.getChildAt(k) instanceof ImageView)
+	    	  {
+		          oImageViews.add((ImageView) gridChild.getChildAt(k));
+		      }
+	    	}
+	    }
+	    for(ImageView img:oImageViews)
+	    {
+	    	img.setVisibility(ImageView.INVISIBLE); 
+	    }
+        u.setDrawingCacheEnabled(true);                                                
+        int totalHeight = u.getHeight();
+        int totalWidth = u.getWidth();
+        u.layout(0, 0, totalWidth, totalHeight);    
+        u.buildDrawingCache(true);
+        Bitmap b = Bitmap.createBitmap(u.getDrawingCache());             
+        u.setDrawingCacheEnabled(false);
+        String localAbsoluteFilePath = saveImageLocally(b);
+        if (localAbsoluteFilePath!=null && localAbsoluteFilePath!="") {
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            Uri phototUri = Uri.parse(localAbsoluteFilePath);
+
+            File file = new File(phototUri.getPath());
+
+
+            if(file.exists()) {
+                // file create success
+
+            } else {
+                // file create fail
+            }
+            shareIntent.setData(phototUri);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, phototUri);
+            startActivity(Intent.createChooser(Intent.createChooser(shareIntent, "Share Via"), "Share Image"));
+
+        }
+        for(ImageView img:oImageViews)
+	    {
+	    	img.setVisibility(ImageView.VISIBLE); 
+	    }
+	}
 	@Override
 	public void OnResponse(String response) {
 		// TODO Auto-generated method stub
-		String the = response;
-		
+		setRefreshActionButtonState(false);
+        
 	}
+	 private String saveImageLocally(Bitmap _bitmap) {
+	        File outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+	        File outputFile = null;
+	        try {
+	            outputFile = File.createTempFile("tmp", ".png", outputDir);
+	        } catch (IOException e1) {
+	            // handle exception
+	        }
+
+	        try {
+	            FileOutputStream out = new FileOutputStream(outputFile);
+	            _bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+	            out.close();
+
+	        } catch (Exception e) {
+	            // handle exception
+	        }
+
+	        return outputFile.getAbsolutePath();
+	    }
 }

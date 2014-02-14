@@ -6,11 +6,11 @@
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/slogosmall"
+        android:icon="@drawable/slogo"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme" >

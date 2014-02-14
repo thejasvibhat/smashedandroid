@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -75,7 +76,7 @@ public class GridImageAdapter extends BaseAdapter {
     		oHeight = HEIGHT/2;
     	FrameLayout oFrameLayout = new FrameLayout(mContext);
     	oFrameLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,oWidth),(int)dipToPixels(mContext,oHeight)));
-    	oFrameLayout.setBackgroundColor(0xffBBBBBB);
+    	oFrameLayout.setBackgroundColor(0xffDDDDDD);
     	RelativeLayout oRelLayout = new RelativeLayout(mContext); 
     	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,oWidth),(int)dipToPixels(mContext,oHeight)));
     	oRelLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
@@ -119,6 +120,7 @@ public class GridImageAdapter extends BaseAdapter {
         oTopText.setGravity(Gravity.CENTER_HORIZONTAL);
         oTopText.setTextColor(0xffffffff);
         oTopText.setTextSize(36);
+        oTopText.setShadowLayer(2,1,1,Color.BLACK);
         oTopText.setText(m_overheardData.mTopTexts.get(position));
         oFrameLayout.addView(oTopText);
         android.widget.FrameLayout.LayoutParams paramsText = (android.widget.FrameLayout.LayoutParams) oTopText.getLayoutParams();
@@ -128,6 +130,7 @@ public class GridImageAdapter extends BaseAdapter {
         
         TextView oBottomText = new TextView(mContext);
         oBottomText.setGravity(Gravity.CENTER_HORIZONTAL);
+        oBottomText.setShadowLayer(2,1,1,Color.BLACK);
         oBottomText.setTextSize(36);
         oBottomText.setTextColor(0xffffffff);
         oBottomText.setText(m_overheardData.mBottomTexts.get(position));

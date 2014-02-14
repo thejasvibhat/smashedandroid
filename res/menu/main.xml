@@ -6,7 +6,7 @@
         android:showAsAction="never"
         android:title="@string/action_settings"/>
     <item android:id="@+id/gallery"
-          android:icon="@drawable/ic_collections"
+          android:icon="@drawable/ic_gallery"
           android:showAsAction="collapseActionView|ifRoom"
            />
     <item android:id="@+id/camera"
@@ -33,10 +33,14 @@
    
     <item android:id="@+id/saveoh"
           android:icon="@drawable/ic_upload"
-          android:showAsAction="collapseActionView|ifRoom"
+          android:showAsAction="always"
           />
     
-
+ <item android:id="@+id/shareoh"
+          android:icon="@drawable/ic_share"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+  
     
 
 </menu>

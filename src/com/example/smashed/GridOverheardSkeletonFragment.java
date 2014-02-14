@@ -14,9 +14,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -96,6 +100,8 @@ public class GridOverheardSkeletonFragment extends Fragment {
         else
         	GetSkeletonData("");
         setHasOptionsMenu(true);
+        final ActionBar actionBar = getActivity().getActionBar();
+	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         return rootView;
     }
 	@Override
@@ -311,5 +317,10 @@ public class GridOverheardSkeletonFragment extends Fragment {
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
+
+	public void UpdateTab(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

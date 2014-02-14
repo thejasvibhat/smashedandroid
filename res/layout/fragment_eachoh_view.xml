@@ -8,7 +8,7 @@
         android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
+        android:background="@color/grey"
 	>
     
     <FrameLayout
@@ -24,7 +24,7 @@
 	    android:layout_height="fill_parent"
 	    android:layout_margin="5dp"
 	    android:layout_alignParentBottom="true" 
-	    android:background="@color/grey"
+	    android:background="#FFDDDDDD"
 	    
 	    android:id="@+id/m_eachRelView" >
 
@@ -38,6 +38,10 @@
 		    android:layout_marginLeft="15dp"
 		    android:fontFamily="impact.eot"
 		    android:textColor="#FFFFFF"
+		    android:shadowRadius="2"
+		    android:shadowDx="1"
+		    android:shadowDy="1"		    
+		    android:shadowColor="#FF000000"
 		    android:gravity="center_horizontal"
 		    android:layout_gravity="center_horizontal"
 		    android:textSize="16pt" />
@@ -48,6 +52,10 @@
 		    android:layout_height="wrap_content"
 		    android:layout_marginTop="15dp"
 		    android:layout_marginLeft="15dp"
+		    android:shadowColor="#FF000000"
+		    android:shadowDx="1"
+		    android:shadowDy="1"
+		    android:shadowRadius="2"
 		    android:gravity="center_horizontal"
 		    android:layout_gravity="center_horizontal"
 		    android:textColor="#FFFFFF"
