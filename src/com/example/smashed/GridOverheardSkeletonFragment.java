@@ -100,8 +100,6 @@ public class GridOverheardSkeletonFragment extends Fragment {
         else
         	GetSkeletonData("");
         setHasOptionsMenu(true);
-        final ActionBar actionBar = getActivity().getActionBar();
-	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         return rootView;
     }
 	@Override

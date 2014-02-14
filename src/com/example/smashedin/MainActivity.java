@@ -143,64 +143,6 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			// on first time display view for first nav item
 			displayView(0);
 		}
-		final ActionBar actionBar = this.getActionBar();
-	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-	    // for each of the sections in the app, add a tab to the action bar.
-	    actionBar.addTab(actionBar.newTab().setText("Gallery")
-	    		.setTabListener(new TabListener() {
-					
-					@Override
-					public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void onTabSelected(Tab tab, FragmentTransaction ft) {
-						// TODO Auto-generated method stub
-						String x = "";
-						if(getFragmentManager().getBackStackEntryCount() > 1)
-						{
-						BackStackEntry i = getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1);
-						
-						Fragment curFragment = getFragmentManager().findFragmentByTag("skel");
-						if(curFragment instanceof GridOverheardSkeletonFragment)
-						{
-							((GridOverheardSkeletonFragment)curFragment).UpdateTab("Gallery");
-						}
-						}
-						
-					}
-					
-					@Override
-					public void onTabReselected(Tab tab, FragmentTransaction ft) {
-						// TODO Auto-generated method stub
-						
-					}
-				}));
-	    actionBar.addTab(actionBar.newTab().setText("My Uploads")
-	        .setTabListener(new TabListener() {
-				
-				@Override
-				public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onTabSelected(Tab tab, FragmentTransaction ft) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onTabReselected(Tab tab, FragmentTransaction ft) {
-					// TODO Auto-generated method stub
-					
-				}
-			}));
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 	
 	

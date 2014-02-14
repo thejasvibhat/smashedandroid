@@ -11,23 +11,17 @@
             backward-compatibility can go here.
         -->
         <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:actionBarTabStyle">@style/MyActionBarTab</item>
-        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
-        		<item name="android:subtitleTextStyle">@style/MyActionBarTitleText</item>
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:actionBarTabStyle">@style/MyActionBarTab</item>
-		<item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
-		<item name="android:subtitleTextStyle">@style/MyActionBarTitleText</item>
     </style>
 
     <!-- ActionBar title text -->
  	<style name="MyActionBarTitleText"
            parent="@android:style/TextAppearance">
-        <item name="android:textColor">#FFef8405</item>
+        <item name="android:textColor">#FFFFFFFF</item>
     </style>
 	<style name="MyActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
 	    <item name="android:background">#FFef8405</item>

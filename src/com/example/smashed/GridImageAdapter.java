@@ -93,7 +93,7 @@ public class GridImageAdapter extends BaseAdapter {
         	imageView.setImageResource(R.drawable.addpicstooh);
         else
         {
-        	imageView.LoadScaleView(imageView,oWidth);
+        	imageView.LoadScaleView(imageView,oWidth,oHeight);
         	
         	imageView.setImageUrl(m_overheardData.mThumbIds.get(position));
         }

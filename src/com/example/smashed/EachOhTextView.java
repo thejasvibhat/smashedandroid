@@ -65,7 +65,7 @@ public class EachOhTextView extends Fragment {
         	imageView.setImageResource(R.drawable.ic_home);
         else
         {
-        	imageView.LoadScaleView(imageView,oWidth);
+        	imageView.LoadScaleView(imageView,oWidth,oHeight);
         	
         	imageView.setImageUrl(m_strUrl);
         }

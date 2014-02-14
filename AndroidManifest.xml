@@ -10,7 +10,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/slogo"
+        android:icon="@drawable/slogosmall"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme" >

@@ -57,7 +57,7 @@ public class GridImageSkelAdapter extends BaseAdapter {
         	imageView.setImageResource(R.drawable.ic_home);
         else
         {
-        	imageView.LoadScaleView(imageView,100);
+        	imageView.LoadScaleView(imageView,100,100);
         	imageView.setImageUrl(mThumbIds.get(position));
         }
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);

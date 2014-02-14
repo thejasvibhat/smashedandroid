@@ -28,7 +28,7 @@ public class CSmartImageView extends SmartImageView {
 		mContext = context;
 	}
 	
-	public void LoadScaleView(ImageView oView,int width)
+	public void LoadScaleView(ImageView oView,int width,int height)
 	{
 		view = oView;
 		oWidth = width;
