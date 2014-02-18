@@ -78,11 +78,17 @@ public class ResponseParser {
 	        	n_oDocument.normalize();
 	        	if(m_Fragment != null)
 	        	{
-	        		((GridOverheardSkeletonFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
+	        		if(m_Fragment instanceof GridOverheardSkeletonFragment)
+	        			((GridOverheardSkeletonFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
+	        		else
+	        			((GridOverheardFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        	}
 	        	else
 	        	{
-	        		((MainActivity)oMainActivity).ReturnResponseDocument(n_oDocument);
+	        		if(oMainActivity instanceof MainActivity)
+	        			((MainActivity)oMainActivity).ReturnResponseDocument(n_oDocument);
+	        		else
+	        			((OverHeardActivity)oMainActivity).ReturnResponseDocument(n_oDocument);
 	        	}
 	        	
 	        }

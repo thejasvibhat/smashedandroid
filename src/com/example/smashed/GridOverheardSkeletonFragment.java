@@ -58,9 +58,13 @@ public class GridOverheardSkeletonFragment extends Fragment {
 	String path = "";
 	public ArrayList<String> m_strSkeletonUrls = new ArrayList<String>();
 	public ArrayList<String> m_strSkeletonIds = new ArrayList<String>();
+	public ArrayList<String> m_strbkupSkeletonUrls = new ArrayList<String>();
+	public ArrayList<String> m_strbkupSkeletonIds = new ArrayList<String>();
+	public ArrayList<String> m_bkupThumbIds = new ArrayList<String>();
+	private Menu optionsMenu;
 	private Fragment m_createFragment;
 	OnHeadlineSelectedListener mCallback;
-
+	private String m_StrUrl;
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
         public void onArticleSelected(String id,String url);
@@ -81,6 +85,10 @@ public class GridOverheardSkeletonFragment extends Fragment {
     }
 
 	public GridOverheardSkeletonFragment(){}
+	public void AddFragment()
+	{
+		m_curFragment = this;
+	}
 	public void AddArgument(Fragment oCreateFragment){
         m_curFragment = this;
         m_createFragment = oCreateFragment;
@@ -102,8 +110,23 @@ public class GridOverheardSkeletonFragment extends Fragment {
         setHasOptionsMenu(true);
         return rootView;
     }
+	@Override 
+	public void onResume()
+	{
+    	Singleton.getInstance().m_bCameraMenuItem = false;
+		Singleton.getInstance().m_bGalleryMenuItem = false;
+		Singleton.getInstance().m_bRowAddMenuItem = true;
+		Singleton.getInstance().m_bSaveMenuItem = true;
+		Singleton.getInstance().m_bShareMenuItem = true;
+		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
+		Singleton.getInstance().m_bSearchOverheardSkel = false;
+		getActivity().invalidateOptionsMenu();
+		super.onResume();
+	}
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
+		optionsMenu = menu;
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.searchoverskel).getActionView();
 
@@ -116,13 +139,31 @@ public class GridOverheardSkeletonFragment extends Fragment {
             public boolean onQueryTextChange(String newText) 
             {
                 // this is your adapter that will be filtered
+            	if(m_strbkupSkeletonIds.size() > 0)
+            	{
+	        		m_strSkeletonIds.clear();
+	        		m_strSkeletonUrls.clear();
+	        		gAdapter.mThumbIds.clear();
+	            	m_strSkeletonUrls.addAll(m_strbkupSkeletonUrls);
+	            	m_strSkeletonIds.addAll(m_strbkupSkeletonIds);
+					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
+            	}
                 return true;
             }
             @Override
             public boolean onQueryTextSubmit(String query) 
             {
                 // this is your adapter that will be filtered
-            	//GetSkeletonData(query);
+            	m_strbkupSkeletonUrls.clear();
+            	m_strbkupSkeletonIds.clear();
+            	m_bkupThumbIds.clear();
+            	m_strbkupSkeletonUrls.addAll(m_strSkeletonUrls);
+            	m_strbkupSkeletonIds.addAll(m_strSkeletonIds);
+            	m_strSkeletonUrls.clear();
+            	m_strSkeletonIds.clear();
+            	m_bkupThumbIds.addAll(gAdapter.mThumbIds);
+            	gAdapter.mThumbIds.clear();
+            	GetSkeletonData(query);
             	searchView.clearFocus();
                 return true;
             }
@@ -165,19 +206,18 @@ public class GridOverheardSkeletonFragment extends Fragment {
 		SetGridItems((GridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
+	
 	private void SetGridItems(GridView gridView)
 	{
 		
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {	        	
-	        	FragmentManager fragmentManager = getFragmentManager();
-	        	Fragment ofrag = fragmentManager.findFragmentByTag("main");
-	        	//fragmentManager
-	        	//CreateOverHeardFragment oCreateFrag = (CreateOverHeardFragment) ofrag;
+            	MenuItem searchItem = optionsMenu.findItem(R.id.searchoverskel);
+            	searchItem.collapseActionView();
+            	
+
 	        	mCallback.onArticleSelected(m_strSkeletonIds.get(position),m_strSkeletonUrls.get(position));
-	        	//oCreateFrag.UpdateSkel();
-				fragmentManager.popBackStack();
 	        }
 	    });
 	}
@@ -202,7 +242,7 @@ public class GridOverheardSkeletonFragment extends Fragment {
         Thread background = new Thread(new Runnable() {
              
             private final HttpClient Client = new DefaultHttpClient();
-            private String URL = "http://www.smashed.in/api/oh/skel-list?offset=0&limit=100";
+            private String URL = m_StrUrl;
             // After call for background.start this run method call
             public void run() {
                 try {
@@ -318,6 +358,11 @@ public class GridOverheardSkeletonFragment extends Fragment {
 
 	public void UpdateTab(String string) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	public void SetUrl(String string) {
+		m_StrUrl = string;
 		
 	}
 

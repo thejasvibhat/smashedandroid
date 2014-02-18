@@ -1,6 +1,9 @@
 package com.example.smashed;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import com.example.config.OverheardData;
@@ -10,6 +13,7 @@ import com.loopj.android.image.SmartImageView;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -31,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
  
@@ -41,7 +46,9 @@ public class GridImageAdapter extends BaseAdapter {
     private static int HEIGHT = 400;
 	int oWidth;
 	int oHeight;
-
+	CSmartImageView imageView;
+	ProgressDialog oProgress;
+    private HashMap<String,String> op;
     // Keep all Images in array
 	public OverheardData m_overheardData = OverheardData.getInstance();
     // Constructor
@@ -69,7 +76,7 @@ public class GridImageAdapter extends BaseAdapter {
     }
  
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
     	oWidth = WIDTH;
     	oHeight = HEIGHT;
     	if(getCount() > 1)
@@ -81,12 +88,13 @@ public class GridImageAdapter extends BaseAdapter {
     	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,oWidth),(int)dipToPixels(mContext,oHeight)));
     	oRelLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
     	oFrameLayout.addView(oRelLayout);
-        CSmartImageView imageView = new CSmartImageView(mContext);
+        imageView = new CSmartImageView(mContext);
         //imageView.setImageResource(mThumbIds[position]);
         String url = m_overheardData.mThumbIds.get(position);
         String[] arrUrl =  url.split("theju");
         if(arrUrl[0].equals("uri"))
         {
+
         	imageView.setImageURI(Uri.parse(arrUrl[1]));
         }
         else if(m_overheardData.mThumbIds.get(position) == "local")
@@ -94,8 +102,40 @@ public class GridImageAdapter extends BaseAdapter {
         else
         {
         	imageView.LoadScaleView(imageView,oWidth,oHeight);
+        	if(op == null)
+        	{
+        		op = new HashMap();
+        	}
+        	if(op.get(String.valueOf(position)) == null)
+        	{
+        		op.put(String.valueOf(position), m_overheardData.mThumbIds.get(position));
+        		if(oProgress == null)
+        		{
+        			oProgress = new ProgressDialog(mContext);
+        			oProgress.setIndeterminate(true);
+        			oProgress.setMessage("Downloading high res ");
+        			//oProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        		}
+    			oProgress.show();
+        	}
+        	else
+        	{
+        		if(op.get(String.valueOf(position)).equals(m_overheardData.mThumbIds.get(position)) == false)
+        		{
+        			op.put(String.valueOf(position), m_overheardData.mThumbIds.get(position));
+        			oProgress.show();
+        		}
+        	}
         	
-        	imageView.setImageUrl(m_overheardData.mThumbIds.get(position));
+        	imageView.setImageUrl(m_overheardData.mThumbIds.get(position),new OnCompleteListener() {
+				
+				@Override
+				public void onComplete() {
+					// TODO Auto-generated method stub
+					imageView.scaleImage();
+					oProgress.dismiss();
+				}
+			});
         }
         
         //imageView.setScaleType(ImageView.ScaleType.FIT_XY);

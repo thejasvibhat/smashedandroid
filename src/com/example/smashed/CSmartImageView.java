@@ -33,6 +33,7 @@ public class CSmartImageView extends SmartImageView {
 		view = oView;
 		oWidth = width;
 	}
+	
 	@Override 
 	public void setImageUrl(String url){
         super.setImageUrl(url, new OnCompleteListener() {
@@ -44,7 +45,7 @@ public class CSmartImageView extends SmartImageView {
 			}
 		});
     }
-	private void scaleImage()
+	public void scaleImage()
     {
         // Get the ImageView and its bitmap
         Drawable drawing = view.getDrawable();
@@ -83,9 +84,12 @@ public class CSmartImageView extends SmartImageView {
 
         // Now change ImageView's dimensions to match the scaled image
         LayoutParams params = getLayoutParams();
+        if(params != null)
+        {
         params.width = width;
         params.height = height;
         view.setLayoutParams(params);
+        }
     }
 	public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

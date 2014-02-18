@@ -108,6 +108,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	        	{
 	        		gridSkelView = new GridOverheardSkeletonFragment();	    
 	        		((GridOverheardSkeletonFragment) gridSkelView).AddArgument(m_createFragment);
+	        		((GridOverheardSkeletonFragment) gridSkelView).SetUrl("http://www.smashed.in/api/oh/skel-list?offset=0&limit=100");
 	        	}
 	        	Singleton.getInstance().m_bCameraMenuItem = false;
 				Singleton.getInstance().m_bGalleryMenuItem = false;
@@ -184,7 +185,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	{
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
-		Singleton.getInstance().m_bShareMenuItem = true;
+		//Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.popBackStack();
@@ -319,6 +320,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		  Singleton.getInstance().m_bSearchMenuItem = true;
 		  Singleton.getInstance().m_bSearchOverheardSkel = true;
+
 		  getActivity().invalidateOptionsMenu();
 	     super.onResume();
 	  }
@@ -360,7 +362,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 				Singleton.getInstance().m_bRowAddMenuItem = true;
 				Singleton.getInstance().m_bSaveMenuItem = true;
 				Singleton.getInstance().m_bShareMenuItem = true;
-				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
+				Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
@@ -369,7 +371,35 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
             
 	        }
 	    });
-	   
+	    CheckAndUpdateActionBar();
+	}
+	public void CheckAndUpdateActionBar()
+	{
+		boolean lExists = false;
+		for(String url:gAdapter.m_overheardData.mThumbIds)
+		{
+			if(url.contains("uri"))
+			{
+				lExists = true;
+				break;
+			}
+		}
+		if(lExists == true)
+		{
+			if(Singleton.getInstance().m_bShareMenuItem == true)
+			{
+				Singleton.getInstance().m_bShareMenuItem = false;
+				getActivity().invalidateOptionsMenu();
+			}
+		}
+		else
+		{
+			if(Singleton.getInstance().m_bShareMenuItem == false)
+			{
+				Singleton.getInstance().m_bShareMenuItem = true;
+				getActivity().invalidateOptionsMenu();
+			}
+		}
 	}
 	private void ShareOverheard()
 	{

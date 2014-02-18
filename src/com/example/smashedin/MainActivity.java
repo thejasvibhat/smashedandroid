@@ -29,12 +29,16 @@ import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -46,11 +50,11 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnHeadlineSelectedListener,OnResponseListener {
+public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
-
+	private static final String[] CONTENT = new String[] { "Recent", "Artists", "Albums", "Songs", "Playlists", "Genres" };
 	// nav drawer title
 	private CharSequence mDrawerTitle;
 
@@ -68,14 +72,16 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 	private Menu m_oMenu;
 	ArrayList<ReviewItem> itemsList = null;
 	
-	
+	private ProgressDialog oPd;
 	private Fragment m_oCreateOverHeard;
 	private String m_oType = "init";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		m_oMainACtivity = this;
 		super.onCreate(savedInstanceState);
 		Singleton.getInstance().SetApplicationContext(getApplicationContext());
+
 		setContentView(R.layout.activity_main);
 		mTitle = mDrawerTitle = getTitle();
 
@@ -138,10 +144,10 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+		int data= getIntent().getIntExtra("typeindex", 0);
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
-			displayView(0);
+			displayView(data);
 		}
 	}
 	
@@ -273,6 +279,16 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		}
 		else
 		{
+			if(oPd == null)
+			{
+				oPd = new ProgressDialog(this);
+				oPd.setTitle("Trying to get Smashed...");
+				oPd.setMessage("Please wait.");
+				oPd.setIndeterminate(true);
+				oPd.setCancelable(false);
+				oPd.show();
+			}
+
         	String url = "http://www.smashed.in/auth/post/facebook?access_token="+accessToken;
         	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
         	oAsyncClient.Attach(this);
@@ -288,7 +304,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		Singleton.getInstance().m_bGalleryMenuItem = true;
 		Singleton.getInstance().m_bRowAddMenuItem = false;
 		Singleton.getInstance().m_bSaveMenuItem = false;
-		Singleton.getInstance().m_bShareMenuItem = true;
+		//Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = true;
 		if(m_oCreateOverHeard == null)
@@ -324,7 +340,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		Singleton.getInstance().m_bShareMenuItem = true;
 		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchMenuItem = false;
-		Fragment fragment = null;
+		android.support.v4.app.Fragment fragment = null;
 		switch (position) {
 		case 0:
 			
@@ -337,8 +353,8 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 			Singleton.getInstance().m_bSaveMenuItem = true;
 			Singleton.getInstance().m_bShareMenuItem = true;
 			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-			fragment = new Reviews();
-			Toast.makeText(getBaseContext(),
+			fragment = new HomeFragment();
+			/*Toast.makeText(getBaseContext(),
                     "Please wait, connecting to server.",
                     Toast.LENGTH_SHORT).show();
 
@@ -401,11 +417,19 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 
             });
             // Start Thread
-            background.start();  //After call start method thread called run Methods
+            background.start(); */ //After call start method thread called run Methods
 			break;
 		case 2:
-			fragment = new OverHeardFragment();
-			break;
+			mDrawerLayout.closeDrawer(mDrawerList);
+			mDrawerList.setItemChecked(0, true);
+			mDrawerList.setSelection(0);
+
+			m_oType = "oh";
+            Intent intent = new Intent(m_oMainACtivity, OverHeardActivity.class);
+            startActivity(intent);
+
+			return;
+			//break;
 		case 3:
 			if(Singleton.getInstance().loggedIn != true)
 			{
@@ -434,7 +458,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		}
 
 		if (fragment != null) {
-			FragmentManager fragmentManager = getFragmentManager();
+			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
 			fragmentManager.beginTransaction()
 					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
 
@@ -449,6 +473,10 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		}
 	}
 	public void onArticleSelected(String id,String url) {
+    	FragmentManager fragmentManager = getFragmentManager();
+    	Fragment ofrag = fragmentManager.findFragmentByTag("main");
+		fragmentManager.popBackStack();
+
 		((CreateOverHeardFragment) m_oCreateOverHeard).UpdateSkel(id,url);
     }
 	@Override
@@ -527,7 +555,7 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 	@Override
-    protected void onResume() {
+    protected void onResume() {		
         super.onResume();
   	  if(m_oType == "create") {
 	    	ShowCreateOverheard();
@@ -537,6 +565,8 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 
 	@Override
 	public void OnResponse(String response) {
+		if(oPd != null)
+			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;
 		if(m_oType == "create")
 		{
@@ -544,5 +574,6 @@ public class MainActivity extends Activity implements OnHeadlineSelectedListener
 		}
 		
 	}
+	
 	
 }
