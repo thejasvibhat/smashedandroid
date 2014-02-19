@@ -94,8 +94,10 @@ public class GridImageAdapter extends BaseAdapter {
         String[] arrUrl =  url.split("theju");
         if(arrUrl[0].equals("uri"))
         {
-
+        	imageView.LoadScaleView(imageView,oWidth,oHeight);
+        	imageView.setTag("disk");
         	imageView.setImageURI(Uri.parse(arrUrl[1]));
+        	imageView.scaleImage();
         }
         else if(m_overheardData.mThumbIds.get(position) == "local")
         	imageView.setImageResource(R.drawable.addpicstooh);
@@ -126,16 +128,9 @@ public class GridImageAdapter extends BaseAdapter {
         			oProgress.show();
         		}
         	}
+        	imageView.SetProgress(oProgress);
+        	imageView.setImageUrl(m_overheardData.mThumbIds.get(position));
         	
-        	imageView.setImageUrl(m_overheardData.mThumbIds.get(position),new OnCompleteListener() {
-				
-				@Override
-				public void onComplete() {
-					// TODO Auto-generated method stub
-					imageView.scaleImage();
-					oProgress.dismiss();
-				}
-			});
         }
         
         //imageView.setScaleType(ImageView.ScaleType.FIT_XY);

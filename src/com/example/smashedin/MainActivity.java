@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	
 	private ProgressDialog oPd;
 	private Fragment m_oCreateOverHeard;
-	private String m_oType = "init";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -250,7 +250,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 				  Singleton.getInstance().m_bSearchMenuItem = true;
 				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
-			   
+			    	FragmentManager fragmentManager = getFragmentManager();
+					fragmentManager.popBackStack();
+					getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
 		   }
 		   if(fragment instanceof EachOhTextView)
 		   {
@@ -269,7 +272,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 	private void Login(String type)
 	{
-		m_oType = type;
+		Singleton.getInstance().m_oType = type;
 		String accessToken = Singleton.getInstance().getAccessToken(); 
 		if(accessToken == "NOT_FOUND")
 		{
@@ -424,7 +427,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			mDrawerList.setItemChecked(0, true);
 			mDrawerList.setSelection(0);
 
-			m_oType = "oh";
+			Singleton.getInstance().m_oType = "oh";
             Intent intent = new Intent(m_oMainACtivity, OverHeardActivity.class);
             startActivity(intent);
 
@@ -557,7 +560,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	@Override
     protected void onResume() {		
         super.onResume();
-  	  if(m_oType == "create") {
+  	  if(Singleton.getInstance().m_oType == "create") {
 	    	ShowCreateOverheard();
 	    } 
 
@@ -568,7 +571,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;
-		if(m_oType == "create")
+		if(Singleton.getInstance().m_oType == "create")
 		{
 			ShowCreateOverheard();
 		}

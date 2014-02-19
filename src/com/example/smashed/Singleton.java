@@ -19,6 +19,7 @@ public class Singleton {
 	public boolean m_bSearchMenuItem = true;
 	public boolean m_bSaveOhTextMenuItem = true;
 	public boolean m_bSearchOverheardSkel = true;
+	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
 	public SharedPreferences m_LocalStorage;
 	private Context mContext;
@@ -53,6 +54,18 @@ public class Singleton {
     public String getAccessToken()
     {
     	return m_LocalStorage.getString("access", "NOT_FOUND");
+    }
+    public void ClearAllOptionMenus()
+    {
+    	m_bGalleryMenuItem = true;
+    	m_bCameraMenuItem  = true;
+    	m_bRowAddMenuItem = true;
+    	m_bSaveMenuItem = true;
+    	m_bShareMenuItem = true;
+    	m_bSearchMenuItem = true;
+    	m_bSaveOhTextMenuItem = true;
+    	m_bSearchOverheardSkel = true;
+
     }
 
 

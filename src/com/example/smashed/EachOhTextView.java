@@ -183,14 +183,10 @@ public class EachOhTextView extends Fragment {
 	}
 	  @Override
 	  public void onResume() {
-		  Singleton.getInstance().m_bCameraMenuItem = true;
-		  Singleton.getInstance().m_bGalleryMenuItem = true;
-		  Singleton.getInstance().m_bRowAddMenuItem = true;
-		  Singleton.getInstance().m_bSaveMenuItem = true;
-		  Singleton.getInstance().m_bShareMenuItem = true;
-		  Singleton.getInstance().m_bSaveOhTextMenuItem = false;
-		  getActivity().invalidateOptionsMenu();
-	     super.onResume();
+		Singleton.getInstance().ClearAllOptionMenus();
+		Singleton.getInstance().m_bSaveOhTextMenuItem = false;
+		getActivity().invalidateOptionsMenu();
+	    super.onResume();
 	  }
 	
 	public void setArguments(Fragment m_createFragment, int position,

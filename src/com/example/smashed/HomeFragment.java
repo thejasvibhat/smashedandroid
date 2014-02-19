@@ -22,12 +22,13 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 
 	  @Override
 	  public void onResume() {
-		  Singleton.getInstance().m_bCameraMenuItem = false;
-		  Singleton.getInstance().m_bGalleryMenuItem = false;
-		  Singleton.getInstance().m_bRowAddMenuItem = true;
-		  Singleton.getInstance().m_bSaveMenuItem = true;
-		  Singleton.getInstance().m_bShareMenuItem = true;
-		  getActivity().invalidateOptionsMenu();
+		  if(Singleton.getInstance().m_oType == "home")
+		  {
+			  Singleton.getInstance().ClearAllOptionMenus();
+			  Singleton.getInstance().m_bCameraMenuItem = false;
+			  Singleton.getInstance().m_bGalleryMenuItem = false;
+			  getActivity().invalidateOptionsMenu();
+		  }
 	     super.onResume();
 	  }
 }

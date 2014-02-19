@@ -1,5 +1,6 @@
 package com.example.smashed;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.loopj.android.image.SmartImageTask;
 import com.loopj.android.image.SmartImageTask.OnCompleteListener;
@@ -20,7 +23,7 @@ import com.loopj.android.image.WebImage;
 public class CSmartImageView extends SmartImageView {
 	private Context mContext;
 	ImageView view;
-	
+	ProgressDialog mProgress;
 	private int oWidth;
 	public CSmartImageView(Context context) {
 		
@@ -41,7 +44,10 @@ public class CSmartImageView extends SmartImageView {
 			@Override
 			public void onComplete() {
 				scaleImage();
-				
+				if(mProgress != null)
+				{
+					mProgress.dismiss();
+				}
 			}
 		});
     }
@@ -83,7 +89,8 @@ public class CSmartImageView extends SmartImageView {
         view.setImageDrawable(result);
 
         // Now change ImageView's dimensions to match the scaled image
-        LayoutParams params = getLayoutParams();
+     //   LayoutParams params = view.getLayoutParams();
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(new LayoutParams(width, height));
         if(params != null)
         {
         params.width = width;
@@ -95,4 +102,9 @@ public class CSmartImageView extends SmartImageView {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
+
+	public void SetProgress(ProgressDialog oProgress) {
+		// TODO Auto-generated method stub
+		mProgress = oProgress;
+	}
 }

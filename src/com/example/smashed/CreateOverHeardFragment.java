@@ -5,6 +5,7 @@ import com.example.config.OverheardData;
 import com.example.smashed.NumberPicker.OnChangedListener;
 import com.example.smashedin.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,9 +26,11 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -41,6 +44,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract.Document;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -77,18 +81,12 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	String path = "";
 	private Dialog dialog;
 	public Menu optionsMenu;
+	private ProgressDialog oPd;
+	private int totalImages = 0;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		Singleton.getInstance().m_bCameraMenuItem = true;
-		Singleton.getInstance().m_bGalleryMenuItem = true;
-		Singleton.getInstance().m_bRowAddMenuItem = false;
-		Singleton.getInstance().m_bSaveMenuItem = false;
-		Singleton.getInstance().m_bShareMenuItem = true;
-		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-		Singleton.getInstance().m_bSearchMenuItem = true;
-		Singleton.getInstance().m_bSearchOverheardSkel = true;
-		getActivity().invalidateOptionsMenu();
+        getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         View rootView = inflater.inflate(R.layout.fragment_createoverheard, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
@@ -110,15 +108,6 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	        		((GridOverheardSkeletonFragment) gridSkelView).AddArgument(m_createFragment);
 	        		((GridOverheardSkeletonFragment) gridSkelView).SetUrl("http://www.smashed.in/api/oh/skel-list?offset=0&limit=100");
 	        	}
-	        	Singleton.getInstance().m_bCameraMenuItem = false;
-				Singleton.getInstance().m_bGalleryMenuItem = false;
-				Singleton.getInstance().m_bRowAddMenuItem = true;
-				Singleton.getInstance().m_bSaveMenuItem = true;
-				Singleton.getInstance().m_bShareMenuItem = true;
-				Singleton.getInstance().m_bSaveOhTextMenuItem = false;
-				Singleton.getInstance().m_bSearchMenuItem = true;
-				Singleton.getInstance().m_bSearchOverheardSkel = false;
-				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
 						.add(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
@@ -141,7 +130,14 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    case R.id.saveoh:
 	    	setRefreshActionButtonState(true);
 	    	try {
-				UploadOh();
+	    		if(CheckForLocalImage() == true)
+	    		{
+	    			UploadLocalImage();
+	    		}
+	    		else
+	    		{
+	    			UploadOh();
+	    		}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -183,10 +179,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	}
 	public void ReturnText(String text1,String text2,int position)
 	{
-		Singleton.getInstance().m_bRowAddMenuItem = false;
-		Singleton.getInstance().m_bSaveMenuItem = false;
-		//Singleton.getInstance().m_bShareMenuItem = true;
-		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
+		onResume();
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.popBackStack();
 		gAdapter.m_overheardData.AddTexts(text1,text2,position);
@@ -266,6 +259,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    UploadOhString(upString);
 	    
 	}
+	
 	private void UploadOhString(String data)
 	{
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
@@ -274,6 +268,67 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
     	RequestParams oParams = new RequestParams();
     	oParams.put("data",data);
     	oAsyncClient.MakePostCall("http://www.smashed.in/api/oh/savemobile?mode=private",oParams);   
+	}
+	private void UploadLocalImage()
+	{
+		ArrayList<CSmartImageView> imageiews = GetAllImageViews();
+		totalImages = imageiews.size();
+		
+		
+		if(oPd == null)
+		{
+			oPd = new ProgressDialog(getActivity());
+			oPd.setTitle("Uploading Image...");
+			oPd.setMessage("Please wait.");
+			oPd.setIndeterminate(true);
+			oPd.setCancelable(false);
+			oPd.show();
+		}
+		for(CSmartImageView img:imageiews)
+		{
+			UploadImage(img);
+		}
+    	
+	}
+	public void UploadImage(CSmartImageView imageView)
+	{
+		imageView.buildDrawingCache();
+		Bitmap bm = imageView.getDrawingCache();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+		bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object   
+		byte[] b = baos.toByteArray();
+
+		String encodedImage = Base64.encodeToString(b , Base64.DEFAULT);
+		RequestParams oParams = new RequestParams();
+    	oParams.put("imgdata",encodedImage);
+
+    	String url = "http://www.smashed.in/api/oh/skel-mob-upload?pmode=private";
+    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.MakePostCall(url, oParams);
+	}
+	public ArrayList<CSmartImageView> GetAllImageViews()
+	{
+		GridView mGridView = (GridView) getActivity().findViewById(R.id.grid_view);
+		ArrayList<CSmartImageView> list = new ArrayList<CSmartImageView>();
+		final int size = mGridView.getChildCount();
+	    for(int i = 0; i < size; i++) {
+	      ViewGroup gridChild = (ViewGroup) mGridView.getChildAt(i);
+	      int childSize = gridChild.getChildCount();
+	      for(int k = 0; k < childSize; k++) {
+	    	  if(gridChild.getChildAt(k) instanceof RelativeLayout)
+	    	  {
+		    	  RelativeLayout rel = (RelativeLayout) gridChild.getChildAt(k) ;
+		    	  
+		        if( rel.getChildAt(0) instanceof CSmartImageView ) {
+		        	CSmartImageView oimg = (CSmartImageView) rel.getChildAt(0);
+		        	if(oimg.getTag() == "disk")
+		        		list.add(oimg);
+		        }
+	    	  }
+	      }
+	    }
+	    return list;
 	}
 	public void RefreshRows(int numRows)
 	{
@@ -313,31 +368,20 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	}
     @Override
 	public void onResume() {
-		  Singleton.getInstance().m_bCameraMenuItem = true;
-		  Singleton.getInstance().m_bGalleryMenuItem = true;
-		  Singleton.getInstance().m_bRowAddMenuItem = false;
-		  Singleton.getInstance().m_bSaveMenuItem = false;
-		  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-		  Singleton.getInstance().m_bSearchMenuItem = true;
-		  Singleton.getInstance().m_bSearchOverheardSkel = true;
-
-		  getActivity().invalidateOptionsMenu();
-	     super.onResume();
-	  }
+			Singleton.getInstance().ClearAllOptionMenus();
+			Singleton.getInstance().m_bRowAddMenuItem = false;
+			Singleton.getInstance().m_bSaveMenuItem = false;
+			Singleton.getInstance().m_bShareMenuItem = false;
+			CheckAndUpdateActionBar();
+			getActivity().invalidateOptionsMenu();
+			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		    super.onResume();
+	}
 	public void UpdateSkel(String id, String url) {
 		if(gAdapter.m_overheardData.mThumbIds.get(selectedPosition) != null)
 			gAdapter.m_overheardData.Remove(selectedPosition);
 		gAdapter.m_overheardData.AddImage(selectedPosition,url);
 		gAdapter.m_overheardData.AddImageId(selectedPosition,id);
-		Singleton.getInstance().m_bCameraMenuItem = true;
-		Singleton.getInstance().m_bGalleryMenuItem = true;
-		Singleton.getInstance().m_bRowAddMenuItem = false;
-		Singleton.getInstance().m_bSaveMenuItem = false;
-		Singleton.getInstance().m_bShareMenuItem = true;
-		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-		Singleton.getInstance().m_bSearchMenuItem = true;
-		Singleton.getInstance().m_bSearchOverheardSkel = true;
-		getActivity().invalidateOptionsMenu();
         GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
         // Instance of ImageAdapter Class
         if(gAdapter == null)
@@ -357,13 +401,6 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	        		gridSkelView = new GridOverheardSkeletonFragment();	    
 	        		((GridOverheardSkeletonFragment) gridSkelView).AddArgument(m_createFragment);
 	        	}
-	        	Singleton.getInstance().m_bCameraMenuItem = false;
-				Singleton.getInstance().m_bGalleryMenuItem = false;
-				Singleton.getInstance().m_bRowAddMenuItem = true;
-				Singleton.getInstance().m_bSaveMenuItem = true;
-				Singleton.getInstance().m_bShareMenuItem = true;
-				Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-				getActivity().invalidateOptionsMenu();
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
 						.add(R.id.frame_container, gridSkelView).addToBackStack( "skel" ).commit();
@@ -371,9 +408,10 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
             
 	        }
 	    });
+	    onResume();
 	    CheckAndUpdateActionBar();
 	}
-	public void CheckAndUpdateActionBar()
+	public boolean CheckForLocalImage()
 	{
 		boolean lExists = false;
 		for(String url:gAdapter.m_overheardData.mThumbIds)
@@ -384,6 +422,11 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 				break;
 			}
 		}
+		return lExists;
+	}
+	public void CheckAndUpdateActionBar()
+	{
+		boolean lExists = CheckForLocalImage();
 		if(lExists == true)
 		{
 			if(Singleton.getInstance().m_bShareMenuItem == true)
@@ -458,6 +501,29 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	public void OnResponse(String response) {
 		// TODO Auto-generated method stub
 		setRefreshActionButtonState(false);
+		if(totalImages > 0)
+		{
+			for(int i=0; i < gAdapter.m_overheardData.mResIds.size();i++)
+			{
+				String id = gAdapter.m_overheardData.mResIds.get(i);
+				if(id == "disk")
+				{
+					gAdapter.m_overheardData.mResIds.set(i, response);
+					break;
+				}
+			}
+			totalImages--;
+			if(totalImages == 0)
+			{
+				oPd.dismiss();
+				try {
+					UploadOh();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
         
 	}
 	 private String saveImageLocally(Bitmap _bitmap) {

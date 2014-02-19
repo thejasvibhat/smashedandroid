@@ -27,7 +27,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 
+import com.example.async.SmashedAsyncClient;
+import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.config.SkeletonData;
 import com.example.smashedin.*;
+import com.loopj.android.http.RequestParams;
 import com.loopj.android.image.SmartImageView;
 
 import android.net.Uri;
@@ -51,13 +55,14 @@ import android.widget.SearchView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class GridOverheardSkeletonFragment extends Fragment {
+public class GridOverheardSkeletonFragment extends Fragment implements OnResponseListener {
 	private String m_strTag = "";
+	private String m_strMode = "";
 	SearchView searchView;
 	private static final int SELECT_PICTURE = 1;
 	String path = "";
-	public ArrayList<String> m_strSkeletonUrls = new ArrayList<String>();
-	public ArrayList<String> m_strSkeletonIds = new ArrayList<String>();
+	private SkeletonData m_galSkeletons = new SkeletonData();
+	private SkeletonData m_privSkeletons = new SkeletonData();
 	public ArrayList<String> m_strbkupSkeletonUrls = new ArrayList<String>();
 	public ArrayList<String> m_strbkupSkeletonIds = new ArrayList<String>();
 	public ArrayList<String> m_bkupThumbIds = new ArrayList<String>();
@@ -65,6 +70,9 @@ public class GridOverheardSkeletonFragment extends Fragment {
 	private Fragment m_createFragment;
 	OnHeadlineSelectedListener mCallback;
 	private String m_StrUrl;
+	private String m_StrResponse;
+	private String selectedTab = "gallery";
+	View m_grootView;
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
         public void onArticleSelected(String id,String url);
@@ -101,24 +109,84 @@ public class GridOverheardSkeletonFragment extends Fragment {
             Bundle savedInstanceState) {
 		
         View rootView = inflater.inflate(R.layout.fragment_skelview, container, false);
-        if(m_strSkeletonIds.size() != 0)
-        {
-        	SetGridItems((GridView) rootView.findViewById(R.id.grid_view_skels));
-        }
-        else
-        	GetSkeletonData("");
+
         setHasOptionsMenu(true);
+       SetTabs(rootView);
+        
         return rootView;
     }
+	private void SetTabs(View orootView)
+	{
+		m_grootView = orootView;
+		  ActionBar actionBar = getActivity().getActionBar();
+		  actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		  if(actionBar.getTabCount() == 0)
+		  {
+		        Tab tab = actionBar.newTab()
+		                           .setText("Gallery")
+		                           .setTabListener(new TabListener() {
+									
+									@Override
+									public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+										// TODO Auto-generated method stub
+										
+									}
+									
+									@Override
+									public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+										onResume();
+										selectedTab = "gallery";
+										if(m_galSkeletons.m_strSkeletonIds.size() != 0)
+								        {
+								        	SetGridItems((GridView) m_grootView.findViewById(R.id.grid_view_skels));
+								        }
+								        else
+								        	GetSkeletonData("public","");
+									}
+									
+									@Override
+									public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+										// TODO Auto-generated method stub
+										
+									}
+								});
+		        actionBar.addTab(tab);
+		        Tab tab1 = actionBar.newTab()
+		                .setText("My Uploads")
+		                .setTabListener(new TabListener() {
+							
+							@Override
+							public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+								// TODO Auto-generated method stub
+								
+							}
+							
+							@Override
+							public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+								selectedTab = "private";
+								if(m_privSkeletons.m_strSkeletonIds.size() != 0)
+						        {
+						        	SetGridItems((GridView) m_grootView.findViewById(R.id.grid_view_skels));
+						        }
+						        else
+						        	GetSkeletonData("private","");
+							}
+							
+							@Override
+							public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+								// TODO Auto-generated method stub
+								
+							}
+						});
+		        actionBar.addTab(tab1);
+		  }
+	}
 	@Override 
 	public void onResume()
 	{
+		Singleton.getInstance().ClearAllOptionMenus();
     	Singleton.getInstance().m_bCameraMenuItem = false;
 		Singleton.getInstance().m_bGalleryMenuItem = false;
-		Singleton.getInstance().m_bRowAddMenuItem = true;
-		Singleton.getInstance().m_bSaveMenuItem = true;
-		Singleton.getInstance().m_bShareMenuItem = true;
-		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
 		Singleton.getInstance().m_bSearchOverheardSkel = false;
 		getActivity().invalidateOptionsMenu();
 		super.onResume();
@@ -141,11 +209,11 @@ public class GridOverheardSkeletonFragment extends Fragment {
                 // this is your adapter that will be filtered
             	if(m_strbkupSkeletonIds.size() > 0)
             	{
-	        		m_strSkeletonIds.clear();
-	        		m_strSkeletonUrls.clear();
+	        		m_galSkeletons.m_strSkeletonIds.clear();
+	        		m_galSkeletons.m_strSkeletonUrls.clear();
 	        		gAdapter.mThumbIds.clear();
-	            	m_strSkeletonUrls.addAll(m_strbkupSkeletonUrls);
-	            	m_strSkeletonIds.addAll(m_strbkupSkeletonIds);
+	        		m_galSkeletons.m_strSkeletonUrls.addAll(m_strbkupSkeletonUrls);
+	        		m_galSkeletons.m_strSkeletonIds.addAll(m_strbkupSkeletonIds);
 					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
             	}
                 return true;
@@ -157,13 +225,13 @@ public class GridOverheardSkeletonFragment extends Fragment {
             	m_strbkupSkeletonUrls.clear();
             	m_strbkupSkeletonIds.clear();
             	m_bkupThumbIds.clear();
-            	m_strbkupSkeletonUrls.addAll(m_strSkeletonUrls);
-            	m_strbkupSkeletonIds.addAll(m_strSkeletonIds);
-            	m_strSkeletonUrls.clear();
-            	m_strSkeletonIds.clear();
+            	m_strbkupSkeletonUrls.addAll(m_galSkeletons.m_strSkeletonUrls);
+            	m_strbkupSkeletonIds.addAll(m_galSkeletons.m_strSkeletonIds);
+            	m_galSkeletons.m_strSkeletonUrls.clear();
+            	m_galSkeletons.m_strSkeletonIds.clear();
             	m_bkupThumbIds.addAll(gAdapter.mThumbIds);
             	gAdapter.mThumbIds.clear();
-            	GetSkeletonData(query);
+            	GetSkeletonData(selectedTab,query);
             	searchView.clearFocus();
                 return true;
             }
@@ -189,6 +257,7 @@ public class GridOverheardSkeletonFragment extends Fragment {
 	public void ReturnResponseDocument(Document n_oDocument)
 	{
 		oPd.dismiss();
+		oPd = null;
 		NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
 		NodeList skelUrls = n_oDocument.getElementsByTagName("url");
 		NodeList skelIds = n_oDocument.getElementsByTagName("id");
@@ -197,33 +266,59 @@ public class GridOverheardSkeletonFragment extends Fragment {
 		for(int i=0 ; i < skelThumbs.getLength(); i++)
 		{
 			Node thumburl = skelThumbs.item(i);
-			gAdapter.mThumbIds.add(thumburl.getTextContent());
 			Node url = skelUrls.item(i);
 			Node id = skelIds.item(i);
-			m_strSkeletonUrls.add(url.getTextContent());
-			m_strSkeletonIds.add(id.getTextContent());
+			if(selectedTab == "gallery")
+			{
+				m_galSkeletons.mThumbIds.add(thumburl.getTextContent());
+				m_galSkeletons.m_strSkeletonUrls.add(url.getTextContent());
+				m_galSkeletons.m_strSkeletonIds.add(id.getTextContent());
+			}
+			else
+			{
+				m_privSkeletons.mThumbIds.add(thumburl.getTextContent());
+				m_privSkeletons.m_strSkeletonUrls.add(url.getTextContent());
+				m_privSkeletons.m_strSkeletonIds.add(id.getTextContent());
+			}
+
+			
 		}
+
+		if(selectedTab == "gallery")
+			gAdapter.mThumbIds.addAll(m_galSkeletons.mThumbIds);
+		else
+			gAdapter.mThumbIds.addAll(m_privSkeletons.mThumbIds);
+		
 		SetGridItems((GridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
 	
 	private void SetGridItems(GridView gridView)
 	{
-		
+		gAdapter.mThumbIds.clear();
+		if(selectedTab == "private")
+		{
+			gAdapter.mThumbIds.addAll(m_privSkeletons.mThumbIds);
+		}
+		else
+			gAdapter.mThumbIds.addAll(m_galSkeletons.mThumbIds);
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {	        	
             	MenuItem searchItem = optionsMenu.findItem(R.id.searchoverskel);
             	searchItem.collapseActionView();
             	
-
-	        	mCallback.onArticleSelected(m_strSkeletonIds.get(position),m_strSkeletonUrls.get(position));
+            	if(selectedTab == "private")
+            		mCallback.onArticleSelected(m_privSkeletons.m_strSkeletonIds.get(position),m_privSkeletons.m_strSkeletonUrls.get(position));
+            	else
+            		mCallback.onArticleSelected(m_galSkeletons.m_strSkeletonIds.get(position),m_galSkeletons.m_strSkeletonUrls.get(position));
 	        }
 	    });
 	}
-	private void GetSkeletonData(String tag)
+	private void GetSkeletonData(String mode,String tag)
 	{
 		m_strTag = tag;
+		m_strMode = mode;
 		if(oPd == null)
 		{
 			oPd = new ProgressDialog(getActivity());
@@ -236,26 +331,98 @@ public class GridOverheardSkeletonFragment extends Fragment {
 		Toast.makeText(getActivity(),
                 "Please wait, connecting to server.",
                 Toast.LENGTH_SHORT).show();
+		String URL = m_StrUrl;
 
+         if(m_strTag != "")
+         {
+         	 URL = URL + "&tag=" + m_strTag;
+         }
+         if(m_strMode == "private")
+         {
+         	 URL = URL + "&mode=mine";
+         }
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getActivity());
+    	oAsyncClient.MakeCall(URL);   
 
-        // Create Inner Thread Class
+       
+	}
+	public void AddFromCamera()
+	{
+		takePhoto();
+	}
+	public void AddFromGallery()
+	{
+		Intent intent = new Intent();
+		intent.setType("image/*");
+		intent.setAction(Intent.ACTION_GET_CONTENT);
+      	startActivityForResult(Intent.createChooser(intent,"Select Picture"), SELECT_PICTURE);
+	}
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == -1) {
+        	Uri selectedImageUri;
+            if (requestCode == SELECT_PICTURE) {
+				selectedImageUri = data.getData();
+            }
+            else
+            {
+            	selectedImageUri = Uri.parse(path);
+            }
+            mCallback.onArticleSelected("disk","uritheju"+selectedImageUri.toString());
+            	
+        	FragmentManager fragmentManager = getFragmentManager();
+        	fragmentManager.popBackStack();
+        }
+    }
+	 public void takePhoto()
+    {
+         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+         File folder = new File(Environment.getExternalStorageDirectory() + "/LoadImg");
+
+         if(!folder.exists())
+         {
+             folder.mkdir();
+         }        
+         final Calendar c = Calendar.getInstance();
+         String new_Date= c.get(Calendar.DAY_OF_MONTH)+"-"+((c.get(Calendar.MONTH))+1)   +"-"+c.get(Calendar.YEAR) +" " + c.get(Calendar.HOUR) + "-" + c.get(Calendar.MINUTE)+ "-"+ c.get(Calendar.SECOND);
+         path=String.format(Environment.getExternalStorageDirectory() +"/LoadImg/%s.png","LoadImg("+new_Date+")");
+         File photo = new File(path);
+         intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photo));
+         startActivityForResult(intent, 2);
+    }
+	    
+    public String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().getContentResolver().query(uri, filePathColumn, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+	public void UpdateTab(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void SetUrl(String string) {
+		m_StrUrl = string;
+		
+	}
+
+	@Override
+	public void OnResponse(String response) {
+		m_StrResponse = response;
+		 // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
              
-            private final HttpClient Client = new DefaultHttpClient();
-            private String URL = m_StrUrl;
             // After call for background.start this run method call
             public void run() {
                 try {
-                    if(m_strTag != "")
-                    {
-                    	 URL = URL + "&tag=" + m_strTag;
-                    }
-
-                    String SetServerString = "";
-                    HttpGet httpget = new HttpGet(URL);
-                    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                    SetServerString = Client.execute(httpget, responseHandler);
-                    threadMsg(SetServerString);
+                   
+                    threadMsg(m_StrResponse);
 
                 } catch (Throwable t) {
                     // just end the background thread
@@ -301,68 +468,6 @@ public class GridOverheardSkeletonFragment extends Fragment {
         });
         // Start Thread
         background.start();  //After call start method thread called run Methods
-	}
-	public void AddFromCamera()
-	{
-		takePhoto();
-	}
-	public void AddFromGallery()
-	{
-		Intent intent = new Intent();
-		intent.setType("image/*");
-		intent.setAction(Intent.ACTION_GET_CONTENT);
-      	startActivityForResult(Intent.createChooser(intent,"Select Picture"), SELECT_PICTURE);
-	}
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == -1) {
-        	Uri selectedImageUri;
-            if (requestCode == SELECT_PICTURE) {
-				selectedImageUri = data.getData();
-            }
-            else
-            {
-            	selectedImageUri = Uri.parse(path);
-            }
-            mCallback.onArticleSelected("","uritheju"+selectedImageUri.toString());
-            	
-        	FragmentManager fragmentManager = getFragmentManager();
-        	fragmentManager.popBackStack();
-        }
-    }
-	 public void takePhoto()
-    {
-         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-         File folder = new File(Environment.getExternalStorageDirectory() + "/LoadImg");
-
-         if(!folder.exists())
-         {
-             folder.mkdir();
-         }        
-         final Calendar c = Calendar.getInstance();
-         String new_Date= c.get(Calendar.DAY_OF_MONTH)+"-"+((c.get(Calendar.MONTH))+1)   +"-"+c.get(Calendar.YEAR) +" " + c.get(Calendar.HOUR) + "-" + c.get(Calendar.MINUTE)+ "-"+ c.get(Calendar.SECOND);
-         path=String.format(Environment.getExternalStorageDirectory() +"/LoadImg/%s.png","LoadImg("+new_Date+")");
-         File photo = new File(path);
-         intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photo));
-         startActivityForResult(intent, 2);
-    }
-	    
-    public String getPath(Uri uri) {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getActivity().getContentResolver().query(uri, filePathColumn, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
-
-	public void UpdateTab(String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void SetUrl(String string) {
-		m_StrUrl = string;
 		
 	}
 
