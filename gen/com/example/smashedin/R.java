@@ -737,7 +737,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int number_picker=0x7f030022;
         public static final int reviews_list_item=0x7f030023;
         public static final int row_spinner_item=0x7f030024;
-        public static final int simple_tabs=0x7f030025;
+        public static final int searchable=0x7f030025;
+        public static final int simple_tabs=0x7f030026;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;

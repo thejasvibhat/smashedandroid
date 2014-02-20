@@ -27,10 +27,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -52,6 +54,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -110,7 +114,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	        	}
 	        	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.beginTransaction()
-						.add(R.id.frame_container, gridSkelView).addToBackStack( "tag" ).commit();
+						.add(R.id.frame_container, gridSkelView).addToBackStack( "skel" ).commit();
 				
             
 	        }
@@ -186,7 +190,52 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		GridView gridView = (GridView) getActivity().findViewById(R.id.grid_view);
 	    gridView.setAdapter(gAdapter);
 	}
-	private void UploadOh() throws Exception
+	private void UploadOh() 
+	{
+		// 1. Instantiate an AlertDialog.Builder with its constructor
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+		// 2. Chain together various setter methods to set the dialog characteristics
+		builder.setMessage("How would you like people to see your Overheard?")
+		       .setTitle("Upload Overheard");
+		builder.setPositiveButton("Private",new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				try {
+					UploadActual("private");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		builder.setNegativeButton("Public",new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				try {
+					UploadActual("gallery");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	               // User cancelled the dialog
+
+		// 3. Get the AlertDialog from create()
+		AlertDialog dialog = builder.create();
+		  Window window = dialog.getWindow();
+	        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+	                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+	        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+	        dialog.show();
+	}
+	public void UploadActual(String mode) throws Exception
 	{
 		OverheardData oData = OverheardData.getInstance();
 		org.w3c.dom.Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -256,18 +305,18 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	 
 	    // return XML string
 	    String upString =  writer.toString();
-	    UploadOhString(upString);
+	    UploadOhString(upString,mode);
 	    
 	}
 	
-	private void UploadOhString(String data)
+	private void UploadOhString(String data,String mode)
 	{
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity());
     	RequestParams oParams = new RequestParams();
     	oParams.put("data",data);
-    	oAsyncClient.MakePostCall("http://www.smashed.in/api/oh/savemobile?mode=private",oParams);   
+    	oAsyncClient.MakePostCall("http://www.smashed.in/api/oh/savemobile?mode="+mode,oParams);   
 	}
 	private void UploadLocalImage()
 	{

@@ -30,6 +30,7 @@ import android.database.Cursor;
 import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.config.SkeletonData;
+import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.image.SmartImageView;
@@ -40,6 +41,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -263,6 +265,20 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 		NodeList skelIds = n_oDocument.getElementsByTagName("id");
 		if(gAdapter == null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
+		if(selectedTab == "gallery")
+		{
+			m_galSkeletons.mThumbIds.clear();
+			m_galSkeletons.m_strSkeletonUrls.clear();
+			m_galSkeletons.m_strSkeletonIds.clear();
+
+		}
+		else
+		{
+			m_privSkeletons.mThumbIds.clear();
+			m_privSkeletons.m_strSkeletonUrls.clear();
+			m_privSkeletons.m_strSkeletonIds.clear();
+
+		}
 		for(int i=0 ; i < skelThumbs.getLength(); i++)
 		{
 			Node thumburl = skelThumbs.item(i);
@@ -379,7 +395,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	 public void takePhoto()
     {
          Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-         File folder = new File(Environment.getExternalStorageDirectory() + "/LoadImg");
+         File folder = new File(Environment.getExternalStorageDirectory() + "/Overheards");
 
          if(!folder.exists())
          {
@@ -387,7 +403,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
          }        
          final Calendar c = Calendar.getInstance();
          String new_Date= c.get(Calendar.DAY_OF_MONTH)+"-"+((c.get(Calendar.MONTH))+1)   +"-"+c.get(Calendar.YEAR) +" " + c.get(Calendar.HOUR) + "-" + c.get(Calendar.MINUTE)+ "-"+ c.get(Calendar.SECOND);
-         path=String.format(Environment.getExternalStorageDirectory() +"/LoadImg/%s.png","LoadImg("+new_Date+")");
+         path=String.format(Environment.getExternalStorageDirectory() +"/Overheards/%s.png","Overheards("+new_Date+")");
          File photo = new File(path);
          intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photo));
          startActivityForResult(intent, 2);

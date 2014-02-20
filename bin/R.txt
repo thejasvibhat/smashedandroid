@@ -322,7 +322,8 @@ int layout main 0x7f030021
 int layout number_picker 0x7f030022
 int layout reviews_list_item 0x7f030023
 int layout row_spinner_item 0x7f030024
-int layout simple_tabs 0x7f030025
+int layout searchable 0x7f030025
+int layout simple_tabs 0x7f030026
 int menu main 0x7f0c0000
 int menu ohmain 0x7f0c0001
 int string action_settings 0x7f07001b

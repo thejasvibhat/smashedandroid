@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 
+import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
 import com.loopj.android.image.SmartImageView;
 
@@ -36,6 +37,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -95,18 +97,32 @@ public class GridOverheardFragment extends Fragment {
 	private GridImageSkelAdapter gAdapter = null;
 	private ProgressDialog oPd;
 	private boolean m_bSearchOn = false;
-	
+	private Menu optionsMenu = null;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 		
         View rootView = inflater.inflate(R.layout.fragment_skelview, container, false);
-        if(m_strSkeletonUrls.size() != 0)
+        String query = getActivity().getIntent().getStringExtra(SearchManager.QUERY);
+        if(query == null)
         {
-        	SetGridItems((GridView) rootView.findViewById(R.id.grid_view_skels));
+	        if(m_strSkeletonUrls.size() != 0)
+	        {
+	        	SetGridItems((GridView) rootView.findViewById(R.id.grid_view_skels));
+	        }
+	        else
+	        	GetSkeletonData("");
         }
         else
-        	GetSkeletonData("");
+        {
+        	getActivity().getActionBar().setTitle("Search results for '"+query+"'");
+        	GetSkeletonData(query);
+        }
+        if(this.optionsMenu != null)
+        {
+        	 MenuItem oSearchMenu = optionsMenu.findItem(R.id.searchoverskel);
+             oSearchMenu.collapseActionView();
+        }
         setHasOptionsMenu(true);
         m_bSearchOn = false;
         return rootView;
@@ -115,7 +131,9 @@ public class GridOverheardFragment extends Fragment {
 	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.searchoverskel).getActionView();
-
+        MenuItem oSearchMenu = menu.findItem(R.id.searchoverskel);
+        oSearchMenu.collapseActionView();
+        this.optionsMenu = menu;
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setIconifiedByDefault(false);   
             
@@ -147,6 +165,10 @@ public class GridOverheardFragment extends Fragment {
             	m_bSearchOn  = true;
             	GetSkeletonData(query);
             	searchView.clearFocus();
+    	        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
+    	                SampleRecentSuggestionsProvider.AUTHORITY, SampleRecentSuggestionsProvider.MODE);
+    	        suggestions.saveRecentQuery(query, null);
+
                 return true;
             }
         };
@@ -156,6 +178,11 @@ public class GridOverheardFragment extends Fragment {
 	@Override 
 	public void onResume()
 	{
+		if(this.optionsMenu != null)
+        {
+        	 MenuItem oSearchMenu = optionsMenu.findItem(R.id.searchoverskel);
+             oSearchMenu.collapseActionView();
+        }
 		  Singleton.getInstance().m_bShareMenuItem = true;
 		  Singleton.getInstance().m_bSearchMenuItem = false;
 		  getActivity().invalidateOptionsMenu();
@@ -321,7 +348,7 @@ public class GridOverheardFragment extends Fragment {
 	 public void takePhoto()
     {
          Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-         File folder = new File(Environment.getExternalStorageDirectory() + "/LoadImg");
+         File folder = new File(Environment.getExternalStorageDirectory() + "/Overheards");
 
          if(!folder.exists())
          {
@@ -329,7 +356,7 @@ public class GridOverheardFragment extends Fragment {
          }        
          final Calendar c = Calendar.getInstance();
          String new_Date= c.get(Calendar.DAY_OF_MONTH)+"-"+((c.get(Calendar.MONTH))+1)   +"-"+c.get(Calendar.YEAR) +" " + c.get(Calendar.HOUR) + "-" + c.get(Calendar.MINUTE)+ "-"+ c.get(Calendar.SECOND);
-         path=String.format(Environment.getExternalStorageDirectory() +"/LoadImg/%s.png","LoadImg("+new_Date+")");
+         path=String.format(Environment.getExternalStorageDirectory() +"/Overheards/%s.png","Overheards("+new_Date+")");
          File photo = new File(path);
          intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photo));
          startActivityForResult(intent, 2);

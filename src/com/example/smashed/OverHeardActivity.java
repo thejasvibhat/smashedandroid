@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
 import com.example.smashedin.*;
 
@@ -19,11 +20,13 @@ import android.app.ActionBar;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -70,7 +73,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
         
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowTitleEnabled(false);
+        //actionBar.setDisplayShowTitleEnabled(false);
 
         Tab tab = actionBar.newTab()
                            .setText("Gallery")
@@ -196,6 +199,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		if(m_OhFragment == null)
         	m_OhFragment = new OverHeardFragment();
+
     }
 	@Override
 	public void onBackPressed() {

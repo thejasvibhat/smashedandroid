@@ -144,6 +144,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		
 		int data= getIntent().getIntExtra("typeindex", 0);
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
@@ -266,7 +267,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 				  Singleton.getInstance().m_bSearchMenuItem = true;
 				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
-			   
+				  FragmentManager fragmentManager = getFragmentManager();
+					fragmentManager.popBackStack();
+
 		   }		   
 		   super.onBackPressed();
 		}
