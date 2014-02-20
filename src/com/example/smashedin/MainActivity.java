@@ -32,12 +32,16 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -51,13 +55,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
+    private Intent m_ohIntent;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private static final String[] CONTENT = new String[] { "Recent", "Artists", "Albums", "Songs", "Playlists", "Genres" };
 	// nav drawer title
 	private CharSequence mDrawerTitle;
-
+	private int m_oPosition = 0;
 	// used to store app title
 	private CharSequence mTitle;
 	private ListView m_oListView;
@@ -145,11 +150,14 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
-		int data= getIntent().getIntExtra("typeindex", 0);
+
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
-			displayView(data);
+			displayView(m_oPosition);
 		}
+		// Register mMessageReceiver to receive messages.
+		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+		      new IntentFilter("my-event"));
 	}
 	
 	
@@ -201,8 +209,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// toggle nav drawer on selecting action bar app icon/title
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
+		if(Singleton.getInstance().m_bDrawerClosed == false)
+		{			
+			if (mDrawerToggle.onOptionsItemSelected(item)) {
+				return true;
+			}
 		}
 		// Handle action bar actions click
 		switch (item.getItemId()) {
@@ -226,6 +237,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 	@Override
 	public void onBackPressed() {
+
+    	mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
 		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
 		   if (fragment instanceof CreateOverHeardFragment) {
 		          
@@ -279,8 +293,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		String accessToken = Singleton.getInstance().getAccessToken(); 
 		if(accessToken == "NOT_FOUND")
 		{
-            Intent intent = new Intent(m_oMainACtivity, HelloFacebookSampleActivity.class);
-            startActivity(intent);
+            //Intent intent = new Intent(m_oMainACtivity, HelloFacebookSampleActivity.class);
+            startActivity(getIntent());
             return;
 		}
 		else
@@ -431,8 +445,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			mDrawerList.setSelection(0);
 
 			Singleton.getInstance().m_oType = "oh";
-            Intent intent = new Intent(m_oMainACtivity, OverHeardActivity.class);
-            startActivity(intent);
+			if(m_ohIntent == null)
+				m_ohIntent = new Intent(m_oMainACtivity, OverHeardActivity.class);
+            startActivity(m_ohIntent);
 
 			return;
 			//break;
@@ -561,9 +576,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 	@Override
-    protected void onResume() {		
+    protected void onResume() {
+	    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);        
+
         super.onResume();
-  	  if(Singleton.getInstance().m_oType == "create") {
+        displayView(m_oPosition);
+        if(Singleton.getInstance().m_oType == "create") {
 	    	ShowCreateOverheard();
 	    } 
 
@@ -580,6 +598,14 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 		
 	}
-	
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+		    m_oPosition = intent.getIntExtra("position", 0);
+		  }
+
+	};
+
 	
 }

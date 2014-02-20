@@ -42,6 +42,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.SearchRecentSuggestions;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -114,7 +115,6 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 
         setHasOptionsMenu(true);
        SetTabs(rootView);
-        
         return rootView;
     }
 	private void SetTabs(View orootView)
@@ -186,10 +186,14 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	@Override 
 	public void onResume()
 	{
+	       DrawerLayout mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+	       mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);        
+	       
 		Singleton.getInstance().ClearAllOptionMenus();
     	Singleton.getInstance().m_bCameraMenuItem = false;
 		Singleton.getInstance().m_bGalleryMenuItem = false;
 		Singleton.getInstance().m_bSearchOverheardSkel = false;
+		Singleton.getInstance().m_bDrawerClosed = true;
 		getActivity().invalidateOptionsMenu();
 		super.onResume();
 	}

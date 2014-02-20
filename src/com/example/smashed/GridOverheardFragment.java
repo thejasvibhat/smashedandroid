@@ -27,6 +27,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 
+import com.example.async.SmashedAsyncClient;
+import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
 import com.loopj.android.image.SmartImageView;
@@ -53,7 +55,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class GridOverheardFragment extends Fragment {
+public class GridOverheardFragment extends Fragment implements OnResponseListener{
 	private String m_strTag = "";
 	SearchView searchView;
 	private static final int SELECT_PICTURE = 1;
@@ -65,6 +67,7 @@ public class GridOverheardFragment extends Fragment {
 	private String m_StrUrl;
 	private ArrayList<String> m_strBackUpSkeletonUrls = new ArrayList<String>();
 	private ArrayList<String> m_bkupThumbIds = new ArrayList<String>();
+	private String m_StrResponse;
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
         public void onArticleSelected(String id,String url);
@@ -251,71 +254,16 @@ public class GridOverheardFragment extends Fragment {
 		Toast.makeText(getActivity(),
                 "Please wait, connecting to server.",
                 Toast.LENGTH_SHORT).show();
+        if(m_strTag != "")
+        {
+        	 m_StrUrl = m_StrUrl + "&tag=" + m_strTag;
+        }
 
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getActivity());
+    	oAsyncClient.MakeCall(m_StrUrl);   
 
-        // Create Inner Thread Class
-        Thread background = new Thread(new Runnable() {
-             
-            private final HttpClient Client = new DefaultHttpClient();
-            private String URL = m_StrUrl;
-            // After call for background.start this run method call
-            public void run() {
-                try {
-                    if(m_strTag != "")
-                    {
-                    	 URL = URL + "&tag=" + m_strTag;
-                    }
-
-                    String SetServerString = "";
-                    HttpGet httpget = new HttpGet(URL);
-                    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                    SetServerString = Client.execute(httpget, responseHandler);
-                    threadMsg(SetServerString);
-
-                } catch (Throwable t) {
-                    // just end the background thread
-                    Log.i("Animation", "Thread  exception " + t);
-                }
-            }
-
-            private void threadMsg(String msg) {
-
-                if (!msg.equals(null) && !msg.equals("")) {
-                    Message msgObj = handler.obtainMessage();
-                    Bundle b = new Bundle();
-                    b.putString("message", msg);
-                    msgObj.setData(b);
-                    handler.sendMessage(msgObj);
-                }
-            }
-
-            // Define the Handler that receives messages from the thread and update the progress
-            private final Handler handler = new Handler() {
-
-                public void handleMessage(Message msg) {
-                    String aResponse = msg.getData().getString("message");
-
-                    if ((null != aResponse)) {
-                    	ResponseParser oParser = new ResponseParser(aResponse,getActivity());
-                    	oParser.SetFragment(m_curFragment);
-                    	oParser.Parse();
-                    }
-                    else
-                    {
-
-                            // ALERT MESSAGE
-                            Toast.makeText(
-                                    getActivity(),
-                                    "Not Got Response From Server.",
-                                    Toast.LENGTH_SHORT).show();
-                    }   
-
-                }
-            };
-
-        });
-        // Start Thread
-        background.start();  //After call start method thread called run Methods
 	}
 	public void AddFromCamera()
 	{
@@ -378,6 +326,67 @@ public class GridOverheardFragment extends Fragment {
 
 	public void SetUrl(String string) {
 		m_StrUrl = string;
+		
+	}
+
+	@Override
+	public void OnResponse(String response) {
+		m_StrResponse = response;
+
+        // Create Inner Thread Class
+        Thread background = new Thread(new Runnable() {
+             
+            private final HttpClient Client = new DefaultHttpClient();
+            private String URL = m_StrUrl;
+            // After call for background.start this run method call
+            public void run() {
+                try {
+                    threadMsg(m_StrResponse);
+
+                } catch (Throwable t) {
+                    // just end the background thread
+                    Log.i("Animation", "Thread  exception " + t);
+                }
+            }
+
+            private void threadMsg(String msg) {
+
+                if (!msg.equals(null) && !msg.equals("")) {
+                    Message msgObj = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("message", msg);
+                    msgObj.setData(b);
+                    handler.sendMessage(msgObj);
+                }
+            }
+
+            // Define the Handler that receives messages from the thread and update the progress
+            private final Handler handler = new Handler() {
+
+                public void handleMessage(Message msg) {
+                    String aResponse = msg.getData().getString("message");
+
+                    if ((null != aResponse)) {
+                    	ResponseParser oParser = new ResponseParser(aResponse,getActivity());
+                    	oParser.SetFragment(m_curFragment);
+                    	oParser.Parse();
+                    }
+                    else
+                    {
+
+                            // ALERT MESSAGE
+                            Toast.makeText(
+                                    getActivity(),
+                                    "Not Got Response From Server.",
+                                    Toast.LENGTH_SHORT).show();
+                    }   
+
+                }
+            };
+
+        });
+        // Start Thread
+        background.start();  //After call start method thread called run Methods
 		
 	}
 

@@ -19,6 +19,7 @@ public class Singleton {
 	public boolean m_bSearchMenuItem = true;
 	public boolean m_bSaveOhTextMenuItem = true;
 	public boolean m_bSearchOverheardSkel = true;
+	public boolean m_bDrawerClosed = false;
 	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
 	public SharedPreferences m_LocalStorage;
@@ -65,7 +66,7 @@ public class Singleton {
     	m_bSearchMenuItem = true;
     	m_bSaveOhTextMenuItem = true;
     	m_bSearchOverheardSkel = true;
-
+    	m_bDrawerClosed = false;
     }
 
 

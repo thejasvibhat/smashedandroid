@@ -32,6 +32,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -120,7 +121,12 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 					@Override
 					public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
 						if(myUploadFragment == null)
-							myUploadFragment = new MyGalleryFragment();
+						{
+							myUploadFragment = new GridOverheardFragment();
+							((GridOverheardFragment) myUploadFragment).AddFragment();
+							((GridOverheardFragment) myUploadFragment).SetUrl("http://www.smashed.in/api/oh/list?mode=private&offset=0&limit=100");
+
+						}
 						android.app.FragmentManager fragmentManager = getFragmentManager();
 						fragmentManager.beginTransaction()
 								.replace(R.id.frame_container_oh, myUploadFragment).addToBackStack( "oh" ).commit();
@@ -222,9 +228,14 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
     private void displayView(int position) {
     	if(position == 2)
     		position = 3;
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("typeindex", position);
-        startActivity(intent);
+    	Intent intent = new Intent("my-event");
+    	  // add data
+    	  intent.putExtra("position", position);
+    	  LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        //Intent intent = new Intent(this, MainActivity.class);
+        //intent.putExtra("typeindex", position);
+        //startActivity(intent);
+        finish();
         return;
 /*    		// update the main content by replacing fragments
     		Singleton.getInstance().m_bCameraMenuItem = false;
