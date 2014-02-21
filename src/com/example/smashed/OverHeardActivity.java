@@ -11,12 +11,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.example.async.SmashedAsyncClient;
+import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
 import com.example.smashedin.*;
 
 
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
@@ -44,13 +48,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSelectedListener {
+public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSelectedListener,OnResponseListener {
     private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	// nav drawer title
 	private CharSequence mDrawerTitle;
-
+	private ProgressDialog oPd;
 	// used to store app title
 	private CharSequence mTitle;
 	private ListView m_oListView;
@@ -66,6 +70,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 	private android.app.Fragment myUploadFragment;
 	ArrayList<ReviewItem> itemsList = null;
 	android.app.Fragment m_OhFragment;
+	private Tab m_galTab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +113,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 							}
 						});
         actionBar.addTab(tab);
+        m_galTab = tab;
         Tab tab1 = actionBar.newTab()
                 .setText("My Overheards")
                 .setTabListener(new TabListener() {
@@ -120,6 +126,11 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 					
 					@Override
 					public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+						if(Singleton.getInstance().loggedIn != true)
+						{
+							Login("overheard");
+							return;
+						}
 						if(myUploadFragment == null)
 						{
 							myUploadFragment = new GridOverheardFragment();
@@ -207,6 +218,36 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
         	m_OhFragment = new OverHeardFragment();
 
     }
+    private void Login(String type)
+	{
+		Singleton.getInstance().m_oType = type;
+		String accessToken = Singleton.getInstance().getAccessToken(); 
+		if(accessToken == "NOT_FOUND")
+		{
+            Intent intent = new Intent(getApplicationContext(), HelloFacebookSampleActivity.class);
+            startActivity(intent);
+            getActionBar().selectTab(m_galTab);
+            return;
+		}
+		else
+		{
+			if(oPd == null)
+			{
+				oPd = new ProgressDialog(this);
+				oPd.setTitle("Trying to get Smashed...");
+				oPd.setMessage("Please wait.");
+				oPd.setIndeterminate(true);
+				oPd.setCancelable(false);
+				oPd.show();
+			}
+
+        	String url = "http://www.smashed.in/auth/post/facebook?access_token="+accessToken;
+        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        	oAsyncClient.Attach(this);
+        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        	oAsyncClient.MakeCall(url);        	
+		}
+	}
 	@Override
 	public void onBackPressed() {
 		
@@ -468,6 +509,27 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		fragmentManager.beginTransaction()
 				.add(R.id.frame_container_oh, m_OhFragment).addToBackStack( "new" ).commit();
 
+		
+	}
+	@Override
+	public void OnResponse(String response) {
+		if(oPd != null)
+			oPd.dismiss();
+		Singleton.getInstance().loggedIn = true;
+		if(Singleton.getInstance().m_oType == "overheard")
+		{
+			if(myUploadFragment == null)
+			{
+				myUploadFragment = new GridOverheardFragment();
+				((GridOverheardFragment) myUploadFragment).AddFragment();
+				((GridOverheardFragment) myUploadFragment).SetUrl("http://www.smashed.in/api/oh/list?mode=private&offset=0&limit=100");
+
+			}
+			android.app.FragmentManager fragmentManager = getFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.frame_container_oh, myUploadFragment).addToBackStack( "oh" ).commit();
+
+		}
 		
 	}
 	
