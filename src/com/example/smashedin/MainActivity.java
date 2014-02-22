@@ -2,7 +2,10 @@ package com.example.smashedin;
 
 import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.common.NavDrawerItem;
+import com.example.common.NavDrawerListAdapter;
 import com.example.facebook.HelloFacebookSampleActivity;
+import com.example.reviews.ReviewActivity;
 import com.example.smashed.*;
 import com.example.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
@@ -56,6 +59,7 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
     private Intent m_ohIntent;
+    private Intent m_reviewIntent;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -369,76 +373,16 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			fragment = new HomeFragment();
 			break;
 		case 1:
-			Singleton.getInstance().m_bRowAddMenuItem = true;
-			Singleton.getInstance().m_bSaveMenuItem = true;
-			Singleton.getInstance().m_bShareMenuItem = true;
-			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-			fragment = new HomeFragment();
-			/*Toast.makeText(getBaseContext(),
-                    "Please wait, connecting to server.",
-                    Toast.LENGTH_SHORT).show();
+			mDrawerLayout.closeDrawer(mDrawerList);
+			mDrawerList.setItemChecked(0, true);
+			mDrawerList.setSelection(0);
 
+			Singleton.getInstance().m_oType = "reviews";
+			if(m_reviewIntent == null)
+				m_reviewIntent = new Intent(m_oMainACtivity, ReviewActivity.class);
+            startActivity(m_reviewIntent);
 
-            // Create Inner Thread Class
-            Thread background = new Thread(new Runnable() {
-                 
-                private final HttpClient Client = new DefaultHttpClient();
-                private String URL = "http://www.smashed.in/api/b/list";
-                 
-                // After call for background.start this run method call
-                public void run() {
-                    try {
-
-                        String SetServerString = "";
-                        HttpGet httpget = new HttpGet(URL);
-                        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                        SetServerString = Client.execute(httpget, responseHandler);
-                        threadMsg(SetServerString);
-
-                    } catch (Throwable t) {
-                        // just end the background thread
-                        Log.i("Animation", "Thread  exception " + t);
-                    }
-                }
-
-                private void threadMsg(String msg) {
-
-                    if (!msg.equals(null) && !msg.equals("")) {
-                        Message msgObj = handler.obtainMessage();
-                        Bundle b = new Bundle();
-                        b.putString("message", msg);
-                        msgObj.setData(b);
-                        handler.sendMessage(msgObj);
-                    }
-                }
-
-                // Define the Handler that receives messages from the thread and update the progress
-                private final Handler handler = new Handler() {
-
-                    public void handleMessage(Message msg) {
-                        String aResponse = msg.getData().getString("message");
-
-                        if ((null != aResponse)) {
-                        	ResponseParser oParser = new ResponseParser(aResponse,m_oMainACtivity);
-                        	oParser.Parse();
-                        }
-                        else
-                        {
-
-                                // ALERT MESSAGE
-                                Toast.makeText(
-                                        getBaseContext(),
-                                        "Not Got Response From Server.",
-                                        Toast.LENGTH_SHORT).show();
-                        }   
-
-                    }
-                };
-
-            });
-            // Start Thread
-            background.start(); */ //After call start method thread called run Methods
-			break;
+			return;
 		case 2:
 			mDrawerLayout.closeDrawer(mDrawerList);
 			mDrawerList.setItemChecked(0, true);

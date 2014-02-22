@@ -1,4 +1,4 @@
-package com.example.smashed;
+package com.example.common;
 
 public class NavDrawerItem {
 	

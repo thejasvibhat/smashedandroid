@@ -1,4 +1,4 @@
-package com.example.smashed;
+package com.example.common;
 
 
 import com.example.smashedin.R; 

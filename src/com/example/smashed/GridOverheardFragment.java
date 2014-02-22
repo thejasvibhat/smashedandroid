@@ -209,8 +209,9 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	public void ReturnResponseDocument(Document n_oDocument)
 	{
 		oPd.dismiss();
-		NodeList skelThumbs = n_oDocument.getElementsByTagName("icon");
-		NodeList skelUrls = n_oDocument.getElementsByTagName("url");
+		NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
+		NodeList skelIds = n_oDocument.getElementsByTagName("id");
+		NodeList downloadUrls = n_oDocument.getElementsByTagName("downloadurl");
 		//NodeList ohCreatorname = n_oDocument.getElementsByTagName("id");
 		if(gAdapter == null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
@@ -219,10 +220,11 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 			Node thumburl = skelThumbs.item(i);
 			String iconUrl = thumburl.getTextContent();
 			String[] urls = iconUrl.split("/");			
-			gAdapter.mThumbIds.add("http://www.smashed.in"+thumburl.getTextContent());
-			Node url = skelUrls.item(i);
+			gAdapter.mThumbIds.add(thumburl.getTextContent());
+			Node id = skelIds.item(i);
+			Node url = downloadUrls.item(i);
 			//Node id = skelIds.item(i);
-			m_strSkeletonUrls.add("http://www.smashed.in/res/download/"+urls[urls.length - 1]);
+			m_strSkeletonUrls.add(url.getTextContent());
 			//m_strSkeletonIds.add(id.getTextContent());
 		}
 		SetGridItems((GridView) getView().findViewById(R.id.grid_view_skels));

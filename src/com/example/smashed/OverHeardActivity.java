@@ -13,6 +13,8 @@ import org.w3c.dom.NodeList;
 
 import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.common.NavDrawerItem;
+import com.example.common.NavDrawerListAdapter;
 import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
