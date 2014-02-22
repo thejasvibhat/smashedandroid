@@ -1,5 +1,7 @@
 package com.example.reviews;
 
+import com.example.smashedin.R;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
@@ -17,12 +19,12 @@ public final class ReviewFragment extends Fragment {
         ReviewFragment fragment = new ReviewFragment();
 
         fragment.mContent = content;
-        fragment.mRevData = mRevData;
+        fragment.mRevData = oRevData;
         return fragment;
     }
 
     private String mContent = "???";
-    private static ReviewData mRevData = null;
+    private ReviewData mRevData = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +68,12 @@ public final class ReviewFragment extends Fragment {
 
 	private View GetViewForInfo() {
 		// TODO Auto-generated method stub
-		
-		return null;
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.infoview,null,false);
+        ((TextView)view.findViewById(R.id.revinfoname)).setText(mRevData.name);
+        ((TextView)view.findViewById(R.id.revinfoaddress)).setText(mRevData.location.address);
+        ((TextView)view.findViewById(R.id.revinfocitystate)).setText(mRevData.location.city+","+mRevData.location.state);
+        ((TextView)view.findViewById(R.id.revinfodist)).setText(mRevData.location.distance);
+		return view;
 	}
 
 	@Override

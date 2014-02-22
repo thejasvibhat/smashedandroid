@@ -28,7 +28,7 @@ public class GridReviewsAdapter extends BaseAdapter {
     private Context mContext;
  
     // Keep all Images in array
-    public  ArrayList<FsqVenue> FsqVenues = new ArrayList<FsqVenue>();
+    public  ArrayList<ReviewData> FsqVenues = new ArrayList<ReviewData>();
  
     // Constructor
     public GridReviewsAdapter(Context c){
@@ -55,14 +55,11 @@ public class GridReviewsAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.revieweachitem,null,false);
         }
-        int distance = FsqVenues.get(position).distance;
-        float dist = ((float)distance)/1000;
-        String result = String.format("%.2f", dist);
-        result = result + "km";
+        String distance = FsqVenues.get(position).location.distance;
         
         ((TextView)convertView.findViewById(R.id.revname)).setText(FsqVenues.get(position).name);
-        ((TextView)convertView.findViewById(R.id.revadd)).setText(FsqVenues.get(position).address);
-        ((TextView)convertView.findViewById(R.id.revdist)).setText(result);
+        ((TextView)convertView.findViewById(R.id.revadd)).setText(FsqVenues.get(position).location.address);
+        ((TextView)convertView.findViewById(R.id.revdist)).setText(distance);
         return convertView;
     }
     public static float dipToPixels(Context context, float dipValue) {

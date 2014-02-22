@@ -2,6 +2,7 @@ package com.example.reviews;
 import com.example.smashedin.*;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -295,8 +297,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	String fnialAddress = builder.toString(); //This is the complete address.
     	} catch (IOException e) {}
     	  catch (NullPointerException e) {}
-    	
-		String url 	= "https://api.foursquare.com/v2/venues/search?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll="+location.getLatitude()+","+location.getLongitude()+"&query=hotel";
+
+		String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll="+location.getLatitude()+","+location.getLongitude()+"&venuePhotos=1&offset=0&limit=50";
+
 		TextView oText = (TextView) findViewById(R.id.locationText);
 		oText.setText(localArea);
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
@@ -600,24 +603,27 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	private void ParseJson(String response) throws JSONException
 	{
-		ArrayList<FsqVenue> venueList = new ArrayList<FsqVenue>();
+		ArrayList<ReviewData> venueList = ListReviewDataSingleton.getInstance().venueList;
 		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
 		
-		JSONArray items	= (JSONArray) jsonObj.getJSONObject("response").getJSONArray("venues");
+		JSONArray groups	= (JSONArray) jsonObj.getJSONObject("response").getJSONArray("groups");
+		JSONObject group = (JSONObject) groups.get(0);
+		JSONArray items = group.getJSONArray("items");
 		
 		int length			= items.length();
 		
 		if (length > 0) {
 			for (int i = 0; i < length; i++) {
+				ReviewData oRevData = new ReviewData();
 				//JSONObject group 	= (JSONObject) groups.get(i);
 				//JSONArray items 	= (JSONArray) group.getJSONArray("items");
 				
 				//int ilength 		= items.length();
 				
 				//for (int j = 0; j < ilength; j++) {
-					JSONObject item = (JSONObject) items.get(i);
-					
-					FsqVenue venue 	= new FsqVenue();
+					JSONObject item = ((JSONObject) items.get(i)).getJSONObject("venue");
+					venueList.add(ParseJsonObjectItem(item));
+/*					FsqVenue venue 	= new FsqVenue();
 					
 					venue.id 		= item.getString("id");
 					venue.name		= item.getString("name");
@@ -642,11 +648,49 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 					
 					venueList.add(venue);
 				//}
-			}
+*/			}
 		}
+		
 		gAdapter.FsqVenues = venueList;
 		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	}
+	private ReviewData ParseJsonObjectItem(JSONObject item) throws JSONException
+	{
+		ReviewData venue = new ReviewData();
+					
+		venue.id 		= item.getString("id");
+		venue.name		= item.getString("name");
+		try {
+			venue.rating    = item.getString("rating");	
+		} catch (Exception e) {
+			venue.rating    = "1.0";
+		}
+		
+		JSONObject location = (JSONObject) item.getJSONObject("location");
+		venue.location = new ReviewLocation();
+		venue.location.PopulateData(location);
+		try {
+			venue.contact = item.getJSONObject("contact").getString("formattedPhone");	
+		} catch (Exception e) {
+			venue.contact = "";
+		}
+		
+		ArrayList<String> photos= new ArrayList<String>();
+		
+		try {
+			JSONArray photosUrls	= (JSONArray)((JSONObject)((JSONArray) item.getJSONObject("photos").getJSONArray("venues")).get(0)).getJSONArray("items");
+			for(int i = 0; i < photosUrls.length(); i++)
+			{
+				JSONObject pata = (JSONObject)photosUrls.get(i);
+				venue.photos.add(pata.getString("prefix")+pata.getString("suffix"));
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return venue;
+	}
+
 	private void SetGridItems(GridView gridView)
 	{
 		gridView.setAdapter(gAdapter);
@@ -658,9 +702,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				
 	            Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
 	            Bundle b = new Bundle();
-	            b.putString("id", gAdapter.FsqVenues.get(location).id); //Your id
-	            b.putString("name", (String) ((TextView)arg1.findViewById(R.id.revname)).getText()); 
-	            intent.putExtras(b); //Put your id to your next Intent
+	            b.putInt("position", location);
+	            intent.putExtras(b);
 	            startActivity(intent);
 				
 				

@@ -34,9 +34,21 @@ public class ReviewLocation {
 			distance = "";
 		}
 		
-		postalcode = location.getString("postalCode");
-		city = location.getString("city");
-		state = location.getString("state");
+		//postalcode = location.getString("postalCode");
+		try {
+			city = location.getString("city");
+			
+		} catch (Exception e) {
+			city = "";
+
+		}
+		
+		try {
+			state = location.getString("state");	
+		} catch (Exception e) {
+			state = "Karnataka";
+		}
+		
 		 
 
 	}

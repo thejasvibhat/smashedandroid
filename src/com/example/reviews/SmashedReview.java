@@ -30,6 +30,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpage_tabs);
+        Bundle b = getIntent().getExtras();
+        int pos = b.getInt("position");
+        oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
+
         FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
 
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
@@ -38,19 +42,16 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         TabPageIndicator indicator = (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
 
+        
 
     }
     @Override
     public void onResume()
     {
         Bundle b = getIntent().getExtras();
-        String id = b.getString("id");
+        ReviewData oData = b.getParcelable("places");
 
         getActionBar().setTitle(b.getString("name"));
-		String url 	= "https://api.foursquare.com/v2/venues/"+id+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=2013081";
-    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-    	oAsyncClient.Attach(this);
-    	oAsyncClient.MakeCall(url);        	
     	
     }
     
@@ -117,6 +118,11 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 					
 		venue.id 		= item.getString("id");
 		venue.name		= item.getString("name");
+		try {
+			venue.rating    = item.getString("rating");	
+		} catch (Exception e) {
+			venue.rating    = "1.0";
+		}
 		
 		JSONObject location = (JSONObject) item.getJSONObject("location");
 		venue.location = new ReviewLocation();
