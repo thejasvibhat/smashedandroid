@@ -1,5 +1,7 @@
 # cache for current jar dependency. DO NOT EDIT.
 # format is <lastModified> <length> <SHA-1> <path>
 # Encoding is UTF-8
+1393143550000 1501528 e5f81129dfb3d02df80126512bc98278ed2bb40a /home/thejasvi/android-sdks/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar
+1393143550000 1501528 e5f81129dfb3d02df80126512bc98278ed2bb40a /home/thejasvi/workspace/smashedandroid/smashedandroid/libs/google-play-services.jar
 1386589412000 349252 612846c9857077a039b533718f72db3bc041d389 /home/thejasvi/workspace/smashedandroid/smashedandroid/libs/android-support-v4.jar
 1386589412000 349252 612846c9857077a039b533718f72db3bc041d389 /home/thejasvi/Desktop/facebook-android-sdk-3.6.0/facebook/libs/android-support-v4.jar

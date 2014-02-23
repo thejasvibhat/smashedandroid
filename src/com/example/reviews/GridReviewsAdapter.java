@@ -60,6 +60,8 @@ public class GridReviewsAdapter extends BaseAdapter {
         ((TextView)convertView.findViewById(R.id.revname)).setText(FsqVenues.get(position).name);
         ((TextView)convertView.findViewById(R.id.revadd)).setText(FsqVenues.get(position).location.address);
         ((TextView)convertView.findViewById(R.id.revdist)).setText(distance);
+        SmartImageView imgview = ((SmartImageView)convertView.findViewById(R.id.m_oRevIcon));
+        imgview.setImageUrl(FsqVenues.get(position).photo);
         return convertView;
     }
     public static float dipToPixels(Context context, float dipValue) {

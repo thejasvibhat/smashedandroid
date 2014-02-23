@@ -29,7 +29,7 @@
 			            android:id="@+id/textView1"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:text="You are around "
+			            android:text="Smashing places around  "
 			            android:fontFamily="impact.eot"
 			            android:textAppearance="?android:attr/textAppearanceMedium" />
 			
@@ -56,6 +56,7 @@
 			            android:id="@+id/refreshLocation"
 			            android:layout_width="wrap_content"
 			            android:layout_height="50dp"
+			            android:paddingRight="10dp"
 			            android:src="@drawable/refreshiconlocation" />
 			            <ProgressBar
 			                android:gravity="center_vertical"

@@ -23,8 +23,9 @@ import android.widget.TextView;
 
 import com.viewpagerindicator.TabPageIndicator;
 
-public class SmashedReview extends FragmentActivity implements OnResponseListener{
-    private static final String[] CONTENT = new String[] { "INFO", "MAP", "PHOTOS", "MENU", "OVERHEARDS", "FOOD" };
+public class SmashedReview extends FragmentActivity{
+    //private static final String[] CONTENT = new String[] { "INFO", "MAP", "PHOTOS", "MENU", "OVERHEARDS", "FOOD" };
+	private static final String[] CONTENT = new String[] { "INFO", "MAP", "PHOTOS", "OVERHEARDS", "FOOD" };
     private ReviewData oRevData = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,66 +83,5 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			m_oFragment.UpdateRevData(oRevData);
 		}
     }
-
-	@Override
-	public void OnResponse(String response) {
-		ReviewData oRev = null;
-		try {
-			oRev = ParseJson(response);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(oRev != null)
-		{
-			oRevData = oRev;
-	        //FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
-
-	        ViewPager pager = (ViewPager)findViewById(R.id.pager);
-	        GoogleMusicAdapter adapter = (GoogleMusicAdapter) pager.getAdapter();
-	        adapter.UpdateFragment();
-	        pager.setAdapter(adapter);
-
-	        TabPageIndicator indicator = (TabPageIndicator)findViewById(R.id.indicator);
-	        indicator.setViewPager(pager);
-			
-		}
-		
-	}
-	private ReviewData ParseJson(String response) throws JSONException
-	{
-		ReviewData venue = new ReviewData();
-		ArrayList<FsqVenue> venueList = new ArrayList<FsqVenue>();
-		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
-		
-		JSONObject item	= (JSONObject) jsonObj.getJSONObject("response").getJSONObject("venue");
-					
-		venue.id 		= item.getString("id");
-		venue.name		= item.getString("name");
-		try {
-			venue.rating    = item.getString("rating");	
-		} catch (Exception e) {
-			venue.rating    = "1.0";
-		}
-		
-		JSONObject location = (JSONObject) item.getJSONObject("location");
-		venue.location = new ReviewLocation();
-		venue.location.PopulateData(location);
-		venue.contact = item.getJSONObject("contact").getString("formattedPhone");
-		ArrayList<String> photos= new ArrayList<String>();
-		
-		try {
-			JSONArray photosUrls	= (JSONArray)((JSONObject)((JSONArray) item.getJSONObject("photos").getJSONArray("venues")).get(0)).getJSONArray("items");
-			for(int i = 0; i < photosUrls.length(); i++)
-			{
-				JSONObject pata = (JSONObject)photosUrls.get(i);
-				venue.photos.add(pata.getString("prefix")+pata.getString("suffix"));
-			}
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return venue;
-	}
 
 }

@@ -297,8 +297,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	String fnialAddress = builder.toString(); //This is the complete address.
     	} catch (IOException e) {}
     	  catch (NullPointerException e) {}
-
+    	
 		String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll="+location.getLatitude()+","+location.getLongitude()+"&venuePhotos=1&offset=0&limit=50";
+    	//String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll=12.97,77.64&venuePhotos=1&offset=0&limit=50";
 
 		TextView oText = (TextView) findViewById(R.id.locationText);
 		oText.setText(localArea);
@@ -673,18 +674,28 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			venue.contact = item.getJSONObject("contact").getString("formattedPhone");	
 		} catch (Exception e) {
 			venue.contact = "";
-		}
-		
-		ArrayList<String> photos= new ArrayList<String>();
+		} 
 		
 		try {
-			JSONArray photosUrls	= (JSONArray)((JSONObject)((JSONArray) item.getJSONObject("photos").getJSONArray("venues")).get(0)).getJSONArray("items");
+			JSONArray photosUrls	= (JSONArray)((JSONObject)((JSONArray) item.getJSONObject("photos").getJSONArray("groups")).get(0)).getJSONArray("items");
 			for(int i = 0; i < photosUrls.length(); i++)
 			{
 				JSONObject pata = (JSONObject)photosUrls.get(i);
-				venue.photos.add(pata.getString("prefix")+pata.getString("suffix"));
+				venue.photo = pata.getString("prefix")+"100x100"+pata.getString("suffix");
 			}
 			
+		} catch (Exception e) {
+			
+		}
+		try {
+			venue.categories = "";
+			JSONArray cats = (JSONArray)item.getJSONArray("categories");
+			for(int i = 0; i < cats.length(); i++)
+			{
+				JSONObject pata = (JSONObject)cats.get(i);
+				venue.categories = venue.categories + " " + pata.getString("name");
+			}
+
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

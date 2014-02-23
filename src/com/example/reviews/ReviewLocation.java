@@ -29,6 +29,7 @@ public class ReviewLocation {
 			int dist = location.getInt("distance");
 			float inPre = ((float)dist)/1000;
 			distance = String.format("%.2f", inPre); 
+			distance = distance + "km";
 	
 		} catch (Exception e) {
 			distance = "";

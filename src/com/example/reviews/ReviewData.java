@@ -9,6 +9,9 @@ public class ReviewData {
 	public String contact;
 	public String url;
 	public ReviewLocation location;
+	public String photo;
+	public String categories;
+	public OverheardData ohdata;
 	public ArrayList<String> photos;
 	public void ReviewData()
 	{

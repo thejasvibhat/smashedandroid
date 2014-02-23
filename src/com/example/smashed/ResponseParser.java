@@ -12,6 +12,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.example.reviews.ReviewFragment;
 import com.example.smashedin.MainActivity;
 
 import android.app.Activity;
@@ -25,7 +26,7 @@ public class ResponseParser {
 	private DocumentBuilder m_oDocumentBuilder = null;
 	private String m_strResponseData;
 	private Activity oMainActivity;
-	private Fragment m_Fragment = null;
+	private Object m_Fragment = null;
 	public ResponseParser(String responseData,Activity activity)
 	{
 		oMainActivity = activity;
@@ -80,6 +81,8 @@ public class ResponseParser {
 	        	{
 	        		if(m_Fragment instanceof GridOverheardSkeletonFragment)
 	        			((GridOverheardSkeletonFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
+	        		else if(m_Fragment instanceof ReviewFragment)
+	        			((ReviewFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        		else
 	        			((GridOverheardFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        	}
@@ -93,5 +96,9 @@ public class ResponseParser {
 	        	
 	        }
 	    }
+	public void SetFragment(android.support.v4.app.Fragment m_curFragment) {
+		m_Fragment = m_curFragment;
+		
+	}
 
 }
