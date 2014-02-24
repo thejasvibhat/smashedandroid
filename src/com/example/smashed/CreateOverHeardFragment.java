@@ -593,7 +593,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 			if(Singleton.getInstance().bid != "")
 			{
 				Intent intent = new Intent("bidoh");
-		    	intent.putExtra("iconurl", "www.smashed.in/res/icon/"+response);
+		    	intent.putExtra("iconurl", "http://www.smashed.in/res/icon/"+response);
 		    	LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
 		        getActivity().finish();
 			}

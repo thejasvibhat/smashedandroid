@@ -733,11 +733,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
 	}
+	
 	@Override
 	public void OnResponse(String response) {
 		if(oPd != null)
 			oPd.dismiss();
-		Singleton.getInstance().loggedIn = true;
+		
 		if(Singleton.getInstance().m_oType == "reviews")
 		{
 			try {

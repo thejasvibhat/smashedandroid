@@ -298,8 +298,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		String accessToken = Singleton.getInstance().getAccessToken(); 
 		if(accessToken == "NOT_FOUND")
 		{
-            //Intent intent = new Intent(m_oMainACtivity, HelloFacebookSampleActivity.class);
-            startActivity(getIntent());
+            Intent intent = new Intent(m_oMainACtivity, HelloFacebookSampleActivity.class);
+            startActivity(intent);
             return;
 		}
 		else

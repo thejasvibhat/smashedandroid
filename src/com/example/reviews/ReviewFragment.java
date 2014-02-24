@@ -155,7 +155,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		ohGrid = (GridView) ohview.findViewById(R.id.grid_view_skels);
 		if(gOhAdapter == null)
 			gOhAdapter = new GridOverheardReviewAdapter(getActivity());
-		if(mRevData.ohdata != null)
+		if((mRevData.ohdata != null)&&(mRevData.ohdata.ohUrl != null))
 		{
 			gOhAdapter.mThumbIds.addAll(mRevData.ohdata.ohUrl);
 			ohGrid.setAdapter(gOhAdapter);
