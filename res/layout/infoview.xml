@@ -119,6 +119,7 @@
 		                android:layout_marginLeft="10dp"
 		                android:layout_marginTop="10dp"
 		                android:text="Name"
+		                android:autoLink="all"
 		                android:textSize="16dp" />
 		            
 		                        
@@ -184,4 +185,10 @@
 		    android:background="@android:color/darker_gray"/>
 		</LinearLayout>
 	</RelativeLayout>
+	<fragment
+        android:id="@+id/map"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" />
 </LinearLayout>

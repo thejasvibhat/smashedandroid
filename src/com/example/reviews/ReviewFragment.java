@@ -16,6 +16,7 @@ import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.smashed.GridImageSkelAdapter;
 import com.example.smashed.ResponseParser;
+import com.example.smashed.Singleton;
 import com.example.smashedin.R;
 import com.google.android.gms.internal.gh;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,10 +29,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.RequestParams;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -56,6 +62,10 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private String m_StrResponse;
     private GoogleMap map;
     private Fragment m_curFragment;
+    private View mapview;
+    private View photosview;
+    private View infoview;
+    private View ohview;
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
         ReviewFragment fragment = new ReviewFragment();
 
@@ -73,6 +83,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         if ((savedInstanceState != null) && savedInstanceState.containsKey(KEY_CONTENT)) {
             mContent = savedInstanceState.getString(KEY_CONTENT);
         }
+		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+			      new IntentFilter("bidoh"));
+
     }
 
     @Override
@@ -117,12 +130,29 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	{
     		return GetViewForOverheards();
     	}
-		return null;
+    	else
+    	{
+    		TextView text = new TextView(getActivity());
+	        text.setGravity(Gravity.CENTER);
+	        text.setText(mContent);
+	        text.setTextSize(20 * getResources().getDisplayMetrics().density);
+	        text.setPadding(20, 20, 20, 20);
+	
+	        LinearLayout layout = new LinearLayout(getActivity());
+	        layout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+	        layout.setGravity(Gravity.CENTER);
+	        layout.addView(text);
+	
+	        return layout;	
+    	}
+		
 	}
     private View GetViewForOverheards()
     {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
-		ohGrid = (GridView) view.findViewById(R.id.grid_view_skels);
+    	if(ohview != null)
+    		return ohview;
+        ohview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
+		ohGrid = (GridView) ohview.findViewById(R.id.grid_view_skels);
 		if(gOhAdapter == null)
 			gOhAdapter = new GridOverheardReviewAdapter(getActivity());
 		if(mRevData.ohdata != null)
@@ -135,21 +165,23 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			m_oType = "oh";
 			mRevData.ohdata = new OverheardData();
 			mRevData.ohdata.id = mRevData.id;
-			String url = "http://www.smashed.in/api/b/overheards?bid=a6973741-d4ec-4b81-aeab-3a4e10e57cc8";
+			String url = "http://www.smashed.in/api/b/fsoverheards?fsbid="+mRevData.ohdata.id;
 			SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
 	    	oAsyncClient.Attach(this);
 	    	oAsyncClient.SetPersistantStorage(getActivity());
 	    	oAsyncClient.MakeCall(url);   
 
 		}
-		return view;
+		return ohview;
 
     }
     
     private View GetViewForMap()
     {
+    	if(mapview != null)
+    		return mapview;
     	KIEL = new LatLng(Double.parseDouble(mRevData.location.lat), Double.parseDouble(mRevData.location.lng));
-    	View view = LayoutInflater.from(getActivity()).inflate(R.layout.mapview,null,false);
+    	mapview = LayoutInflater.from(getActivity()).inflate(R.layout.mapview,null,false);
     	 map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 //    		    Marker hamburg = map.addMarker(new MarkerOptions().position(HAMBURG)
   //  		        .title("Hamburg"));
@@ -158,40 +190,56 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     		        .title("Kiel")
     		        .snippet("Kiel is cool")
     		        .icon(BitmapDescriptorFactory
-    		            .fromResource(R.drawable.ic_launcher)));
+    		            .fromResource(R.drawable.ic_action_location_place)));
 
     		    // Move the camera instantly to hamburg with a zoom of 15.
     		//    map.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
 
     		    // Zoom in, animating the camera.
     		 //   map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-    	return view;
+    	return mapview;
     }
 	private View GetViewForInfo() {
 		// TODO Auto-generated method stub
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.infoview,null,false);
-        ((TextView)view.findViewById(R.id.revinfoname)).setText(mRevData.name);
-        ((TextView)view.findViewById(R.id.revinfoaddress)).setText(mRevData.location.address);
-        ((TextView)view.findViewById(R.id.revinfocitystate)).setText(mRevData.location.city+","+mRevData.location.state);
-        ((TextView)view.findViewById(R.id.revinfodist)).setText(mRevData.location.distance);
-        ((TextView)view.findViewById(R.id.revinfocontact)).setText(mRevData.contact);
-        ((TextView)view.findViewById(R.id.revinfocats)).setText(mRevData.categories);
-		return view;
+		if(infoview != null)
+			return infoview;
+        infoview = LayoutInflater.from(getActivity()).inflate(R.layout.infoview,null,false);
+        ((TextView)infoview.findViewById(R.id.revinfoname)).setText(mRevData.name);
+        ((TextView)infoview.findViewById(R.id.revinfoaddress)).setText(mRevData.location.address);
+        ((TextView)infoview.findViewById(R.id.revinfocitystate)).setText(mRevData.location.city+","+mRevData.location.state);
+        ((TextView)infoview.findViewById(R.id.revinfodist)).setText(mRevData.location.distance);
+        ((TextView)infoview.findViewById(R.id.revinfocontact)).setText(mRevData.contact);
+        ((TextView)infoview.findViewById(R.id.revinfocats)).setText(mRevData.categories);
+    	KIEL = new LatLng(Double.parseDouble(mRevData.location.lat), Double.parseDouble(mRevData.location.lng));
+        map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+//	    Marker hamburg = map.addMarker(new MarkerOptions().position(HAMBURG)
+//  		        .title("Hamburg"));
+	    Marker kiel = map.addMarker(new MarkerOptions()
+	        .position(KIEL)
+	        .title("Kiel")
+	        .snippet("Kiel is cool")
+	        .icon(BitmapDescriptorFactory
+	            .fromResource(R.drawable.ic_action_location_place)));
+	    map.moveCamera(CameraUpdateFactory.newLatLngZoom(KIEL, 15));
+		return infoview;
 	}
 	private View GetViewForPhotos()
 	{
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
+		if(photosview != null)
+			return photosview;
+        photosview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
 		if(gAdapter == null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
 		GetPhotos(mRevData.id);
+		oGrid = (GridView) photosview.findViewById(R.id.grid_view_skels);
 		if(mRevData.photos != null)
 		{
 			gAdapter.mThumbIds.addAll(mRevData.photos);
 			oGrid.setAdapter(gAdapter);			
 		}
-		oGrid = (GridView) view.findViewById(R.id.grid_view_skels);
+		
 		oGrid.setAdapter(gAdapter);
-		return view;
+		return photosview;
 		
 	}
 	private void GetPhotos(String id)
@@ -240,7 +288,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		for(int i=0 ; i < skelThumbs.getLength(); i++)
 		{
 			Node thumburl = skelThumbs.item(i);
-			String iconUrl = "www.smashed.in"+thumburl.getTextContent();
+			String iconUrl = "http://www.smashed.in"+thumburl.getTextContent();
 			
 			gOhAdapter.mThumbIds.add(iconUrl);
 			Node id = skelIds.item(i);
@@ -321,4 +369,21 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 		
 	}
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+			  if(intent.getAction() == "bidoh")
+			  {
+				  String url = intent.getStringExtra("iconurl");
+				  mRevData.ohdata.ohUrl.add(url);
+				  if(gOhAdapter != null)
+				  {					  
+					  gOhAdapter.mThumbIds.add(url);
+					  ohGrid.setAdapter(gOhAdapter);
+				  }
+			  }		   
+		  }
+
+	};
 }

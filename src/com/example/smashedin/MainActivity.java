@@ -66,7 +66,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private static final String[] CONTENT = new String[] { "Recent", "Artists", "Albums", "Songs", "Playlists", "Genres" };
 	// nav drawer title
 	private CharSequence mDrawerTitle;
-	private int m_oPosition = 0;
+	private static int m_oPosition = 0;
+	private String bid;
 	// used to store app title
 	private CharSequence mTitle;
 	private ListView m_oListView;
@@ -322,6 +323,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	}
 	private void ShowCreateOverheard()
 	{
+
 		Singleton.getInstance().loggedIn = true;
 		Fragment fragment = null;
 		Singleton.getInstance().m_bCameraMenuItem = true;
@@ -547,6 +549,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		  public void onReceive(Context context, Intent intent) {
 		    // Extract data included in the Intent
 		    m_oPosition = intent.getIntExtra("position", 0);
+		    bid = intent.getStringExtra("bid");
+		    if(bid != null)
+		    	Singleton.getInstance().bid = bid;
+		    else
+		    	Singleton.getInstance().bid = "";
 		  }
 
 	};

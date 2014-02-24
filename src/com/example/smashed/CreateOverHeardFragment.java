@@ -46,6 +46,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract.Document;
 import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -193,6 +194,16 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	}
 	private void UploadOh() 
 	{
+		if(Singleton.getInstance().bid != "")
+		{
+			try {
+				UploadActual("gallery");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 		// 1. Instantiate an AlertDialog.Builder with its constructor
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -317,6 +328,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
     	oAsyncClient.SetPersistantStorage(getActivity());
     	RequestParams oParams = new RequestParams();
     	oParams.put("data",data);
+    	oParams.put("fsbid", Singleton.getInstance().bid);
     	oAsyncClient.MakePostCall("http://www.smashed.in/api/oh/savemobile?mode="+mode,oParams);   
 	}
 	private void UploadLocalImage()
@@ -574,6 +586,16 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+		}
+		else
+		{
+			if(Singleton.getInstance().bid != "")
+			{
+				Intent intent = new Intent("bidoh");
+		    	intent.putExtra("iconurl", "www.smashed.in/res/icon/"+response);
+		    	LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+		        getActivity().finish();
 			}
 		}
         

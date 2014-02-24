@@ -57,7 +57,7 @@
 			            android:layout_width="wrap_content"
 			            android:layout_height="50dp"
 			            android:paddingRight="10dp"
-			            android:src="@drawable/refreshiconlocation" />
+			            android:src="@drawable/irefreshnavigationicon" />
 			            <ProgressBar
 			                android:gravity="center_vertical"
 			                android:layout_gravity="right"
@@ -70,6 +70,7 @@
 	
     </FrameLayout>
 <FrameLayout android:layout_marginTop="50dp"
+    android:gravity="center"
 	    			     android:layout_width="fill_parent"
 			            android:layout_height="fill_parent"
 >
@@ -84,7 +85,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="1" >
+      
     </GridView>
+     <ProgressBar
+          android:gravity="center"
+          android:layout_gravity="center"
+       android:id="@+id/progressImageGrid"
+       android:visibility="gone"
+       style="?android:attr/progressBarStyleLarge"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp" />
 </FrameLayout>
     <!-- Listview to display slider menu -->
     <ListView

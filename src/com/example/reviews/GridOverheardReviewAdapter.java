@@ -49,11 +49,20 @@ public class GridOverheardReviewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
     	RelativeLayout oRelLayout = new RelativeLayout(mContext);
-    	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,200),(int)dipToPixels(mContext,200)));
+    	oRelLayout.setLayoutParams(new GridView.LayoutParams((int)dipToPixels(mContext,110),(int)dipToPixels(mContext,110)));
     	oRelLayout.setBackgroundColor(0xffcccccc);
     	oRelLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
-        SmartImageView imageView = new SmartImageView(mContext);
-        imageView.setImageUrl(mThumbIds.get(position));
+        CSmartImageView imageView = new CSmartImageView(mContext);
+        //imageView.setImageResource(mThumbIds[position]);
+        if(mThumbIds.get(position) == "local")
+        	imageView.setImageResource(R.drawable.ic_home);
+        else
+        {
+        	imageView.LoadScaleView(imageView,110,110);
+        	imageView.setImageUrl(mThumbIds.get(position));
+        }
+        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        //imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
         oRelLayout.addView(imageView);
         return oRelLayout;
     }

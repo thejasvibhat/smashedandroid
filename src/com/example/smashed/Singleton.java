@@ -27,6 +27,7 @@ public class Singleton {
 	public PersistentCookieStore myCookieStore;
 	public boolean loggedIn = false;
 	public String m_strType = "create";
+	public String bid = "";
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }

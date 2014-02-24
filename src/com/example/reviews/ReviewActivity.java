@@ -37,6 +37,7 @@ import com.example.smashedin.*;
 
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
@@ -76,12 +77,15 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelectedListener,OnResponseListener {
-    private LocationManager locationManager;
+	SearchView searchView;
+	private Menu optionsMenu = null;
+	private LocationManager locationManager;    
     private GridReviewsAdapter gAdapter = null;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -95,7 +99,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	// slide menu items
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
-
+	Location m_olocation;
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
 	private ReviewListAdapter m_oRevAdapter;
@@ -105,67 +109,36 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	ArrayList<ReviewItem> itemsList = null;
 	android.app.Fragment m_OhFragment;
 	private Tab m_galTab;
+	private FragmentActivity m_oRevActivity;
+	private ArrayList<ReviewData> m_bkupFsqVenues = new ArrayList<ReviewData>();
+	private String m_query = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_oRevActivity = this;
         Singleton.getInstance().m_bShareMenuItem = true;
         setContentView(R.layout.reviewmain);
         if(gAdapter == null)
         	gAdapter = new GridReviewsAdapter(getApplicationContext());
-       /* ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        //actionBar.setDisplayShowTitleEnabled(false);
-
-        Tab tab = actionBar.newTab()
-                           .setText("Gallery")
-                           .setTabListener(new TabListener() {
-							
-							@Override
-							public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-								// TODO Auto-generated method stub
-								
-							}
-							
-							@Override
-							public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
-								
-							}
-							
-							@Override
-							public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-								// TODO Auto-generated method stub
-								
-							}
-						});
-        actionBar.addTab(tab);
-        m_galTab = tab;
-        Tab tab1 = actionBar.newTab()
-                .setText("My Overheards")
-                .setTabListener(new TabListener() {
-					
-					@Override
-					public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
-						if(Singleton.getInstance().loggedIn != true)
-						{
-							Login("reviews");
-							return;
-						}
-						
-					}
-					
-					@Override
-					public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-						// TODO Auto-generated method stub
-						
-					}
-				});
-        actionBar.addTab(tab1);*/
+        String query = getIntent().getStringExtra(SearchManager.QUERY);
+        if(query == null)
+        {
+	        if(gAdapter.FsqVenues.size() != 0)
+	        {
+	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
+	        }
+	        
+        }
+        else
+        {
+        	m_query = query;
+        	getActionBar().setTitle("Search results for '"+query+"'");
+        }
+        if(this.optionsMenu != null)
+        {
+        	 MenuItem oSearchMenu = optionsMenu.findItem(R.id.searchoverskel);
+             oSearchMenu.collapseActionView();
+        }
         
 		mTitle = mDrawerTitle = getTitle();
 
@@ -228,11 +201,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
-    @Override
-    public void onResume()
-    {
-    	final ImageView oV = (ImageView) findViewById(R.id.refreshLocation);
+		final ImageView oV = (ImageView) findViewById(R.id.refreshLocation);
     	oV.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -246,16 +215,28 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		});
     	GetMyLocation();
     }
+    @Override
+    public void onResume()
+    {
+    	
+    	super.onResume();
+    }
     private void GetMyLocation()
     {
     	// Acquire a reference to the system Location Manager
     	locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
+		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
+		oP.setVisibility(View.VISIBLE);
+		ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
+		oV.setVisibility(View.GONE);
+		ProgressBar oPG= (ProgressBar) findViewById(R.id.progressImageGrid);
+		oPG.setVisibility(View.VISIBLE);
     	// Define a listener that responds to location updates
     	LocationListener locationListener = new LocationListener() {
-    	    public void onLocationChanged(Location location) {
+    	    public void onLocationChanged(Location olocation) {
+    	    	m_olocation = olocation;
     	      // Called when a new location is found by the network location provider.
-    	      makeUseOfNewLocation(location);
+    	      makeUseOfNewLocation(olocation);
 				ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
 				oP.setVisibility(View.GONE);
 				ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
@@ -299,6 +280,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	  catch (NullPointerException e) {}
     	
 		String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll="+location.getLatitude()+","+location.getLongitude()+"&venuePhotos=1&offset=0&limit=50";
+		if(m_query != "")
+			url = url + "&query="+m_query;
     	//String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll=12.97,77.64&venuePhotos=1&offset=0&limit=50";
 
 		TextView oText = (TextView) findViewById(R.id.locationText);
@@ -339,23 +322,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         	oAsyncClient.MakeCall(url);        	
 		}
 	}
-	@Override
-	public void onBackPressed() {
-		
-		   android.app.Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container_oh);
-		  if (1==1){//fragment instanceof OverHeardFragment) {
-			   getFragmentManager().popBackStack();
-			   getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-			   Singleton.getInstance().m_bShareMenuItem = true;
-			   Singleton.getInstance().m_bSearchMenuItem = false;
-			   this.invalidateOptionsMenu();
-		   }
-		   else
-		   {
-			   super.onBackPressed();
-		   }
-		   
-	}
+	
 
     private void displayView(int position) {
     	if(position == 2)
@@ -549,14 +516,54 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.ohmain, menu);
-		MenuItem m_oShare = menu.findItem(R.id.shareoh);
-		if(Singleton.getInstance().m_bShareMenuItem == true)
-			m_oShare.setVisible(false);
-		MenuItem m_oSearch = menu.findItem(R.id.searchoverskel);
-		if(Singleton.getInstance().m_bSearchMenuItem == true)
-			m_oSearch.setVisible(false);
-		
+		getMenuInflater().inflate(R.menu.listrevmain, menu);
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.searchoverskel).getActionView();
+        MenuItem oSearchMenu = menu.findItem(R.id.searchoverskel);
+        oSearchMenu.collapseActionView();
+        this.optionsMenu = menu;
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false);   
+            
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
+        {
+            @Override
+            public boolean onQueryTextChange(String newText) 
+            {
+                // this is your adapter that will be filtered
+            	if(m_bkupFsqVenues.size() > 0)
+            	{
+	        		gAdapter.FsqVenues.clear();
+					gAdapter.FsqVenues.addAll(m_bkupFsqVenues);
+            	}
+                return true;
+            }
+            @Override
+            public boolean onQueryTextSubmit(String query) 
+            {
+            	m_bkupFsqVenues.clear();
+            	m_bkupFsqVenues.addAll(gAdapter.FsqVenues);
+            	gAdapter.FsqVenues.clear();
+            	SetGridItems((GridView) findViewById(R.id.reviewsGrid));
+                // this is your adapter that will be filtered
+            	String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"v=20130815&venuePhotos=1&offset=0&limit=50&query="+query;
+            	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+            	oAsyncClient.Attach(m_oRevActivity);
+            	//oAsyncClient.SetPersistantStorage(getApplicationContext());
+            	oAsyncClient.MakeCall(url);
+        		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
+        		oP.setVisibility(View.VISIBLE);
+
+            	searchView.clearFocus();
+    	        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getApplicationContext(),
+    	                SampleRecentSuggestionsProvider.AUTHORITY, SampleRecentSuggestionsProvider.MODE);
+    	        suggestions.saveRecentQuery(query, null);
+    	       
+
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
 		return true;
 	}
 
@@ -704,6 +711,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
 	private void SetGridItems(GridView gridView)
 	{
+		ProgressBar oPG= (ProgressBar) findViewById(R.id.progressImageGrid);
+		oPG.setVisibility(View.GONE);
+
 		gridView.setAdapter(gAdapter);
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 
