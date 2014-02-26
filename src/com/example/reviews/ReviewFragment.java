@@ -311,6 +311,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	
 	private void ParseJsonReviews(String response) throws JSONException
 	{
+		gReviewsAdapter.mReviews.clear();
 		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
 		JSONArray items = (JSONArray) jsonObj.getJSONArray("reviews");		
 		for (int i = 0; i < items.length(); i++) {
@@ -430,6 +431,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		else if(m_oType == "fsreviews")
 		{
+			reviewsGrid.onRefreshComplete();
 			try {
 				ParseJsonReviews(response);
 			} catch (JSONException e) {
