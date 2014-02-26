@@ -27,6 +27,7 @@ public class ResponseParser {
 	private String m_strResponseData;
 	private Activity oMainActivity;
 	private Object m_Fragment = null;
+	private String m_oType = "";
 	public ResponseParser(String responseData,Activity activity)
 	{
 		oMainActivity = activity;
@@ -82,7 +83,17 @@ public class ResponseParser {
 	        		if(m_Fragment instanceof GridOverheardSkeletonFragment)
 	        			((GridOverheardSkeletonFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        		else if(m_Fragment instanceof ReviewFragment)
-	        			((ReviewFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
+	        		{
+	        			if(m_oType != "")
+	        			{
+	        				((ReviewFragment)m_Fragment).ReturnResponseDocumentWithKey(n_oDocument,m_oType);
+	        			}
+	        			else
+	        			{
+	        				
+	        			}
+	        			
+	        		}
 	        		else
 	        			((GridOverheardFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        	}
@@ -97,6 +108,13 @@ public class ResponseParser {
 	        }
 	    }
 	public void SetFragment(android.support.v4.app.Fragment m_curFragment) {
+		m_Fragment = m_curFragment;
+		m_oType = "";
+		
+	}
+	public void SetFragmentWithKey(
+			android.support.v4.app.Fragment m_curFragment, String n_oType) {
+		m_oType = n_oType;
 		m_Fragment = m_curFragment;
 		
 	}

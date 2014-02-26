@@ -27,6 +27,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+
 import com.loopj.android.http.RequestParams;
 
 import android.content.BroadcastReceiver;
@@ -38,6 +42,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -45,6 +50,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -53,9 +59,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private static final String KEY_CONTENT = "TestFragment:Content";
     private GridImageSkelAdapter gAdapter = null;
     private GridOverheardReviewAdapter gOhAdapter = null;
+    private GridFsReviewsAdapter gReviewsAdapter = null;
     private GridAdapter catAdapter = null;
     private GridView oGrid;
     private GridView ohGrid;
+    private PullToRefreshListView reviewsGrid;
     private LatLng HAMBURG = new LatLng(53.558, 9.927);
     private LatLng KIEL = new LatLng(53.551, 9.993);
     private String m_oType = "";
@@ -66,6 +74,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private View photosview;
     private View infoview;
     private View ohview;
+    private View reviewview;
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
         ReviewFragment fragment = new ReviewFragment();
 
@@ -130,6 +139,10 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	{
     		return GetViewForOverheards();
     	}
+    	else if(mContent == "REVIEWS")
+    	{
+    		return GetViewForReviews();
+    	}
     	else
     	{
     		TextView text = new TextView(getActivity());
@@ -147,6 +160,43 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	}
 		
 	}
+    private View GetViewForReviews()
+    {
+    	if(reviewview != null)
+    		return reviewview;
+    	reviewview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_reviews,null,false);
+		reviewsGrid = (PullToRefreshListView) reviewview.findViewById(R.id.m_oReviewsList);
+		if(gReviewsAdapter == null)
+			gReviewsAdapter = new GridFsReviewsAdapter(getActivity());
+		if(mRevData.reviews != null)
+		{
+			gReviewsAdapter.mReviews.addAll(mRevData.reviews);
+			reviewsGrid.setAdapter(gReviewsAdapter);
+		}
+		else
+		{
+			GetLatestReviews();
+		}
+		reviewsGrid.setOnRefreshListener(new OnRefreshListener<ListView>() {
+			@Override
+			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+				GetLatestReviews();
+			}
+		});
+
+		return reviewview;
+    }
+    private void GetLatestReviews()
+    {
+    	m_oType = "fsreviews";
+		mRevData.reviews = new ArrayList<SmashedFsReviewsData>();
+		String url = "http://www.smashed.in/api/b/fscomments?fsbid="+mRevData.id;
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getActivity());
+    	oAsyncClient.MakeCall(url);   
+
+    }
     private View GetViewForOverheards()
     {
     	if(ohview != null)
@@ -258,6 +308,23 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         this.mRevData = oRevData;
 		
 	}
+	
+	private void ParseJsonReviews(String response) throws JSONException
+	{
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+		JSONArray items = (JSONArray) jsonObj.getJSONArray("reviews");		
+		for (int i = 0; i < items.length(); i++) {
+			SmashedFsReviewsData oRevs = new SmashedFsReviewsData();
+			JSONObject reviewItem = (JSONObject)items.get(i);
+			oRevs.rating = reviewItem.getString("rating");
+			oRevs.username = reviewItem.getString("username");
+			oRevs.review = reviewItem.getString("review");
+			mRevData.reviews.add(oRevs);
+		}
+		gReviewsAdapter.mReviews.addAll(mRevData.reviews);
+		reviewsGrid.setAdapter(gReviewsAdapter);
+	}
+
 	private void ParseJson(String response) throws JSONException
 	{
 		mRevData.photos = new ArrayList<String>();
@@ -277,23 +344,27 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		gAdapter.mThumbIds.addAll(mRevData.photos);
 		oGrid.setAdapter(gAdapter);
 	}
-	public void ReturnResponseDocument(Document n_oDocument)
+	public void ReturnResponseDocumentWithKey(Document n_oDocument,String type)
 	{
-		NodeList skelThumbs = n_oDocument.getElementsByTagName("icon");
-		NodeList skelIds = n_oDocument.getElementsByTagName("url");
-//		NodeList downloadUrls = n_oDocument.getElementsByTagName("downloadurl");
-		//NodeList ohCreatorname = n_oDocument.getElementsByTagName("id");
-		if(gOhAdapter == null)
-			gOhAdapter = new GridOverheardReviewAdapter(getActivity());
-		for(int i=0 ; i < skelThumbs.getLength(); i++)
+		if(type == "oh")
 		{
-			Node thumburl = skelThumbs.item(i);
-			String iconUrl = "http://www.smashed.in"+thumburl.getTextContent();
-			
-			gOhAdapter.mThumbIds.add(iconUrl);
-			Node id = skelIds.item(i);
+			NodeList skelThumbs = n_oDocument.getElementsByTagName("icon");
+			NodeList skelIds = n_oDocument.getElementsByTagName("url");
+	//		NodeList downloadUrls = n_oDocument.getElementsByTagName("downloadurl");
+			//NodeList ohCreatorname = n_oDocument.getElementsByTagName("id");
+			if(gOhAdapter == null)
+				gOhAdapter = new GridOverheardReviewAdapter(getActivity());
+			for(int i=0 ; i < skelThumbs.getLength(); i++)
+			{
+				Node thumburl = skelThumbs.item(i);
+				String iconUrl = "http://www.smashed.in"+thumburl.getTextContent();
+				
+				gOhAdapter.mThumbIds.add(iconUrl);
+				Node id = skelIds.item(i);
+			}
+			ohGrid.setAdapter(gOhAdapter);
 		}
-		ohGrid.setAdapter(gOhAdapter);
+		
 
 
 	}
@@ -336,7 +407,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 	                    if ((null != aResponse)) {
 	                    	ResponseParser oParser = new ResponseParser(aResponse,getActivity());
-	                    	oParser.SetFragment(m_curFragment);
+	                    	oParser.SetFragmentWithKey(m_curFragment,m_oType);
 	                    	oParser.Parse();
 	                    }
 	                    else
@@ -356,6 +427,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	        // Start Thread
 	        background.start();  //After call start method thread called run Methods
 
+		}
+		else if(m_oType == "fsreviews")
+		{
+			try {
+				ParseJsonReviews(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else
 		{

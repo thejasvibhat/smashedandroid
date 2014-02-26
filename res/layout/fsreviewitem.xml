@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/grey">
+<LinearLayout 
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">    
+
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal|left"
+	        android:background="@color/white"
+	        android:orientation="horizontal"
+	        android:padding="20dp" >
+
+		<ImageView
+		    android:id="@+id/revrate1"
+		    android:layout_width="30dp"
+		    android:layout_height="50dp"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:id="@+id/revrate2"
+		    android:layout_width="30dp"
+		    android:layout_height="50dp"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:id="@+id/revrate3"
+		    android:layout_width="30dp"
+		    android:layout_height="50dp"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:id="@+id/revrate4"
+		    android:layout_width="30dp"
+		    android:layout_height="50dp"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:id="@+id/revrate5"
+		    android:layout_width="30dp"
+		    android:layout_height="50dp"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+						
+	</LinearLayout>
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="1dp" >
+
+	<TextView
+	    android:id="@+id/fsrevtext"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="20dp"
+	    android:layout_marginTop="10dp"
+	    android:text="this is a review"
+	    android:textColor="@color/orange"
+	    android:textSize="20dp" />
+
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_marginBottom="10dp"
+	    android:layout_marginLeft="20dp"
+	    android:orientation="horizontal" >
+
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="0dp"
+	        android:text="by"
+	        android:textColor="#ff000000"
+	        android:textSize="16dp" />
+
+	    <TextView
+	        android:id="@+id/fsrevname"
+	        android:textColor="#ff000000"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	        android:textSize="16dp"
+	        android:text="ssssssssssssssssssssssss"
+		/>
+	    
+	
+    </LinearLayout>
+ 	</LinearLayout>
+ 	<View
+		    android:layout_width="fill_parent"
+		    android:layout_marginTop="10dp"
+		    android:layout_height="2dp"
+		    android:background="@android:color/darker_gray"/>
+</LinearLayout>
+</FrameLayout>

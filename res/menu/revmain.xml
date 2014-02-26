@@ -15,7 +15,10 @@
           android:icon="@drawable/ic_action_oh_picture"
           android:showAsAction="collapseActionView|ifRoom"
           />
-  
+  	<item android:id="@+id/revfs"
+          android:icon="@drawable/ic_write_review"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
     
 
 </menu>

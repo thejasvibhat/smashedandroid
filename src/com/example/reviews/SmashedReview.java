@@ -11,6 +11,9 @@ import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.smashed.Singleton;
 import com.example.smashedin.*;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -24,17 +27,26 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.viewpagerindicator.TabPageIndicator;
 
-public class SmashedReview extends FragmentActivity{
+public class SmashedReview extends FragmentActivity implements OnResponseListener{
     //private static final String[] CONTENT = new String[] { "INFO", "MAP", "PHOTOS", "MENU", "OVERHEARDS", "FOOD" };
-	private static final String[] CONTENT = new String[] { "INFO", "OVERHEARDS", "PHOTOS" };
+	private static final String[] CONTENT = new String[] { "INFO", "REVIEWS","OVERHEARDS", "PHOTOS" };
     private ReviewData oRevData = null;
     private Intent mainintent;
+    private int m_rating = 0;
+    private String m_review = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +83,215 @@ public class SmashedReview extends FragmentActivity{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		CreateOverheardForBar();
-		return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case R.id.revoh:
+			CreateOverheardForBar();
+			break;
+		case R.id.revfs:
+			CreateReviewForBar();
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+		return true;
 	}
+	private void UpdateReview(String id,int rating,String rev)
+	{
+		String url = "http://www.smashed.in/api/b/updatefscomment?fsbid="+oRevData.id+"&rating="+rating+"&description="+rev;
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getApplicationContext());
+    	oAsyncClient.MakeCall(url);   
+
+	}
+	private void CreateReviewForBar()
+	{
+		
+		LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+		if(oRevAdd.getVisibility() == View.INVISIBLE)
+		{
+			slideToBottom(oRevAdd);
+		}
+		else
+		{
+			slideToTop(oRevAdd);
+		}
+		Button oSubmit = (Button) oRevAdd.findViewById(R.id.submitrev);
+		oSubmit.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+				slideToTop(oRevAdd);
+				m_review = ((EditText)oRevAdd.findViewById(R.id.enterrev)).getText().toString();
+				UpdateReview(oRevData.id,m_rating,m_review);
+	            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+	            
+
+			}
+		});	
+		
+		ImageView orate1 = (ImageView) oRevAdd.findViewById(R.id.rate1);
+		orate1.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				SetRating(1);
+			}
+		});	
+		ImageView orate5 = (ImageView) oRevAdd.findViewById(R.id.rate5);
+		orate5.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				SetRating(5);
+			}
+		});	
+		ImageView orate2 = (ImageView) oRevAdd.findViewById(R.id.rate2);
+		orate2.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				SetRating(2);
+			}
+		});	
+		ImageView orate3 = (ImageView) oRevAdd.findViewById(R.id.rate3);
+		orate3.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				SetRating(3);
+			}
+		});	
+		ImageView orate4 = (ImageView) oRevAdd.findViewById(R.id.rate4);
+		orate4.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				SetRating(4);
+			}
+		});	
+		//oRevAdd.setVisibility(View.VISIBLE);
+		//oRevAdd.bringToFront();
+	}
+	private void SetRating(int rating)
+	{
+		LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+		ImageView rate1 = (ImageView) oRevAdd.findViewById(R.id.rate1);
+		ImageView rate2 = (ImageView) oRevAdd.findViewById(R.id.rate2);
+		ImageView rate3 = (ImageView) oRevAdd.findViewById(R.id.rate3);
+		ImageView rate4 = (ImageView) oRevAdd.findViewById(R.id.rate4);
+		ImageView rate5 = (ImageView) oRevAdd.findViewById(R.id.rate5);
+		m_rating = rating;
+		if(rating == 1)
+		{
+			rate1.setImageResource(R.drawable.rateon);
+			rate2.setImageResource(R.drawable.rate);
+			rate3.setImageResource(R.drawable.rate);
+			rate4.setImageResource(R.drawable.rate);
+			rate5.setImageResource(R.drawable.rate);
+		}
+		else if(rating == 2)
+		{
+			rate1.setImageResource(R.drawable.rateon);
+			rate2.setImageResource(R.drawable.rateon);
+			rate3.setImageResource(R.drawable.rate);
+			rate4.setImageResource(R.drawable.rate);
+			rate5.setImageResource(R.drawable.rate);
+		}
+		else if(rating == 3)
+		{
+			rate1.setImageResource(R.drawable.rateon);
+			rate2.setImageResource(R.drawable.rateon);
+			rate3.setImageResource(R.drawable.rateon);
+			rate4.setImageResource(R.drawable.rate);
+			rate5.setImageResource(R.drawable.rate);
+		}
+		else if(rating == 4)
+		{
+			rate1.setImageResource(R.drawable.rateon);
+			rate2.setImageResource(R.drawable.rateon);
+			rate3.setImageResource(R.drawable.rateon);
+			rate4.setImageResource(R.drawable.rateon);
+			rate5.setImageResource(R.drawable.rate);
+		}
+		else if(rating == 5)
+		{
+			rate1.setImageResource(R.drawable.rateon);
+			rate2.setImageResource(R.drawable.rateon);
+			rate3.setImageResource(R.drawable.rateon);
+			rate4.setImageResource(R.drawable.rateon);
+			rate5.setImageResource(R.drawable.rateon);
+		}
+	}
+	public void slideToBottom(View view){
+		view.setVisibility(View.VISIBLE);
+		ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view,
+	            "y", -view.getHeight(), 0);
+	objectAnimator.addListener(new AnimatorListener() {
+
+	        @Override
+	        public void onAnimationStart(Animator animation) {
+	        	LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+	            // TODO Auto-generated method stub
+	        	oRevAdd.setVisibility(View.VISIBLE);
+	        }
+
+	        @Override
+	        public void onAnimationRepeat(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+
+	        @Override
+	        public void onAnimationEnd(Animator animation) {
+
+	        }
+
+	        @Override
+	        public void onAnimationCancel(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+	    });
+	            objectAnimator.setDuration(500);
+	    objectAnimator.start();
+		}
+	public void slideToTop(View view){
+		view.setVisibility(View.VISIBLE);
+		ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view,
+	            "y", 0, -view.getHeight());
+	objectAnimator.addListener(new AnimatorListener() {
+
+	        @Override
+	        public void onAnimationStart(Animator animation) {
+	        	LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+	            // TODO Auto-generated method stub
+	        	oRevAdd.setVisibility(View.VISIBLE);
+	        }
+
+	        @Override
+	        public void onAnimationRepeat(Animator animation) {
+	        	
+
+	        }
+
+	        @Override
+	        public void onAnimationEnd(Animator animation) {
+	        	LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+	            // TODO Auto-generated method stub
+	        	oRevAdd.setVisibility(View.INVISIBLE);
+	        }
+
+	        @Override
+	        public void onAnimationCancel(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+	    });
+	            objectAnimator.setDuration(500);
+	    objectAnimator.start();
+		}
 	private void CreateOverheardForBar()
 	{
 		if(mainintent == null)
@@ -129,5 +347,15 @@ public class SmashedReview extends FragmentActivity{
 			m_oFragment.UpdateRevData(oRevData);
 		}
     }
+
+	@Override
+	public void OnResponse(String response) {
+		SmashedFsReviewsData oRev = new SmashedFsReviewsData();
+		oRev.review = m_review;
+		oRev.rating = String.valueOf(m_rating);
+		if(oRevData.reviews != null)
+			oRevData.reviews.add(oRev);
+		
+	}
 
 }

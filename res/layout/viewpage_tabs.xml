@@ -13,23 +13,111 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewpagetabs"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <com.viewpagerindicator.TabPageIndicator
-        android:id="@+id/indicator"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        />
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        />
+	<LinearLayout
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+	
+	    <com.viewpagerindicator.TabPageIndicator
+	        android:id="@+id/indicator"
+	        android:layout_height="wrap_content"
+	        android:layout_width="fill_parent"
+	        />
+	    <android.support.v4.view.ViewPager
+	        android:id="@+id/pager"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+	        />
+	
+	</LinearLayout>
+	
+<LinearLayout android:id="@+id/addreview"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:visibility="invisible"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">    
+	    <LinearLayout 
+	    android:orientation="horizontal"
+	    android:background="@color/white"
+	    android:padding="20dp"
+	    android:layout_gravity="center_horizontal"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content">
 
+		<ImageView
+		    android:layout_width="40dp"
+		    android:layout_height="80dp"
+		    android:layout_margin="0dp"
+		    android:id="@+id/rate1"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:layout_width="40dp"
+		    android:layout_height="80dp"
+		    android:id="@+id/rate2"		    
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:layout_width="40dp"
+		    android:layout_height="80dp"
+		    android:id="@+id/rate3"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+
+		<ImageView
+		    android:layout_width="40dp"
+		    android:layout_height="80dp"
+		    android:id="@+id/rate4"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+		<ImageView
+		    android:layout_width="40dp"
+		    android:layout_height="80dp"
+		    android:id="@+id/rate5"
+		    android:layout_margin="0dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/rate" />
+						
+	</LinearLayout>
+<LinearLayout 
+	    android:orientation="vertical"
+	    android:background="@color/white"
+	    android:padding="10dp"
+	    android:layout_gravity="center_horizontal"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content">
+	<EditText
+	    android:id="@+id/enterrev"
+	    android:layout_width="fill_parent"
+	    android:layout_height="80dp"
+	    android:layout_marginBottom="20dp"
+	    android:layout_marginTop="10dp"
+	    android:background="@color/grey"
+	    android:padding="20dp"
+	    android:textSize="16dp" />
+
+	<Button android:id="@+id/submitrev"
+	    android:layout_width="100dp"
+	    android:layout_height="40dp"
+	    android:layout_gravity="right"
+	    android:layout_marginTop="10dp"
+	    android:background="@color/orange"
+	    android:text="Submit" />
+ 	</LinearLayout>
 </LinearLayout>
+
+</FrameLayout>

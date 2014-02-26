@@ -12,6 +12,7 @@ public class ReviewData {
 	public String photo;
 	public String categories;
 	public OverheardData ohdata;
+	public ArrayList<SmashedFsReviewsData> reviews;
 	public ArrayList<String> photos;
 	public void ReviewData()
 	{
