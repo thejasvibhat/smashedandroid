@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 
@@ -61,8 +62,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private GridOverheardReviewAdapter gOhAdapter = null;
     private GridFsReviewsAdapter gReviewsAdapter = null;
     private GridAdapter catAdapter = null;
-    private GridView oGrid;
-    private GridView ohGrid;
+    private PullToRefreshGridView oGrid;
+    private PullToRefreshGridView ohGrid;
     private PullToRefreshListView reviewsGrid;
     private LatLng HAMBURG = new LatLng(53.558, 9.927);
     private LatLng KIEL = new LatLng(53.551, 9.993);
@@ -85,10 +86,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
     private String mContent = "???";
     private ReviewData mRevData = null;
+    private Fragment mainFragment; 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mainFragment = this;
         if ((savedInstanceState != null) && savedInstanceState.containsKey(KEY_CONTENT)) {
             mContent = savedInstanceState.getString(KEY_CONTENT);
         }
@@ -192,7 +194,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		mRevData.reviews = new ArrayList<SmashedFsReviewsData>();
 		String url = "http://www.smashed.in/api/b/fscomments?fsbid="+mRevData.id;
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-    	oAsyncClient.Attach(this);
+    	oAsyncClient.Attach(mainFragment);
     	oAsyncClient.SetPersistantStorage(getActivity());
     	oAsyncClient.MakeCall(url);   
 
@@ -202,7 +204,23 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	if(ohview != null)
     		return ohview;
         ohview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
-		ohGrid = (GridView) ohview.findViewById(R.id.grid_view_skels);
+		ohGrid = (PullToRefreshGridView) ohview.findViewById(R.id.grid_view_skels);
+		ohGrid.setOnRefreshListener(new OnRefreshListener<GridView>() {
+
+			@Override
+			public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+				m_oType = "oh";
+				mRevData.ohdata = new OverheardData();
+				mRevData.ohdata.id = mRevData.id;
+				String url = "http://www.smashed.in/api/b/fsoverheards?fsbid="+mRevData.ohdata.id;
+				SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+		    	oAsyncClient.Attach(mainFragment);
+		    	oAsyncClient.SetPersistantStorage(getActivity());
+		    	oAsyncClient.MakeCall(url);   
+
+				
+			}
+		});
 		if(gOhAdapter == null)
 			gOhAdapter = new GridOverheardReviewAdapter(getActivity());
 		if((mRevData.ohdata != null)&&(mRevData.ohdata.ohUrl != null))
@@ -217,7 +235,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			mRevData.ohdata.id = mRevData.id;
 			String url = "http://www.smashed.in/api/b/fsoverheards?fsbid="+mRevData.ohdata.id;
 			SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-	    	oAsyncClient.Attach(this);
+	    	oAsyncClient.Attach(mainFragment);
 	    	oAsyncClient.SetPersistantStorage(getActivity());
 	    	oAsyncClient.MakeCall(url);   
 
@@ -281,7 +299,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		if(gAdapter == null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
 		GetPhotos(mRevData.id);
-		oGrid = (GridView) photosview.findViewById(R.id.grid_view_skels);
+		oGrid = (PullToRefreshGridView) photosview.findViewById(R.id.grid_view_skels);
 		if(mRevData.photos != null)
 		{
 			gAdapter.mThumbIds.addAll(mRevData.photos);
@@ -289,14 +307,22 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		
 		oGrid.setAdapter(gAdapter);
+		oGrid.setOnRefreshListener(new OnRefreshListener<GridView>() {
+
+			@Override
+			public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+				GetPhotos(mRevData.id);
+			}
+		});
 		return photosview;
 		
 	}
 	private void GetPhotos(String id)
 	{	
+		m_oType = "fs";
 		String url 	= "https://api.foursquare.com/v2/venues/"+id+"/photos?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815";
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-		oAsyncClient.Attach(this);
+		oAsyncClient.Attach(mainFragment);
 		oAsyncClient.MakeCall(url);        	
 	}
 	@Override
@@ -342,6 +368,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				mRevData.photos.add(photo);
 			}
 		}
+		gAdapter.mThumbIds.clear();
 		gAdapter.mThumbIds.addAll(mRevData.photos);
 		oGrid.setAdapter(gAdapter);
 	}
@@ -359,10 +386,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			{
 				Node thumburl = skelThumbs.item(i);
 				String iconUrl = "http://www.smashed.in"+thumburl.getTextContent();
-				
-				gOhAdapter.mThumbIds.add(iconUrl);
+				mRevData.ohdata.ohUrl.add(iconUrl);
 				Node id = skelIds.item(i);
 			}
+			gOhAdapter.mThumbIds.clear();
+			gOhAdapter.mThumbIds.addAll(mRevData.ohdata.ohUrl);
 			ohGrid.setAdapter(gOhAdapter);
 		}
 		
@@ -372,8 +400,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 	@Override
 	public void OnResponse(String response) {
+		if(m_oType == "fs")
+			oGrid.onRefreshComplete();
 		if(m_oType == "oh")
 		{
+			ohGrid.onRefreshComplete();
 			m_StrResponse = response;
 
 	        // Create Inner Thread Class

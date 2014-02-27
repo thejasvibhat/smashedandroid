@@ -304,8 +304,6 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
     		mDrawerLayout.closeDrawers();
     		return;
     	}
-    	if(position == 2)
-    		position = 3;
     	Intent intent = new Intent("my-event");
     	  // add data
     	  intent.putExtra("position", position);

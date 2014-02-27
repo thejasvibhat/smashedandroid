@@ -76,6 +76,16 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     	super.onResume();
     }
     @Override
+	public void onBackPressed() {
+    	LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+		if(oRevAdd.getVisibility() == View.VISIBLE)
+		{
+			slideToTop(oRevAdd);
+		}
+		else
+			super.onBackPressed();
+	}
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.revmain, menu);
 		return true;

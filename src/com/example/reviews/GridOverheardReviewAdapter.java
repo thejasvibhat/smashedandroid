@@ -12,12 +12,14 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
  
 public class GridOverheardReviewAdapter extends BaseAdapter {
@@ -58,6 +60,10 @@ public class GridOverheardReviewAdapter extends BaseAdapter {
         	imageView.setImageResource(R.drawable.ic_home);
         else
         {
+        	LayoutInflater li = LayoutInflater.from(mContext);
+        	ProgressBar oProgress = (ProgressBar) li.inflate(R.layout.progressbarlayout, null);
+        	imageView.SetProgressBar(oProgress);
+
         	imageView.LoadScaleView(imageView,110,110);
         	imageView.setImageUrl(mThumbIds.get(position));
         }

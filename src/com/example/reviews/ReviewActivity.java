@@ -116,6 +116,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	private FragmentActivity m_oRevActivity;
 	private ArrayList<ReviewData> m_bkupFsqVenues = new ArrayList<ReviewData>();
 	private String m_query = "";
+	private ArrayList<ReviewData> venueList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -336,8 +337,6 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     		mDrawerLayout.closeDrawers();
     		return;
     	}
-    	if(position == 2)
-    		position = 3;
     	Intent intent = new Intent("my-event");
     	  // add data
     	  intent.putExtra("position", position);
@@ -449,8 +448,11 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		return true;
 	}
 		@Override
-		public void onBackPressed() {			
-			doExit();
+		public void onBackPressed() {	
+			if(m_query == "")
+				doExit();
+			else
+				super.onBackPressed();
 		}
 		private void doExit() {
 
@@ -516,7 +518,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	private void ParseJson(String response) throws JSONException
 	{
-		ArrayList<ReviewData> venueList = ListReviewDataSingleton.getInstance().venueList;
+		venueList = new ArrayList<ReviewData>();//.getInstance().venueList;
 		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
 		
 		JSONArray groups	= (JSONArray) jsonObj.getJSONObject("response").getJSONArray("groups");
@@ -563,7 +565,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				//}
 */			}
 		}
-		
+		gAdapter.FsqVenues.clear();
 		gAdapter.FsqVenues = venueList;
 		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	}
@@ -625,7 +627,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int location,
 					long arg3) {
-				
+				ListReviewDataSingleton.getInstance().venueList = gAdapter.FsqVenues;
 	            Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
 	            Bundle b = new Bundle();
 	            b.putInt("position", location);

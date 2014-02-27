@@ -363,6 +363,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 				{
 					GetSkeletonData("private", "");
 				}
+				displayhide(true);
 				
 			}
 		});
