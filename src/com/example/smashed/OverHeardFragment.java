@@ -27,9 +27,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 public class OverHeardFragment extends Fragment {
-	
+	private View MainView;
 	public OverHeardFragment(){}
 	
 	@Override
@@ -37,14 +38,24 @@ public class OverHeardFragment extends Fragment {
             Bundle savedInstanceState) {
  
         View rootView = inflater.inflate(R.layout.fragment_overheard, container, false);
+        MainView = rootView;
         String url = getArguments().getString("url");
         SmartImageView img = (SmartImageView) rootView.findViewById(R.id.ohview);
+        ProgressBar oProgress = (ProgressBar) rootView.findViewById(R.id.progressImageGridOh);
         if(url.contains("http"))
         {
+        	img.setVisibility(View.INVISIBLE);
+        	oProgress.setVisibility(View.VISIBLE);
         	img.setImageUrl(url,new OnCompleteListener() {
 				
 				@Override
 				public void onComplete() {
+			        SmartImageView img = (SmartImageView) MainView.findViewById(R.id.ohview);
+			        ProgressBar oProgress = (ProgressBar) MainView.findViewById(R.id.progressImageGridOh);
+
+		        	img.setVisibility(View.VISIBLE);
+		        	oProgress.setVisibility(View.INVISIBLE);
+
 					// TODO Auto-generated method stub
 				//	FrameLayout oL = (FrameLayout) getActivity().findViewById(R.id.spinView);
 				//	oL.setVisibility(View.INVISIBLE);

@@ -32,6 +32,9 @@ import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.config.SkeletonData;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.image.SmartImageView;
 
@@ -53,6 +56,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -106,13 +110,13 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	}
 	private Fragment m_curFragment = null;
 	private GridImageSkelAdapter gAdapter = null;
-	private ProgressDialog oPd;
+	private View MainView;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 		
         View rootView = inflater.inflate(R.layout.fragment_skelview, container, false);
-
+        MainView = rootView;
         setHasOptionsMenu(true);
        SetTabs(rootView);
         return rootView;
@@ -140,7 +144,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 										selectedTab = "gallery";
 										if(m_galSkeletons.m_strSkeletonIds.size() != 0)
 								        {
-								        	SetGridItems((GridView) m_grootView.findViewById(R.id.grid_view_skels));
+								        	SetGridItems((PullToRefreshGridView) m_grootView.findViewById(R.id.grid_view_skels));
 								        }
 								        else
 								        	GetSkeletonData("public","");
@@ -168,7 +172,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 								selectedTab = "private";
 								if(m_privSkeletons.m_strSkeletonIds.size() != 0)
 						        {
-						        	SetGridItems((GridView) m_grootView.findViewById(R.id.grid_view_skels));
+						        	SetGridItems((PullToRefreshGridView) m_grootView.findViewById(R.id.grid_view_skels));
 						        }
 						        else
 						        	GetSkeletonData("private","");
@@ -259,11 +263,25 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	    }
 		return true;
 	}
-
+	private void displayhide(boolean bool)
+	{
+		PullToRefreshGridView oGridView = (PullToRefreshGridView) MainView.findViewById(R.id.grid_view_skels);
+		ProgressBar oProgress = (ProgressBar) MainView.findViewById(R.id.progressImageGridSkel);
+		if(bool == true)
+		{
+			oGridView.setVisibility(View.VISIBLE);
+			oProgress.setVisibility(View.GONE);
+		}
+		else
+		{
+			oGridView.setVisibility(View.GONE);
+			oProgress.setVisibility(View.VISIBLE);
+			
+		}
+	}
 	public void ReturnResponseDocument(Document n_oDocument)
 	{
-		oPd.dismiss();
-		oPd = null;
+		displayhide(true);
 		NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
 		NodeList skelUrls = n_oDocument.getElementsByTagName("url");
 		NodeList skelIds = n_oDocument.getElementsByTagName("id");
@@ -309,11 +327,11 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 		else
 			gAdapter.mThumbIds.addAll(m_privSkeletons.mThumbIds);
 		
-		SetGridItems((GridView) getView().findViewById(R.id.grid_view_skels));
+		SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
 	
-	private void SetGridItems(GridView gridView)
+	private void SetGridItems(PullToRefreshGridView gridView)
 	{
 		gAdapter.mThumbIds.clear();
 		if(selectedTab == "private")
@@ -334,20 +352,26 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
             		mCallback.onArticleSelected(m_galSkeletons.m_strSkeletonIds.get(position),m_galSkeletons.m_strSkeletonUrls.get(position));
 	        }
 	    });
+	    gridView.setOnRefreshListener(new OnRefreshListener<GridView>() {
+			@Override
+			public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+				if(selectedTab == "gallery")
+				{
+					GetSkeletonData("public", "");
+				}
+				else
+				{
+					GetSkeletonData("private", "");
+				}
+				
+			}
+		});
 	}
 	private void GetSkeletonData(String mode,String tag)
 	{
 		m_strTag = tag;
 		m_strMode = mode;
-		if(oPd == null)
-		{
-			oPd = new ProgressDialog(getActivity());
-			oPd.setTitle("Processing...");
-			oPd.setMessage("Please wait.");
-			oPd.setIndeterminate(true);
-			oPd.setCancelable(false);
-			oPd.show();
-		}
+		displayhide(false);
 		Toast.makeText(getActivity(),
                 "Please wait, connecting to server.",
                 Toast.LENGTH_SHORT).show();
@@ -435,6 +459,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	@Override
 	public void OnResponse(String response) {
 		m_StrResponse = response;
+		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
 		 // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
              

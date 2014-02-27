@@ -81,7 +81,6 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	}
 	private static final int SELECT_PICTURE = 1;
 	private String selectedImagePath;
-	private SmartImageView selectedImage;
 	private int selectedPosition = 0;
 	private Fragment gridSkelView = null;
 	String path = "";
@@ -106,7 +105,6 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	selectedImage = (SmartImageView)((RelativeLayout)((FrameLayout)v).getChildAt(0)).getChildAt(0);
 	        	selectedPosition = position;
 	        	if(gridSkelView == null)
 	        	{
@@ -458,7 +456,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    gridView.setAdapter(gAdapter);
 	    gridView.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	selectedImage = (SmartImageView)((RelativeLayout)((FrameLayout)v).getChildAt(0)).getChildAt(0);
+	        	View oView = ((FrameLayout)v).getChildAt(0);
 	        	selectedPosition = position;
 	        	if(gridSkelView == null)
 	        	{

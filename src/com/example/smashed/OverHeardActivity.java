@@ -22,11 +22,14 @@ import com.example.smashedin.*;
 
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
 import android.app.SearchManager;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -52,6 +55,7 @@ import android.widget.Toast;
 
 public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSelectedListener,OnResponseListener {
     private DrawerLayout mDrawerLayout;
+    private FragmentActivity OverheardActivty;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	// nav drawer title
@@ -78,7 +82,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
         super.onCreate(savedInstanceState);
         Singleton.getInstance().m_bShareMenuItem = true;
         setContentView(R.layout.simple_tabs);
-        
+        OverheardActivty = this;
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         //actionBar.setDisplayShowTitleEnabled(false);
@@ -175,7 +179,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		// Find People
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// Photos
-//		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1),true,"22"));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		// Communities, Will add a counter here
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
 		// Pages
@@ -193,10 +197,14 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		adapterlist = new NavDrawerListAdapter(getApplicationContext(),
 				navDrawerItems);
 		mDrawerList.setAdapter(adapterlist);
+		mDrawerList.setItemChecked(2, true);
+		mDrawerList.setSelection(2);
+
 
 		// enabling action bar app icon and behaving it as toggle button
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
+
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, //nav menu toggle icon
@@ -263,12 +271,39 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		   }
 		   else
 		   {
-			   super.onBackPressed();
+			  // super.onBackPressed();
+			   doExit();
 		   }
 		   
 	}
+	private void doExit() {
 
+	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+	    alertDialog.setPositiveButton("Yes", new OnClickListener() {
+
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	        	
+	            finish();
+	        	Intent intent = new Intent("exit-event");
+	      	  	LocalBroadcastManager.getInstance(OverheardActivty).sendBroadcast(intent);
+
+	        }
+	    });
+
+	    alertDialog.setNegativeButton("No", null);
+
+	    alertDialog.setMessage("Do you want to exit?");
+	    alertDialog.setTitle("SmashedIn");
+	    alertDialog.show();
+	}
     private void displayView(int position) {
+    	if(position == 2)
+    	{
+    		mDrawerLayout.closeDrawers();
+    		return;
+    	}
     	if(position == 2)
     		position = 3;
     	Intent intent = new Intent("my-event");
@@ -280,137 +315,6 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
         //startActivity(intent);
         finish();
         return;
-/*    		// update the main content by replacing fragments
-    		Singleton.getInstance().m_bCameraMenuItem = false;
-    		Singleton.getInstance().m_bGalleryMenuItem = false;
-    		Singleton.getInstance().m_bRowAddMenuItem = true;
-    		Singleton.getInstance().m_bSaveMenuItem = true;
-    		Singleton.getInstance().m_bShareMenuItem = true;
-    		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-    		Singleton.getInstance().m_bSearchMenuItem = false;
-    		android.support.v4.app.Fragment fragment = null;
-    		switch (position) {
-    		case 0:
-    			
-    			//m_oRowAddMenuItem.setVisible(false);
-    			//m_oSaveMenuItem.setVisible(false);
-    			fragment = new HomeFragment();
-    			break;
-    		case 1:
-    			Singleton.getInstance().m_bRowAddMenuItem = true;
-    			Singleton.getInstance().m_bSaveMenuItem = true;
-    			Singleton.getInstance().m_bShareMenuItem = true;
-    			Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-    			//fragment = new Reviews();
-    			Toast.makeText(getBaseContext(),
-                        "Please wait, connecting to server.",
-                        Toast.LENGTH_SHORT).show();
-
-
-                // Create Inner Thread Class
-                Thread background = new Thread(new Runnable() {
-                     
-                    private final HttpClient Client = new DefaultHttpClient();
-                    private String URL = "http://www.smashed.in/api/b/list";
-                     
-                    // After call for background.start this run method call
-                    public void run() {
-                        try {
-
-                            String SetServerString = "";
-                            HttpGet httpget = new HttpGet(URL);
-                            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                            SetServerString = Client.execute(httpget, responseHandler);
-                            threadMsg(SetServerString);
-
-                        } catch (Throwable t) {
-                            // just end the background thread
-                            Log.i("Animation", "Thread  exception " + t);
-                        }
-                    }
-
-                    private void threadMsg(String msg) {
-
-                        if (!msg.equals(null) && !msg.equals("")) {
-                            Message msgObj = handler.obtainMessage();
-                            Bundle b = new Bundle();
-                            b.putString("message", msg);
-                            msgObj.setData(b);
-                            handler.sendMessage(msgObj);
-                        }
-                    }
-
-                    // Define the Handler that receives messages from the thread and update the progress
-                    private final Handler handler = new Handler() {
-
-                        public void handleMessage(Message msg) {
-                            String aResponse = msg.getData().getString("message");
-
-                            if ((null != aResponse)) {
-                            	//ResponseParser oParser = new ResponseParser(aResponse,m_oMainACtivity);
-                            	//oParser.Parse();
-                            }
-                            else
-                            {
-
-                                    // ALERT MESSAGE
-                                    Toast.makeText(
-                                            getBaseContext(),
-                                            "Not Got Response From Server.",
-                                            Toast.LENGTH_SHORT).show();
-                            }   
-
-                        }
-                    };
-
-                });
-                // Start Thread
-                background.start();  //After call start method thread called run Methods
-    			break;
-    		case 2:
-    			return;
-    			//break;
-    		case 3:
-    			if(Singleton.getInstance().loggedIn != true)
-    			{
-    				//getApplication().Login("create");
-    			}		
-    			else
-    			{
-    				//getApplication().ShowCreateOverheard();
-    			}
-    			// update selected item and title, then close the drawer
-    			mDrawerList.setItemChecked(position, true);
-    			mDrawerList.setSelection(position);
-    			setTitle(navMenuTitles[position]);
-    			mDrawerLayout.closeDrawer(mDrawerList);
-    			return;
-
-    		case 4:
-    		//	fragment = new PagesFragment();
-    			break;
-    		case 5:
-    		//	fragment = new WhatsHotFragment();
-    			break;
-
-    		default:
-    			break;
-    		}
-
-    		if (fragment != null) {
-    			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-    			fragmentManager.beginTransaction()
-    					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
-
-    			// update selected item and title, then close the drawer
-    			mDrawerList.setItemChecked(position, true);
-    			mDrawerList.setSelection(position);
-    			setTitle(navMenuTitles[position]);
-    			mDrawerLayout.closeDrawer(mDrawerList);
-    		} else {
-    			// error in creating fragment
-    			Log.e("MainActivity", "Error in creating fragment");
-    		}*/
     	}
 	private class SlideMenuClickListener implements
 	ListView.OnItemClickListener {

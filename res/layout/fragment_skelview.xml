@@ -3,23 +3,33 @@
     android:layout_width="fill_parent"
     android:layout_gravity="center_horizontal"
     android:layout_height="fill_parent">
-    <RelativeLayout android:layout_width="fill_parent"
+    <FrameLayout android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
+    android:padding="10dp"
     android:background="@color/white">
-	<GridView 
+	<com.handmark.pulltorefresh.library.PullToRefreshGridView 
 	    android:id="@+id/grid_view_skels"
-	    android:layout_width="335dp"
+	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:background="@color/white"
 	    android:horizontalSpacing="1dp"
 	    android:verticalSpacing="1dp"
-	    android:padding="10dp"
+	    android:paddingLeft="1dp"
+	    android:paddingRight="1dp"
 	    android:numColumns="3"
 	    android:gravity="center"
 	 > 
 	 
-	</GridView>
-	</RelativeLayout>
+	</com.handmark.pulltorefresh.library.PullToRefreshGridView>
+	 <ProgressBar
+          android:gravity="center"
+          android:layout_gravity="center"
+       android:id="@+id/progressImageGridSkel"
+       android:visibility="gone"
+       style="?android:attr/progressBarStyleLarge"
+       android:layout_width="wrap_content"
+       android:layout_height="50dp" />
+	</FrameLayout>
 </RelativeLayout>

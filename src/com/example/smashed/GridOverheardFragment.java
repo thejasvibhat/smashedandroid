@@ -31,6 +31,9 @@ import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.loopj.android.image.SmartImageView;
 
 import android.net.Uri;
@@ -50,6 +53,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -98,20 +103,21 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	}
 	private Fragment m_curFragment = null;
 	private GridImageSkelAdapter gAdapter = null;
-	private ProgressDialog oPd;
 	private boolean m_bSearchOn = false;
 	private Menu optionsMenu = null;
+	private View MainView;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 		
         View rootView = inflater.inflate(R.layout.fragment_skelview, container, false);
+        MainView = rootView;
         String query = getActivity().getIntent().getStringExtra(SearchManager.QUERY);
         if(query == null)
         {
 	        if(m_strSkeletonUrls.size() != 0)
 	        {
-	        	SetGridItems((GridView) rootView.findViewById(R.id.grid_view_skels));
+	        	SetGridItems((PullToRefreshGridView) rootView.findViewById(R.id.grid_view_skels));
 	        }
 	        else
 	        	GetSkeletonData("");
@@ -208,7 +214,7 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 
 	public void ReturnResponseDocument(Document n_oDocument)
 	{
-		oPd.dismiss();
+		displayhide(true);
 		NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
 		NodeList skelIds = n_oDocument.getElementsByTagName("id");
 		NodeList downloadUrls = n_oDocument.getElementsByTagName("downloadurl");
@@ -227,11 +233,11 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 			m_strSkeletonUrls.add(url.getTextContent());
 			//m_strSkeletonIds.add(id.getTextContent());
 		}
-		SetGridItems((GridView) getView().findViewById(R.id.grid_view_skels));
+		SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
 	
-	private void SetGridItems(GridView gridView)
+	private void SetGridItems(PullToRefreshGridView gridView)
 	{
 		
 	    gridView.setAdapter(gAdapter);
@@ -240,19 +246,35 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	        	mCallback.onArticleSelected("",m_strSkeletonUrls.get(position));
 	        }
 	    });
+	    gridView.setOnRefreshListener(new OnRefreshListener<GridView>() {
+			@Override
+			public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+				GetSkeletonData("");
+				displayhide(true);
+				
+			}
+		});
+	}
+	private void displayhide(boolean bool)
+	{
+		PullToRefreshGridView oGridView = (PullToRefreshGridView) MainView.findViewById(R.id.grid_view_skels);
+		ProgressBar oProgress = (ProgressBar) MainView.findViewById(R.id.progressImageGridSkel);
+		if(bool == true)
+		{
+			oGridView.setVisibility(View.VISIBLE);
+			oProgress.setVisibility(View.GONE);
+		}
+		else
+		{
+			oGridView.setVisibility(View.GONE);
+			oProgress.setVisibility(View.VISIBLE);
+			
+		}
 	}
 	private void GetSkeletonData(String tag)
 	{
 		m_strTag = tag;
-		if(oPd == null)
-		{
-			oPd = new ProgressDialog(getActivity());
-			oPd.setTitle("Processing...");
-			oPd.setMessage("Please wait.");
-			oPd.setIndeterminate(true);
-			oPd.setCancelable(false);
-			oPd.show();
-		}
+		displayhide(false);
 		Toast.makeText(getActivity(),
                 "Please wait, connecting to server.",
                 Toast.LENGTH_SHORT).show();
@@ -334,7 +356,7 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	@Override
 	public void OnResponse(String response) {
 		m_StrResponse = response;
-
+		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
         // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
              

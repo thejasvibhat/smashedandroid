@@ -113,7 +113,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// Find People
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// Photos
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1),true,"22"));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		// Communities, Will add a counter here
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
 		// Pages
@@ -163,6 +163,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// Register mMessageReceiver to receive messages.
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
 		      new IntentFilter("my-event"));
+		  LocalBroadcastManager.getInstance(this).registerReceiver(mExitMessageReceiver,
+			      new IntentFilter("exit-event"));
 	}
 	
 	
@@ -247,49 +249,38 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
 		   if (fragment instanceof CreateOverHeardFragment) {
-		          
-				  Singleton.getInstance().m_bCameraMenuItem = true;
-				  Singleton.getInstance().m_bGalleryMenuItem = true;
-				  Singleton.getInstance().m_bRowAddMenuItem = false;
-				  Singleton.getInstance().m_bSaveMenuItem = false;
-				  Singleton.getInstance().m_bShareMenuItem = true;
-				  Singleton.getInstance().m_bSaveOhTextMenuItem = false;
-				  Singleton.getInstance().m_bSearchMenuItem = true;
-				  Singleton.getInstance().m_bSearchOverheardSkel = true;
-				  this.invalidateOptionsMenu();
-
-		   }
-		   if(fragment instanceof GridOverheardSkeletonFragment)
-		   {
-				  Singleton.getInstance().m_bCameraMenuItem = true;
-				  Singleton.getInstance().m_bGalleryMenuItem = true;
-				  Singleton.getInstance().m_bRowAddMenuItem = false;
-				  Singleton.getInstance().m_bSaveMenuItem = false;
-				  Singleton.getInstance().m_bShareMenuItem = true;
-				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-				  Singleton.getInstance().m_bSearchMenuItem = true;
-				  Singleton.getInstance().m_bSearchOverheardSkel = true;
-				  this.invalidateOptionsMenu();
-			    	FragmentManager fragmentManager = getFragmentManager();
+		          Singleton.getInstance().ClearAllOptionMenus();
+		          FragmentManager fragmentManager = getFragmentManager();
 					fragmentManager.popBackStack();
-					getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
+				  this.invalidateOptionsMenu();
 
 		   }
-		   if(fragment instanceof EachOhTextView)
+		   else if(fragment instanceof GridOverheardSkeletonFragment)
 		   {
-				  Singleton.getInstance().m_bCameraMenuItem = true;
-				  Singleton.getInstance().m_bGalleryMenuItem = true;
+			   Singleton.getInstance().ClearAllOptionMenus();
+			   Singleton.getInstance().m_bRowAddMenuItem = false;
+			   Singleton.getInstance().m_bSaveMenuItem = false;
+			   this.invalidateOptionsMenu();
+		    	FragmentManager fragmentManager = getFragmentManager();
+				fragmentManager.popBackStack();
+				getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
+		   }
+		   else if(fragment instanceof EachOhTextView)
+		   {
+			   Singleton.getInstance().ClearAllOptionMenus();
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
-				  Singleton.getInstance().m_bShareMenuItem = true;
-				  Singleton.getInstance().m_bSaveOhTextMenuItem = true;
-				  Singleton.getInstance().m_bSearchMenuItem = true;
-				  Singleton.getInstance().m_bSearchOverheardSkel = true;
 				  this.invalidateOptionsMenu();
 				  FragmentManager fragmentManager = getFragmentManager();
 					fragmentManager.popBackStack();
 
-		   }		   
+		   }	
+		   else
+		   {
+			   finish();
+		   }
 		   super.onBackPressed();
 		}
 	private void Login(String type)
@@ -554,6 +545,13 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		    	Singleton.getInstance().bid = bid;
 		    else
 		    	Singleton.getInstance().bid = "";
+		  }
+
+	};
+	private BroadcastReceiver mExitMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+			  finish();
 		  }
 
 	};

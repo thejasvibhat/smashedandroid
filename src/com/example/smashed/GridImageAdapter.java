@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -94,6 +95,9 @@ public class GridImageAdapter extends BaseAdapter {
         String[] arrUrl =  url.split("theju");
         if(arrUrl[0].equals("uri"))
         {
+        	LayoutInflater li = LayoutInflater.from(mContext);
+        	ProgressBar oProgress = (ProgressBar) li.inflate(R.layout.progressbarlayout, null);
+        	imageView.SetProgressBar(oProgress);
         	imageView.LoadScaleView(imageView,oWidth,oHeight);
         	imageView.setTag("disk");
         	imageView.setImageURI(Uri.parse(arrUrl[1]));
@@ -103,6 +107,10 @@ public class GridImageAdapter extends BaseAdapter {
         	imageView.setImageResource(R.drawable.addpicstooh);
         else
         {
+        	LayoutInflater li = LayoutInflater.from(mContext);
+        	ProgressBar oProgress = (ProgressBar) li.inflate(R.layout.progressbarlayout, null);
+        	imageView.SetProgressBar(oProgress);
+
         	imageView.LoadScaleView(imageView,oWidth,oHeight);
         	if(op == null)
         	{
@@ -113,22 +121,22 @@ public class GridImageAdapter extends BaseAdapter {
         		op.put(String.valueOf(position), m_overheardData.mThumbIds.get(position));
         		if(oProgress == null)
         		{
-        			oProgress = new ProgressDialog(mContext);
-        			oProgress.setIndeterminate(true);
-        			oProgress.setMessage("Downloading high res ");
+        		//	oProgress = new ProgressDialog(mContext);
+        		//	oProgress.setIndeterminate(true);
+        		//	oProgress.setMessage("Downloading high res ");
         			//oProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         		}
-    			oProgress.show();
+    		//	oProgress.show();
         	}
         	else
         	{
         		if(op.get(String.valueOf(position)).equals(m_overheardData.mThumbIds.get(position)) == false)
         		{
         			op.put(String.valueOf(position), m_overheardData.mThumbIds.get(position));
-        			oProgress.show();
+        		//	oProgress.show();
         		}
         	}
-        	imageView.SetProgress(oProgress);
+
         	imageView.setImageUrl(m_overheardData.mThumbIds.get(position));
         	
         }
