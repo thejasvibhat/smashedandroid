@@ -295,6 +295,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 		else
 		{
+			String provider = Singleton.getInstance().GetProvider(); 
 			if(oPd == null)
 			{
 				oPd = new ProgressDialog(this);
@@ -306,6 +307,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			}
 
         	String url = "http://www.smashed.in/auth/post/facebook?access_token="+accessToken;
+        	if(provider.equals("google") == true)
+        	{
+            	url = "http://www.smashed.in/auth/post/google?access_token="+accessToken;
+        	}
         	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
         	oAsyncClient.Attach(this);
         	oAsyncClient.SetPersistantStorage(getApplicationContext());
@@ -517,10 +522,14 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);        
 
         super.onResume();
-        displayView(m_oPosition);
-        if(Singleton.getInstance().m_oType == "create") {
+        
+        if(Singleton.getInstance().m_oType.equals("create") == true) {
 	    	ShowCreateOverheard();
 	    } 
+        else
+        {
+        	displayView(m_oPosition);
+        }
 
     }
 
@@ -529,7 +538,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;
-		if(Singleton.getInstance().m_oType == "create")
+		if(Singleton.getInstance().m_oType.equals("create") == true)
 		{
 			ShowCreateOverheard();
 		}
@@ -555,6 +564,13 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		  }
 
 	};
+
+	@Override
+	public void OnFailure() {
+		if(oPd != null)
+			oPd.dismiss();
+		
+	}
 
 	
 }

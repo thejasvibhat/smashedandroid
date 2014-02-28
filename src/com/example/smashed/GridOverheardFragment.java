@@ -414,4 +414,10 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 		
 	}
 
+	@Override
+	public void OnFailure() {
+		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
+		
+	}
+
 }

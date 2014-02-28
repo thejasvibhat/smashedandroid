@@ -51,11 +51,24 @@ public class Singleton {
     {
     	SharedPreferences.Editor editor = m_LocalStorage.edit();
     	editor.putString("access", oAccessToken);
+    	editor.putString("provider", "facebook");
     	editor.commit();
     }
+    public void SetAccessTokenGoogle(String oAccessToken)
+    {
+    	SharedPreferences.Editor editor = m_LocalStorage.edit();
+    	editor.putString("access", oAccessToken);
+    	editor.putString("provider", "google");
+    	editor.commit();
+    }
+
     public String getAccessToken()
     {
     	return m_LocalStorage.getString("access", "NOT_FOUND");
+    }
+    public String GetProvider()
+    {
+    	return m_LocalStorage.getString("provider", "NOT_FOUND");
     }
     public void ClearAllOptionMenus()
     {

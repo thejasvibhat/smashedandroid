@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -65,6 +66,10 @@ public class EachOhTextView extends Fragment {
         	imageView.setImageResource(R.drawable.ic_home);
         else
         {
+        	LayoutInflater li = LayoutInflater.from(getActivity());
+        	ProgressBar oProgress = (ProgressBar) li.inflate(R.layout.progressbarlayout, null);
+        	imageView.SetProgressBar(oProgress);
+
         	imageView.LoadScaleView(imageView,oWidth,oHeight);
         	
         	imageView.setImageUrl(m_strUrl);

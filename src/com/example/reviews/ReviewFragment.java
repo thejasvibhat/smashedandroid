@@ -499,4 +499,14 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		  }
 
 	};
+	@Override
+	public void OnFailure() {
+		if(m_oType == "fs")
+			oGrid.onRefreshComplete();
+		if(m_oType == "oh")
+		{
+			ohGrid.onRefreshComplete();
+		}
+		
+	}
 }

@@ -162,7 +162,7 @@ public class GridImageAdapter extends BaseAdapter {
         TextView oTopText = new TextView(mContext);
         oTopText.setGravity(Gravity.CENTER_HORIZONTAL);
         oTopText.setTextColor(0xffffffff);
-        oTopText.setTextSize(36);
+        oTopText.setTextSize(32);
         oTopText.setShadowLayer(2,1,1,Color.BLACK);
         oTopText.setText(m_overheardData.mTopTexts.get(position));
         oFrameLayout.addView(oTopText);
@@ -174,7 +174,7 @@ public class GridImageAdapter extends BaseAdapter {
         TextView oBottomText = new TextView(mContext);
         oBottomText.setGravity(Gravity.CENTER_HORIZONTAL);
         oBottomText.setShadowLayer(2,1,1,Color.BLACK);
-        oBottomText.setTextSize(36);
+        oBottomText.setTextSize(32);
         oBottomText.setTextColor(0xffffffff);
         oBottomText.setText(m_overheardData.mBottomTexts.get(position));
         oFrameLayout.addView(oBottomText);

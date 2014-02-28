@@ -28,7 +28,7 @@ public class CSmartImageView extends RelativeLayout {
 	private Context mContext;
 	ProgressBar oProgress;
 	RelativeLayout oMainView;
-	SmartImageView imageView;
+	public SmartImageView imageView;
 	ProgressDialog mProgress;
 	private int oWidth;
 	private boolean oProgEnabled = false;

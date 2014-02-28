@@ -367,5 +367,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			oRevData.reviews.add(oRev);
 		
 	}
+	@Override
+	public void OnFailure() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

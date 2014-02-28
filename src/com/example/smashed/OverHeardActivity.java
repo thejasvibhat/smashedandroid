@@ -436,5 +436,11 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		}
 		
 	}
+	@Override
+	public void OnFailure() {
+		if(oPd != null)
+			oPd.dismiss();
+		
+	}
 	
 }

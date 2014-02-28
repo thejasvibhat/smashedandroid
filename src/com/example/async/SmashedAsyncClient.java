@@ -23,6 +23,7 @@ public class SmashedAsyncClient{
 	}
 	public interface OnResponseListener {
         public void OnResponse(String response);
+        public void OnFailure();
     }
 	public void SetPersistantStorage(Context oContext)
 	{
@@ -45,6 +46,7 @@ public class SmashedAsyncClient{
 	}
 	public void MakePostCall(String url,RequestParams params)
 	{
+		m_oAsyncClient.setTimeout(60000);
 		m_oAsyncClient.setCookieStore(Singleton.getInstance().myCookieStore);
 		m_oAsyncClient.post(url, params, new AsyncHttpResponseHandler(){
     		@Override
@@ -54,7 +56,7 @@ public class SmashedAsyncClient{
     		@Override
     		public void onFailure(Throwable error, String content)
     		{
-    			String x = error.getMessage();
+    			oListenerCallback.OnFailure();
     		}		        
 		 });
 	}
@@ -84,7 +86,7 @@ public class SmashedAsyncClient{
     		@Override
     		public void onFailure(Throwable error, String content)
     		{
-    			String x = error.getMessage();
+    			oListenerCallback.OnFailure();
     		}		        
 		 });
 	}

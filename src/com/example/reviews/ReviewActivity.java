@@ -655,5 +655,13 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		}
 		
 	}
+	@Override
+	public void OnFailure() {
+		if(oPd != null)
+			oPd.dismiss();
+		ProgressBar oPG= (ProgressBar) findViewById(R.id.progressImageGrid);
+		oPG.setVisibility(View.GONE);
+		
+	}
 	
 }

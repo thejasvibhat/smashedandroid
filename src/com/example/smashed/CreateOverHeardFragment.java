@@ -283,7 +283,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		    // add attr: id =
 		    imageview.setAttribute("id",oData.mResIds.get(i));
 		    CSmartImageView oImg = oImageViews.get(i);
-		    LayoutParams oParams = oImg.getLayoutParams();
+		    LayoutParams oParams = oImg.imageView.getLayoutParams();
 		    int imgHeight = oParams.height;
 		    int imgWidth = oParams.width;
 		    if(oHeight < oParams.height)
@@ -618,4 +618,10 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 
 	        return outputFile.getAbsolutePath();
 	    }
+	@Override
+	public void OnFailure() {
+		if(oPd != null)
+			oPd.dismiss();
+		setRefreshActionButtonState(false);
+	}
 }
