@@ -593,7 +593,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	@Override
     protected void onResume() {
 	    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);        
-
+	    if(m_reviewIntent != null)
+	    	m_reviewIntent.removeExtra(SearchManager.QUERY);
         super.onResume();
         
         if(Singleton.getInstance().m_oType.equals("create") == true) {

@@ -38,6 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -53,7 +54,7 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	int NUM_PAGES = 0;
 	private Menu optionsMenu;
 	public HomeFragment(){}
-	
+	private SearchView searchView;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -81,13 +82,13 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
 		this.optionsMenu = menu;
 		SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         MenuItem oSearchMenu = menu.findItem(R.id.search);
         oSearchMenu.collapseActionView();
         this.optionsMenu = menu;
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setIconifiedByDefault(false);   
-            
+          
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
         {
             @Override
@@ -120,8 +121,13 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	}
 	public void showSearch()
 	{
+		
 		 MenuItem oSearchMenu = optionsMenu.findItem(R.id.search);
+		 
 	        oSearchMenu.expandActionView();
+	       // searchView.requestFocus();
+	      //  InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+	       // imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
 	}
 	@Override 
 	public boolean onOptionsItemSelected(MenuItem item) {

@@ -13,10 +13,12 @@
       
  	<item android:id="@+id/revoh"
           android:icon="@drawable/ic_action_oh_picture"
+          android:title="Create Overheard"
           android:showAsAction="collapseActionView|ifRoom"
           />
   	<item android:id="@+id/revfs"
           android:icon="@drawable/ic_write_review"
+          android:title="Write Review"
           android:showAsAction="collapseActionView|ifRoom"
           />
     
