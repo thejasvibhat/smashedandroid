@@ -6,6 +6,10 @@ import java.util.TimerTask;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -17,6 +21,7 @@ import android.content.Intent;
 
 import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.reviews.ReviewData;
 import com.example.reviews.SmashedReview;
 import com.example.search.SampleRecentSuggestionsProvider;
 import com.example.smashedin.*;
@@ -51,10 +56,14 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	android.support.v4.app.Fragment m_cuFragment;
 	private ArrayList<String> m_ohpromolist;
 	int currentPage = 0;
+	int currentPageReviews = 0;
 	int NUM_PAGES = 0;
+	int NUM_PAGES_REVIEWS = 0;
 	private Menu optionsMenu;
 	public HomeFragment(){}
 	private SearchView searchView;
+	private String type = "oh";
+	private ArrayList<ReviewData> m_arrReviews = new ArrayList<ReviewData>();
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -63,7 +72,7 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
         GetPromoOh();
         m_cuFragment = this;
         setHasOptionsMenu(true);
-        ImageView img = (ImageView) rootView.findViewById(R.id.searchFs);
+     /*   ImageView img = (ImageView) rootView.findViewById(R.id.searchFs);
         img.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -72,7 +81,7 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 				
 			}
 		});
-        		
+       */ 		
     	ProgressBar oProg = (ProgressBar) rootView.findViewById(R.id.progressHome);
     	oProg.setVisibility(View.VISIBLE);
 
@@ -140,14 +149,24 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	    }
 		return super.onOptionsItemSelected(item);
 	}
-private void GetPromoOh()
-{
-	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-	oAsyncClient.Attach(this);
-	oAsyncClient.SetPersistantStorage(getActivity());
-	oAsyncClient.MakeCall("http://www.smashed.in/api/oh/list?offset=0&limit=5");   
-
-}
+	private void GetPromoOh()
+	{
+		type = "oh";
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+		oAsyncClient.Attach(this);
+		oAsyncClient.SetPersistantStorage(getActivity());
+		oAsyncClient.MakeCall("http://www.smashed.in/api/oh/list?offset=0&limit=5");   
+	
+	}
+	private void GetLatestReviews()
+	{
+		type = "rev";
+		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+		oAsyncClient.Attach(this);
+		oAsyncClient.SetPersistantStorage(getActivity());
+		oAsyncClient.MakeCall("http://www.smashed.in/api/b/fslatestcomments");   
+		
+	}
 	  @Override
 	  public void onResume() {
 		  if(Singleton.getInstance().m_oType == "home")
@@ -185,6 +204,33 @@ private void GetPromoOh()
 	        }
 
 	    }
+	    class ReviewPromoAdapter extends FragmentPagerAdapter {
+
+	        public ReviewPromoAdapter(android.support.v4.app.FragmentManager fm) {
+	            super(fm);
+	        }
+
+	        @Override
+	        public android.support.v4.app.Fragment getItem(int position) {
+	        	return ReviewPagerFragment.newInstance(CONTENT[position % CONTENT.length],m_arrReviews.get(position)); 
+	        }
+	       
+	        @Override
+	        public CharSequence getPageTitle(int position) {
+	            return CONTENT[position % CONTENT.length].toUpperCase();
+	        }
+
+	        @Override
+	        public int getCount() {
+	            return CONTENT.length;
+	        }
+	        @Override
+	        public void destroyItem(ViewGroup container, int position, Object object) {
+	            super.destroyItem(container, position, object);
+	        }
+
+	    }
+
 		public void ReturnResponseDocument(Document n_oDocument)
 		{
 			NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
@@ -199,6 +245,7 @@ private void GetPromoOh()
 				m_ohpromolist.add(url.getTextContent());
 				
 			}
+			GetLatestReviews();
 			NUM_PAGES = m_ohpromolist.size();
 	        FragmentPagerAdapter adapter1 = new OhPromoAdapter(getActivity().getSupportFragmentManager());
 
@@ -245,11 +292,86 @@ private void GetPromoOh()
 	        }, 5000, 5000);
 			
 		}
+		private void ParseJson(String response) throws JSONException
+		{
+			JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+			
+			JSONArray items = (JSONArray) jsonObj.getJSONArray("reviews");		
+			int length			= items.length();
+			
+			if (length > 0) {
+				for (int i = 0; i < length; i++) {
+					ReviewData orev = new ReviewData();
+					JSONObject revs = (JSONObject)items.get(i);
+					orev.name = revs.getString("username");
+					orev.barname = revs.getString("barname");
+					orev.rating = revs.getString("rating");
+					orev.review = revs.getString("review");
+					
+					m_arrReviews.add(orev);
+				}
+			}
+			NUM_PAGES_REVIEWS = m_arrReviews.size();
+	        FragmentPagerAdapter adapter1 = new ReviewPromoAdapter(getActivity().getSupportFragmentManager());
+
+	        final ViewPager pager1 = (ViewPager)getActivity().findViewById(R.id.reviewpager);
+	        pager1.setAdapter(adapter1);
+	        pager1.setOnPageChangeListener(new OnPageChangeListener() {
+				
+				@Override
+				public void onPageSelected(int arg0) {
+					//currentPage = arg0;
+					
+				}
+				
+				@Override
+				public void onPageScrolled(int arg0, float arg1, int arg2) {
+					currentPageReviews = arg0;
+					
+				}
+				
+				@Override
+				public void onPageScrollStateChanged(int arg0) {
+				//	currentPage = arg0;
+					
+				}
+			});
+	        final Handler handler = new Handler();
+
+	        final Runnable Update = new Runnable() {
+	            public void run() {
+	                if (currentPageReviews == NUM_PAGES_REVIEWS - 1) {
+	                	currentPageReviews = 0;
+	                }
+	                pager1.setCurrentItem(currentPageReviews++, true);
+	            }
+	        };
+
+	        Timer swipeTimer = new Timer();
+	        swipeTimer.schedule(new TimerTask() {
+
+	            @Override
+	            public void run() {
+	                handler.post(Update);
+	            }
+	        }, 5000, 5000);
+			
+		}
 
 		@Override
 		public void OnResponse(String response) {
 			ProgressBar oProg = (ProgressBar) getActivity().findViewById(R.id.progressHome);
 	    	oProg.setVisibility(View.GONE);
+	    	if(type == "rev")
+	    	{
+	    		try {
+					ParseJson(response);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		return;
+	    	}
 			m_StrResponse = response;
 	        // Create Inner Thread Class
 	        Thread background = new Thread(new Runnable() {

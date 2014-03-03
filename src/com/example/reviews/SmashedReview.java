@@ -107,7 +107,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	}
 	private void UpdateReview(String id,int rating,String rev)
 	{
-		String url = "http://www.smashed.in/api/b/updatefscomment?fsbid="+oRevData.id+"&rating="+rating+"&description="+rev;
+		String url = "http://www.smashed.in/api/b/updatefscomment?fsbid="+oRevData.id+"&rating="+rating+"&description="+rev+"&name="+oRevData.name;
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getApplicationContext());

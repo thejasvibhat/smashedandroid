@@ -8,6 +8,8 @@ public class ReviewData {
 	public String rating;
 	public String contact;
 	public String url;
+	public String review;
+	public String barname;
 	public ReviewLocation location;
 	public String photo;
 	public String categories;

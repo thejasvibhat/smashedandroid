@@ -7,12 +7,12 @@
     android:layout_height="match_parent">
     <LinearLayout 
     android:layout_width="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/smashedbackground"
     android:orientation="vertical"
     android:paddingTop="1dp"
     android:layout_height="match_parent">
     <LinearLayout android:layout_width="fill_parent"
-        android:background="@color/grey"
+        android:background="#FF222222"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
     <ImageView android:layout_width="100dp"
@@ -28,25 +28,29 @@
         android:textSize="18dp"
         android:fontFamily="impact.eot"
         android:textStyle="bold|italic"
-        android:shadowColor="#FF000000"
         android:text="Welcome to Smashed.in"/>
         
     </LinearLayout>
         	    <android.support.v4.view.ViewPager
 	        android:id="@+id/ohpager"
+	        android:background="#00000000"
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
 	        android:layout_margin="1dp"
 	        android:layout_weight="1"
 	       />
-        	    
-      <!--  -->android.support.v4.view.ViewPager
+        	    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="120dp"
+         android:layout_gravity="bottom" 
+         android:gravity="bottom">
+      <android.support.v4.view.ViewPager
 	        android:id="@+id/reviewpager"
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
 	        android:layout_weight="1"
-	       /-->
-      <LinearLayout android:layout_width="fill_parent"
+	       />
+      </LinearLayout>
+      <!-- LinearLayout android:layout_width="fill_parent"
         android:layout_height="50dp"
          android:layout_gravity="bottom" 
          android:gravity="bottom">
@@ -60,7 +64,7 @@
               android:clickable="true"
               android:src="@drawable/searchbar" />
 
-      </LinearLayout>
+      </LinearLayout-->
     
     
 
