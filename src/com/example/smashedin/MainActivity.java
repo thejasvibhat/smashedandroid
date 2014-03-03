@@ -6,6 +6,7 @@ import com.example.common.NavDrawerItem;
 import com.example.common.NavDrawerListAdapter;
 import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.reviews.ReviewActivity;
+import com.example.reviews.ReviewFragment;
 import com.example.smashed.*;
 import com.example.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
@@ -30,15 +31,19 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -51,6 +56,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -74,7 +80,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	// slide menu items
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
-
+	private int currentPosition = 0;
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
 	private ReviewListAdapter m_oRevAdapter;
@@ -84,6 +90,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	
 	private ProgressDialog oPd;
 	private Fragment m_oCreateOverHeard;
+	private Menu optionsMenu;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +100,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		Singleton.getInstance().SetApplicationContext(getApplicationContext());
 
 		setContentView(R.layout.activity_main);
+
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
@@ -165,6 +173,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		      new IntentFilter("my-event"));
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mExitMessageReceiver,
 			      new IntentFilter("exit-event"));
+		  LocalBroadcastManager.getInstance(this).registerReceiver(mSearchReviewMessageReceiver,
+			      new IntentFilter("search-event"));
 	}
 	
 	
@@ -184,6 +194,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.optionsMenu = menu;
 		getMenuInflater().inflate(R.menu.main, menu);
 		MenuItem m_oGalleryMenuItem = menu.findItem(R.id.gallery);
 		if(Singleton.getInstance().m_bGalleryMenuItem == true)
@@ -209,6 +220,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		MenuItem m_oSearchOhSkelMenuItem = menu.findItem(R.id.searchoverskel);
 		if(Singleton.getInstance().m_bSearchOverheardSkel == true)
 			m_oSearchOhSkelMenuItem.setVisible(false);
+		MenuItem m_oLoginMenuItem = menu.findItem(R.id.login);
+		if(Singleton.getInstance().m_bHideLoginMenuItem == true)
+			m_oLoginMenuItem.setVisible(false);
 		
 		return true;
 	}
@@ -225,6 +239,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			return true;
+		case R.id.login:
+			Login(Singleton.getInstance().m_strType);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -246,21 +263,38 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	public void onBackPressed() {
 
     	mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
 		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
 		   if (fragment instanceof CreateOverHeardFragment) {
-		          Singleton.getInstance().ClearAllOptionMenus();
+		          /*Singleton.getInstance().ClearAllOptionMenus();
 		          FragmentManager fragmentManager = getFragmentManager();
 					fragmentManager.popBackStack();
+					if(Singleton.getInstance().loggedIn == true)
+						Singleton.getInstance().m_bHideLoginMenuItem = true;
+					else
+						Singleton.getInstance().m_bHideLoginMenuItem = false;
 
-				  this.invalidateOptionsMenu();
+				  this.invalidateOptionsMenu();*/
+				  doExit();
 
 		   }
 		   else if(fragment instanceof GridOverheardSkeletonFragment)
 		   {
 			   Singleton.getInstance().ClearAllOptionMenus();
+				if(Singleton.getInstance().loggedIn == true)
+				{
+					Singleton.getInstance().m_bHideLoginMenuItem = true;
+					   Singleton.getInstance().m_bSaveMenuItem = false;
+					   Singleton.getInstance().m_bShareMenuItem = true;
+				}
+				else
+				{
+					Singleton.getInstance().m_bHideLoginMenuItem = false;
+					   Singleton.getInstance().m_bSaveMenuItem = true;
+					   Singleton.getInstance().m_bShareMenuItem = false;
+				}
+
 			   Singleton.getInstance().m_bRowAddMenuItem = false;
-			   Singleton.getInstance().m_bSaveMenuItem = false;
+
 			   this.invalidateOptionsMenu();
 		    	FragmentManager fragmentManager = getFragmentManager();
 				fragmentManager.popBackStack();
@@ -270,6 +304,19 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		   else if(fragment instanceof EachOhTextView)
 		   {
 			   Singleton.getInstance().ClearAllOptionMenus();
+			   if(Singleton.getInstance().loggedIn == true)
+				{
+					Singleton.getInstance().m_bHideLoginMenuItem = true;
+					   Singleton.getInstance().m_bSaveMenuItem = false;
+					   Singleton.getInstance().m_bShareMenuItem = true;
+				}
+				else
+				{
+					Singleton.getInstance().m_bHideLoginMenuItem = false;
+					   Singleton.getInstance().m_bSaveMenuItem = true;
+					   Singleton.getInstance().m_bShareMenuItem = false;
+				}
+
 				  Singleton.getInstance().m_bRowAddMenuItem = false;
 				  Singleton.getInstance().m_bSaveMenuItem = false;
 				  this.invalidateOptionsMenu();
@@ -279,10 +326,31 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		   }	
 		   else
 		   {
-			   finish();
+			doExit();
 		   }
-		   super.onBackPressed();
+		   //super.onBackPressed();
 		}
+	private void doExit()
+	{
+	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+	    alertDialog.setPositiveButton("Yes", new OnClickListener() {
+
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	        	
+	            finish();
+
+	        }
+	    });
+
+	    alertDialog.setNegativeButton("No", null);
+
+	    alertDialog.setMessage("Do you want to exit?");
+	    alertDialog.setTitle("SmashedIn");
+	    alertDialog.show();
+
+	}
 	private void Login(String type)
 	{
 		Singleton.getInstance().m_oType = type;
@@ -319,8 +387,16 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	}
 	private void ShowCreateOverheard()
 	{
-
-		Singleton.getInstance().loggedIn = true;
+		if(Singleton.getInstance().m_bnevermind == true)
+		{
+			Singleton.getInstance().m_bHideLoginMenuItem = false;
+			Singleton.getInstance().loggedIn = false;
+		}
+		else
+		{
+			Singleton.getInstance().m_bHideLoginMenuItem = true;
+			Singleton.getInstance().loggedIn = true;
+		}
 		Fragment fragment = null;
 		Singleton.getInstance().m_bCameraMenuItem = true;
 		Singleton.getInstance().m_bGalleryMenuItem = true;
@@ -340,7 +416,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 		if (fragment != null) {
 			FragmentManager fragmentManager = getFragmentManager();
-			fragmentManager.beginTransaction()
+			if(fragmentManager.getBackStackEntryCount() == 0)
+				fragmentManager.beginTransaction()
 					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
 
 		} else {
@@ -354,13 +431,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	 * Diplaying fragment view for selected nav drawer list item
 	 * */
 	private void displayView(int position) {
+		currentPosition = position;
 		// update the main content by replacing fragments
-		Singleton.getInstance().m_bCameraMenuItem = false;
-		Singleton.getInstance().m_bGalleryMenuItem = false;
-		Singleton.getInstance().m_bRowAddMenuItem = true;
-		Singleton.getInstance().m_bSaveMenuItem = true;
-		Singleton.getInstance().m_bShareMenuItem = true;
-		Singleton.getInstance().m_bSaveOhTextMenuItem = true;
+		Singleton.getInstance().ClearAllOptionMenus();
 		Singleton.getInstance().m_bSearchMenuItem = false;
 		android.support.v4.app.Fragment fragment = null;
 		switch (position) {
@@ -528,7 +601,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	    } 
         else
         {
-        	displayView(m_oPosition);
+        	if(currentPosition != m_oPosition)
+        		displayView(m_oPosition);
         }
 
     }
@@ -564,7 +638,17 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		  }
 
 	};
+	private BroadcastReceiver mSearchReviewMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+			  String query = intent.getStringExtra("query");
+			  if(m_reviewIntent == null)
+					m_reviewIntent = new Intent(m_oMainACtivity, ReviewActivity.class);
+			  m_reviewIntent.putExtra(SearchManager.QUERY, query);
+			  displayView(1);
+		  }
 
+	};
 	@Override
 	public void OnFailure() {
 		if(oPd != null)

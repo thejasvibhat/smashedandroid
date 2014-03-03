@@ -79,6 +79,7 @@ public class CSmartImageView extends RelativeLayout {
 			}
 		});		
     }
+
 	public void scaleImage()
     {
         // Get the ImageView and its bitmap

@@ -19,6 +19,7 @@ public class Singleton {
 	public boolean m_bSearchMenuItem = true;
 	public boolean m_bSaveOhTextMenuItem = true;
 	public boolean m_bSearchOverheardSkel = true;
+	public boolean m_bHideLoginMenuItem = true;
 	public boolean m_bDrawerClosed = false;
 	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
@@ -26,6 +27,7 @@ public class Singleton {
 	private Context mContext;
 	public PersistentCookieStore myCookieStore;
 	public boolean loggedIn = false;
+	public boolean m_bnevermind = false;
 	public String m_strType = "create";
 	public String bid = "";
     private Singleton(){
@@ -80,6 +82,7 @@ public class Singleton {
     	m_bSearchMenuItem = true;
     	m_bSaveOhTextMenuItem = true;
     	m_bSearchOverheardSkel = true;
+    	m_bHideLoginMenuItem = true;
     	m_bDrawerClosed = false;
     }
 

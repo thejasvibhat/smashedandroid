@@ -426,13 +426,24 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 		dialog.show();
 		
 	}
+	
     @Override
 	public void onResume() {
     	DrawerLayout mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
     	mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 			Singleton.getInstance().ClearAllOptionMenus();
+			if(Singleton.getInstance().loggedIn != true)
+			{
+				Singleton.getInstance().m_bHideLoginMenuItem = false;
+				Singleton.getInstance().m_bSaveMenuItem = true;
+			}
+			else
+			{
+				Singleton.getInstance().m_bHideLoginMenuItem = true;
+				Singleton.getInstance().m_bSaveMenuItem = false;
+			}
 			Singleton.getInstance().m_bRowAddMenuItem = false;
-			Singleton.getInstance().m_bSaveMenuItem = false;
+			
 			Singleton.getInstance().m_bShareMenuItem = false;
 			CheckAndUpdateActionBar();
 			getActivity().invalidateOptionsMenu();
@@ -489,7 +500,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	public void CheckAndUpdateActionBar()
 	{
 		boolean lExists = CheckForLocalImage();
-		if(lExists == true)
+		if((lExists == true)||(Singleton.getInstance().loggedIn == false))
 		{
 			if(Singleton.getInstance().m_bShareMenuItem == true)
 			{

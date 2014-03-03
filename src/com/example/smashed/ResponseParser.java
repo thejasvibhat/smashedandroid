@@ -94,6 +94,8 @@ public class ResponseParser {
 	        			}
 	        			
 	        		}
+	        		else if(m_Fragment instanceof HomeFragment)
+	        			((HomeFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        		else
 	        			((GridOverheardFragment)m_Fragment).ReturnResponseDocument(n_oDocument);
 	        	}

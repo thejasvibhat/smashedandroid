@@ -44,8 +44,10 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -140,6 +142,16 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
             mEmail = extras.getString(EXTRA_ACCOUNTNAME);
             getTask(HelloFacebookSampleActivity.this, mEmail, SCOPE).execute();
         }
+        LinearLayout nevermind = (LinearLayout) findViewById(R.id.nevermind);
+        nevermind.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				
+				Singleton.getInstance().m_bnevermind = true;
+				finish();
+			}
+		});
     }
 
     @Override
@@ -230,6 +242,8 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
 	public void OnResponse(String response) {
 		if(oPd != null)
 			oPd.dismiss();
+		Singleton.getInstance().m_bnevermind = false;
+		Singleton.getInstance().loggedIn = true;
 		finish(); 
 		
 	}

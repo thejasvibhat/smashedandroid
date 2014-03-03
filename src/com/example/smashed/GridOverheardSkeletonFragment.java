@@ -121,10 +121,10 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
        SetTabs(rootView);
         return rootView;
     }
-	private void SetTabs(View orootView)
+	public void SetTabs(View orootView)
 	{
 		m_grootView = orootView;
-		  ActionBar actionBar = getActivity().getActionBar();
+		  final ActionBar actionBar = getActivity().getActionBar();
 		  actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		  if(actionBar.getTabCount() == 0)
 		  {
@@ -169,6 +169,15 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 							
 							@Override
 							public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+								if(Singleton.getInstance().loggedIn != true)
+								{
+									actionBar.selectTab(actionBar.getTabAt(0));
+									Toast.makeText(getActivity(),
+							                "Please Login before you can access your uploads.",
+							                Toast.LENGTH_SHORT).show();
+
+									return;
+								}
 								selectedTab = "private";
 								if(m_privSkeletons.m_strSkeletonIds.size() != 0)
 						        {
@@ -186,14 +195,36 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 						});
 		        actionBar.addTab(tab1);
 		  }
+		  else
+		  {
+			  int length = actionBar.getTabCount();
+			  for (int i=0; i < length; i++)
+			  {
+				  //actionBar.addTab(actionBar.getTabAt(i));
+			  }
+		  }
 	}
+	
 	@Override 
 	public void onResume()
 	{
+		  ActionBar actionBar1 = getActivity().getActionBar();
+		  if(actionBar1.getNavigationMode() != ActionBar.NAVIGATION_MODE_TABS)
+			  actionBar1.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
 	       DrawerLayout mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
 	       mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);        
 	       
 		Singleton.getInstance().ClearAllOptionMenus();
+		if(Singleton.getInstance().loggedIn != true)
+		{
+			Singleton.getInstance().m_bHideLoginMenuItem = false;
+		}
+		else
+		{
+			Singleton.getInstance().m_bHideLoginMenuItem = true;
+		}
+
     	Singleton.getInstance().m_bCameraMenuItem = false;
 		Singleton.getInstance().m_bGalleryMenuItem = false;
 		Singleton.getInstance().m_bSearchOverheardSkel = false;
@@ -285,7 +316,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 		NodeList skelThumbs = n_oDocument.getElementsByTagName("thumburl");
 		NodeList skelUrls = n_oDocument.getElementsByTagName("url");
 		NodeList skelIds = n_oDocument.getElementsByTagName("id");
-		if(gAdapter == null)
+		if(gAdapter == null && getActivity() != null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
 		if(selectedTab == "gallery")
 		{
@@ -321,18 +352,21 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 
 			
 		}
-
+		if(getView() == null)
+			return;
 		if(selectedTab == "gallery")
 			gAdapter.mThumbIds.addAll(m_galSkeletons.mThumbIds);
 		else
 			gAdapter.mThumbIds.addAll(m_privSkeletons.mThumbIds);
 		
-		SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
+			SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
 	
 	private void SetGridItems(PullToRefreshGridView gridView)
 	{
+		if(gAdapter == null)
+			gAdapter = new GridImageSkelAdapter(getActivity());
 		gAdapter.mThumbIds.clear();
 		if(selectedTab == "private")
 		{
@@ -460,6 +494,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	@Override
 	public void OnResponse(String response) {
 		m_StrResponse = response;
+		if(getView() != null)
 		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
 		 // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
