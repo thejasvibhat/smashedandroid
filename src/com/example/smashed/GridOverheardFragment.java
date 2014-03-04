@@ -233,7 +233,8 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 			m_strSkeletonUrls.add(url.getTextContent());
 			//m_strSkeletonIds.add(id.getTextContent());
 		}
-		SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
+		if(getView() != null)
+			SetGridItems((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels));
 
 	}
 	
@@ -356,7 +357,8 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	@Override
 	public void OnResponse(String response) {
 		m_StrResponse = response;
-		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
+		if(getView() != null)
+			((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();
         // Create Inner Thread Class
         Thread background = new Thread(new Runnable() {
              

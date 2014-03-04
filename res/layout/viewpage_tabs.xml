@@ -40,11 +40,19 @@
 	
 <LinearLayout android:id="@+id/addreview"
     android:orientation="vertical"
-    android:background="@color/white"
+     android:background="@drawable/shadow_new_1"
     android:visibility="invisible"
     android:layout_gravity="center_horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">    
+    android:padding="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_height="wrap_content">   
+    <LinearLayout 
+    android:orientation="vertical"
+     android:background="@color/white"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">   
 	    <LinearLayout 
 	    android:orientation="horizontal"
 	    android:background="@color/white"
@@ -93,10 +101,15 @@
 		    android:src="@drawable/rate" />
 						
 	</LinearLayout>
+	<View
+		    android:layout_width="fill_parent"
+		    android:layout_margin="3dp"
+		    android:layout_height="2dp"
+		    android:background="@android:color/darker_gray"/>
 <LinearLayout 
 	    android:orientation="vertical"
-	    android:background="@color/white"
 	    android:padding="10dp"
+	   
 	    android:layout_gravity="center_horizontal"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content">
@@ -109,15 +122,41 @@
 	    android:background="@color/grey"
 	    android:padding="20dp"
 	    android:textSize="16dp" />
-
+	<View
+		    android:layout_width="fill_parent"
+		    android:layout_marginBottom="10dp"
+		    android:layout_height="2dp"
+		    android:background="@android:color/darker_gray"/>
+	<LinearLayout android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+	     <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#FF000000"
+        android:textSize="14dp"
+        android:fontFamily="impact.eot"
+        android:textStyle="bold|italic"
+        android:text="by "/>
+	     <EditText
+	    android:id="@+id/usernametext"
+	    android:layout_width="200dp"
+	    android:layout_height="50dp"
+	    android:background="@color/grey"
+	    android:text="Anonymous"
+	    android:textSize="16dp" />
+	</LinearLayout>
+	
 	<Button android:id="@+id/submitrev"
 	    android:layout_width="100dp"
 	    android:layout_height="40dp"
 	    android:layout_gravity="right"
 	    android:layout_marginTop="10dp"
 	    android:background="@color/orange"
-	    android:text="Submit" />
+	    android:text="Done" />
+	
  	</LinearLayout>
 </LinearLayout>
-
+</LinearLayout>
 </FrameLayout>

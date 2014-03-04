@@ -1,6 +1,12 @@
 package com.example.smashed;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.example.async.SmashedAsyncClient;
+import com.example.reviews.SmashedFsReviewsData;
 import com.loopj.android.http.PersistentCookieStore;
 
 import android.content.Context;
@@ -30,6 +36,8 @@ public class Singleton {
 	public boolean m_bnevermind = false;
 	public String m_strType = "create";
 	public String bid = "";
+	public String username = "Anonymous";
+	public String usericonurl = "";
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }
@@ -85,6 +93,18 @@ public class Singleton {
     	m_bHideLoginMenuItem = true;
     	m_bDrawerClosed = false;
     }
+	public void parseJsonUserDetails(String response) {
+		JSONObject jsonObj;
+		try {
+			jsonObj = (JSONObject) new JSONTokener(response).nextValue();			
+			username = jsonObj.getString("username");
+			usericonurl = jsonObj.getString("avatar");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 
 }

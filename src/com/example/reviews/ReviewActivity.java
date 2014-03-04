@@ -449,6 +449,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
             }
         };
         searchView.setOnQueryTextListener(queryTextListener);
+       
 		return true;
 	}
 		@Override
@@ -488,11 +489,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		switch (item.getItemId()) {
 		case R.id.action_settings:
 			return true;
+		
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-
+	
 	/* *
 	 * Called when invalidateOptionsMenu() is triggered
 	 */
@@ -657,6 +659,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				e.printStackTrace();
 			}
 		}
+		
 		
 	}
 	@Override

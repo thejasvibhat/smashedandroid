@@ -242,6 +242,7 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
 	public void OnResponse(String response) {
 		if(oPd != null)
 			oPd.dismiss();
+		Singleton.getInstance().parseJsonUserDetails(response);
 		Singleton.getInstance().m_bnevermind = false;
 		Singleton.getInstance().loggedIn = true;
 		finish(); 

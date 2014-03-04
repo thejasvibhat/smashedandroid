@@ -19,7 +19,6 @@ import com.example.smashed.CSmartImageView;
 import com.example.smashed.GridImageSkelAdapter;
 import com.example.smashed.ResponseParser;
 import com.example.smashed.Singleton;
-import com.example.smashedin.R;
 import com.google.android.gms.internal.gh;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

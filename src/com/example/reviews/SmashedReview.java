@@ -8,12 +8,14 @@ import org.json.JSONTokener;
 
 import com.example.async.SmashedAsyncClient;
 import com.example.async.SmashedAsyncClient.OnResponseListener;
+import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.smashed.Singleton;
 import com.example.smashedin.*;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -47,6 +49,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     private Intent mainintent;
     private int m_rating = 0;
     private String m_review = "";
+	private ProgressDialog oPd = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +76,15 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         ReviewData oData = b.getParcelable("places");
 
         getActionBar().setTitle(b.getString("name"));
+        if(Singleton.getInstance().loggedIn == true)
+    	{
+    		Singleton.getInstance().m_bHideLoginMenuItem = true;
+    	}
+        else
+        {
+        	Singleton.getInstance().m_bHideLoginMenuItem = false;
+        }
+    	this.invalidateOptionsMenu();
     	super.onResume();
     }
     @Override
@@ -88,6 +100,9 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.revmain, menu);
+		 MenuItem m_oLoginMenuItem = menu.findItem(R.id.login);
+	        if(Singleton.getInstance().m_bHideLoginMenuItem == true)
+				m_oLoginMenuItem.setVisible(false);
 		return true;
 	}
 
@@ -100,14 +115,17 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		case R.id.revfs:
 			CreateReviewForBar();
 			break;
+		case R.id.login:
+			Login();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
 	}
-	private void UpdateReview(String id,int rating,String rev)
+	private void UpdateReview(String id,int rating,String rev, String username)
 	{
-		String url = "http://www.smashed.in/api/b/updatefscomment?fsbid="+oRevData.id+"&rating="+rating+"&description="+rev+"&name="+oRevData.name;
+		String url = "http://www.smashed.in/api/b/updatefscomment?fsbid="+oRevData.id+"&rating="+rating+"&description="+rev+"&name="+oRevData.name+"&username="+username;
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getApplicationContext());
@@ -118,6 +136,8 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	{
 		
 		LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+		TextView ousername = (TextView) findViewById(R.id.usernametext);
+		ousername.setText(Singleton.getInstance().username);
 		if(oRevAdd.getVisibility() == View.INVISIBLE)
 		{
 			slideToBottom(oRevAdd);
@@ -134,7 +154,8 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
 				slideToTop(oRevAdd);
 				m_review = ((EditText)oRevAdd.findViewById(R.id.enterrev)).getText().toString();
-				UpdateReview(oRevData.id,m_rating,m_review);
+				EditText username = (EditText) oRevAdd.findViewById(R.id.usernametext);
+				UpdateReview(oRevData.id,m_rating,m_review,username.getText().toString());
 	            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 	            
 
@@ -315,7 +336,35 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         startActivity(mainintent);
 
 	}
+	private void Login()
+	{
+		Singleton.getInstance().m_oType = "login";
+		String accessToken = Singleton.getInstance().getAccessToken(); 
+		if(accessToken == "NOT_FOUND")
+		{
+            Intent intent = new Intent(getApplicationContext(), HelloFacebookSampleActivity.class);
+            startActivity(intent);
+            return;
+		}
+		else
+		{
+			if(oPd == null)
+			{
+				oPd  = new ProgressDialog(this);
+				oPd.setTitle("Trying to get Smashed...");
+				oPd.setMessage("Please wait.");
+				oPd.setIndeterminate(true);
+				oPd.setCancelable(false);
+				oPd.show();
+			}
 
+        	String url = "http://www.smashed.in/auth/post/facebook?access_token="+accessToken;
+        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        	oAsyncClient.Attach(this);
+        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        	oAsyncClient.MakeCall(url);        	
+		}
+	}
 	/* *
 	 * Called when invalidateOptionsMenu() is triggered
 	 */
@@ -360,6 +409,16 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
 	@Override
 	public void OnResponse(String response) {
+		if(Singleton.getInstance().m_oType == "login")
+		{
+			Singleton.getInstance().m_oType = "reviews";
+			Singleton.getInstance().loggedIn = true;
+			Singleton.getInstance().parseJsonUserDetails(response);
+			if(oPd != null)
+				oPd.dismiss();
+			Singleton.getInstance().m_bHideLoginMenuItem = true;
+			this.invalidateOptionsMenu();
+		}
 		SmashedFsReviewsData oRev = new SmashedFsReviewsData();
 		oRev.review = m_review;
 		oRev.rating = String.valueOf(m_rating);

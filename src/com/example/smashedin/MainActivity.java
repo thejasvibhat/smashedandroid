@@ -191,6 +191,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			displayView(position);
 		}
 	}
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -613,6 +618,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;
+		Singleton.getInstance().parseJsonUserDetails(response);
 		if(Singleton.getInstance().m_oType.equals("create") == true)
 		{
 			ShowCreateOverheard();
