@@ -5,7 +5,10 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -40,6 +43,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     private int m_rating = 0;
     private String m_review = "";
 	private ProgressDialog oPd = null;
+	private String gBid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +61,8 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         indicator.setViewPager(pager);
         pager.setOffscreenPageLimit(3); 
         getActionBar().setTitle(oRevData.name);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+  		      new IntentFilter("review-event"));
 
     }
     @Override
@@ -99,10 +105,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.revoh:
-			CreateOverheardForBar();
+			CreateOverheardForBar(oRevData.id);
 			break;
 		case R.id.revfs:
-			CreateReviewForBar();
+			CreateReviewForBar(oRevData.id);
 			break;
 		case R.id.login:
 			Login();
@@ -121,9 +127,9 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     	oAsyncClient.MakeCall(url);   
 
 	}
-	private void CreateReviewForBar()
+	private void CreateReviewForBar(String bid)
 	{
-		
+		gBid = bid;
 		LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
 		TextView ousername = (TextView) findViewById(R.id.usernametext);
 		ousername.setText(Singleton.getInstance().username);
@@ -144,7 +150,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				slideToTop(oRevAdd);
 				m_review = ((EditText)oRevAdd.findViewById(R.id.enterrev)).getText().toString();
 				EditText username = (EditText) oRevAdd.findViewById(R.id.usernametext);
-				UpdateReview(oRevData.id,m_rating,m_review,username.getText().toString());
+				UpdateReview(gBid,m_rating,m_review,username.getText().toString());
 	            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 	            
 
@@ -312,14 +318,14 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	            objectAnimator.setDuration(500);
 	    objectAnimator.start();
 		}
-	private void CreateOverheardForBar()
+	private void CreateOverheardForBar(String bid)
 	{
 		if(mainintent == null)
 			mainintent = new Intent(this, MainActivity.class);
 		Intent intent = new Intent("my-event");
   	  // add data
   	  	intent.putExtra("position", 2);
-  	  	intent.putExtra("bid", oRevData.id);
+  	  	intent.putExtra("bid", bid);
   	  	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 		
         startActivity(mainintent);
@@ -420,5 +426,22 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		// TODO Auto-generated method stub
 		
 	}
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+		    String type = intent.getStringExtra("type");
+		    String bid = intent.getStringExtra("bid");
+		    if(type == "review")
+		    {
+		    	CreateReviewForBar(bid);
+		    }
+		    else
+		    {
+		    	CreateOverheardForBar(bid);
+		    }
+		  }
+
+	};
 
 }

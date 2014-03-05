@@ -412,7 +412,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// update the main content by replacing fragments
 		Singleton.getInstance().ClearAllOptionMenus();
 		Singleton.getInstance().m_bSearchMenuItem = false;
-		
+		homefragment.getView().setVisibility(View.INVISIBLE);
 		switch (position) {		
 		case 0:
 			mDrawerLayout.closeDrawer(mDrawerList);
@@ -596,7 +596,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					m_reviewIntent = new Intent(m_oMainACtivity, ReviewActivity.class);
 			  m_reviewIntent.putExtra(SearchManager.QUERY, query);
 			  m_reviewIntent.putExtra("MAINSTUFF","true");
-			  displayView(1);
+			  displayView(0);
 		  }
 
 	};

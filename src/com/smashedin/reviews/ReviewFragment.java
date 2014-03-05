@@ -24,8 +24,6 @@ import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.async.SmashedAsyncClient.OnResponseListener;
 import com.smashedin.smashed.GridImageSkelAdapter;
 import com.smashedin.smashed.ResponseParser;
-import com.smashedin.smashedin.MainActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -312,6 +310,50 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		gReviewsAdapter.mReviews.addAll(mRevData.reviews);
 		reviewsGrid.setAdapter(gReviewsAdapter);
+		if(mRevData.reviews.size() == 0)
+		{
+			FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
+			TextView oTextView = new TextView(getActivity());
+			oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+			oTextView.setTextColor(0xffffffff);
+			oTextView.setTextSize(32);
+			oTextView.setShadowLayer(2,1,1,Color.BLACK);
+			oTextView.setText("No other user reviews found. Click to add one more");
+			oLayout.addView(oTextView);
+			oTextView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
+					for(int i=0; i < oLayout.getChildCount(); i++)
+					{
+						if(oLayout.getChildAt(i) instanceof TextView)
+						{
+							TextView oText = (TextView) oLayout.getChildAt(i);
+							oText.setText("Thank you for reviewing. I am sure it wil help");
+							//oLayout.removeViewAt(i);
+							break;
+						}
+					}
+
+					CreateReviewForBar();
+					
+				}
+			});
+
+		}
+		else
+		{
+			FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
+			for(int i=0; i < oLayout.getChildCount(); i++)
+			{
+				if(oLayout.getChildAt(i) instanceof TextView)
+				{
+					oLayout.removeViewAt(i);
+					return;
+				}
+			}
+		}
 	}
 
 	private void ParseJson(String response) throws JSONException
@@ -397,17 +439,22 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 
 	}
+	private void CreateReviewForBar()
+	{
+		Intent intent = new Intent("review-event");
+		  // add data
+		intent.putExtra("type", "review");
+		  intent.putExtra("bid", mRevData.id);
+		LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+		
+	}
 	private void CreateOverheardForBar()
 	{
-
-		Intent	mainintent = new Intent(getActivity(), MainActivity.class);
-		Intent intent = new Intent("my-event");
-  	  // add data
-  	  	intent.putExtra("position", 2);
-  	  	intent.putExtra("bid", mRevData.id);
-  	  	LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-		
-        startActivity(mainintent);
+		Intent intent = new Intent("review-event");
+		  // add data
+		intent.putExtra("type", "oh");
+		  intent.putExtra("bid", mRevData.id);
+		LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
 
 	}
 
