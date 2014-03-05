@@ -6,38 +6,21 @@ import com.example.common.NavDrawerItem;
 import com.example.common.NavDrawerListAdapter;
 import com.example.facebook.HelloFacebookSampleActivity;
 import com.example.reviews.ReviewActivity;
-import com.example.reviews.ReviewFragment;
 import com.example.smashed.*;
 import com.example.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
-
-
 import java.util.ArrayList;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
-import android.app.FragmentManager.BackStackEntry;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,20 +31,15 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.Toast;
+
 
 public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
     private Intent m_ohIntent;
@@ -69,7 +47,6 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
-	private static final String[] CONTENT = new String[] { "Recent", "Artists", "Albums", "Songs", "Playlists", "Genres" };
 	// nav drawer title
 	private CharSequence mDrawerTitle;
 	private static int m_oPosition = 0;
@@ -85,12 +62,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private NavDrawerListAdapter adapter;
 	private ReviewListAdapter m_oRevAdapter;
 	private MainActivity m_oMainACtivity;
-	private Menu m_oMenu;
 	ArrayList<ReviewItem> itemsList = null;
 	
 	private ProgressDialog oPd;
 	private Fragment m_oCreateOverHeard;
-	private Menu optionsMenu;
 	android.support.v4.app.Fragment homefragment = null;	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,20 +91,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		navDrawerItems = new ArrayList<NavDrawerItem>();
 
 		// adding nav drawer items to array
-		// Home
-		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-		// Find People
+		//Reviews
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-		// Photos
+		//Overheards
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
-		// Communities, Will add a counter here
+		//Create
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
-		// Pages
-		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
-		// What's hot, We  will add a counter here
-		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1), true, "50+"));
-		
-
 		// Recycle the typed array
 		navMenuIcons.recycle();
 
@@ -165,8 +132,6 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		
 
 		if (savedInstanceState == null) {
-			// on first time display view for first nav item
-			//displayView(m_oPosition);
 			displayHome();
 		}
 		// Register mMessageReceiver to receive messages.
@@ -212,7 +177,6 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		this.optionsMenu = menu;
 		getMenuInflater().inflate(R.menu.main, menu);
 		MenuItem m_oGalleryMenuItem = menu.findItem(R.id.gallery);
 		if(Singleton.getInstance().m_bGalleryMenuItem == true)

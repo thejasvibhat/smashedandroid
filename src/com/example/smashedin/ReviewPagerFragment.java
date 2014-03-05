@@ -105,7 +105,7 @@ public final class ReviewPagerFragment extends Fragment {
         text.setGravity(Gravity.CENTER);
         text.setTextColor(0xFFFFFFFF);
         text.setText(disText);
-        text.setTextSize(14 * getResources().getDisplayMetrics().density);
+        text.setTextSize(10 * getResources().getDisplayMetrics().density);
         text.setPadding(20, 20, 20, 20);
         String dString1 = "For "+oRevData.barname+" by "+oRevData.name;
         TextView text1 = new TextView(getActivity());
