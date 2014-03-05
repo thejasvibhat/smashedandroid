@@ -23,6 +23,6 @@
     <fragment android:layout_height="fill_parent"
               android:layout_width="fill_parent"
               android:id="@+id/fragment"
-              android:name="com.example.facebook.FacebookLogin" />
+              android:name="com.smashedin.facebook.FacebookLogin" />
 
 </LinearLayout>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.smashedin"
+    package="com.smashedin.smashedin"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
-<permission android:name="com.example.smashedin.permission.MAPS_RECEIVE"
+<permission android:name="com.smashedin.smashedin.permission.MAPS_RECEIVE"
          android:protectionLevel="signature"/>
 
-<uses-permission  android:name="com.example.smashedin.permission.MAPS_RECEIVE"/>
+<uses-permission  android:name="com.smashedin.smashedin.permission.MAPS_RECEIVE"/>
  <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
@@ -25,7 +25,7 @@
   <uses-feature android:name="android.hardware.camera" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <uses-feature android:name="android.hardware.camera.autofocus" />
-     <uses-permission android:name="com.example.smashedin.permission.MAPS_RECEIVE" />
+     <uses-permission android:name="com.smashedin.smashedin.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
   
     
@@ -36,7 +36,7 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity 
-            android:name="com.example.smashedin.MainActivity"
+            android:name="com.smashedin.smashedin.MainActivity"
             android:label="@string/app_name" 
             android:screenOrientation="portrait">
             <intent-filter>
@@ -50,10 +50,10 @@
                   android:theme="@android:style/Theme.Translucent.NoTitleBar"
                   android:label="@string/app_name" />
         <activity  android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:name="com.example.facebook.HelloFacebookSampleActivity">
+            android:name="com.smashedin.facebook.HelloFacebookSampleActivity">
 	    </activity>
 	    <activity 
-            android:name="com.example.smashed.OverHeardActivity"
+            android:name="com.smashedin.smashed.OverHeardActivity"
             android:label="Overheards"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
@@ -65,7 +65,7 @@
                    android:resource="@layout/searchable"/>
         </activity>
        <activity 
-            android:name="com.example.reviews.ReviewActivity"
+            android:name="com.smashedin.reviews.ReviewActivity"
             android:label="Reviews"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
@@ -77,15 +77,15 @@
                    android:resource="@layout/searchable"/>
         </activity>
         <activity
-            android:name="com.example.reviews.SmashedReview"
+            android:name="com.smashedin.reviews.SmashedReview"
             android:label="Reviews"
             android:screenOrientation="portrait"
             android:theme="@style/StyledIndicators">
         </activity>
        
 	    <provider
-		   android:authorities="com.example.search.SampleRecentSuggestionsProvider"
-		   android:name="com.example.search.SampleRecentSuggestionsProvider" >
+		   android:authorities="com.smashedin.search.SampleRecentSuggestionsProvider"
+		   android:name="com.smashedin.search.SampleRecentSuggestionsProvider" >
 		</provider>
   <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />

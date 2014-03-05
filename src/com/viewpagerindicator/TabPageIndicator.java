@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package com.viewpagerindicator;
-import com.example.smashedin.*;
+import com.smashedin.smashedin.R;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
