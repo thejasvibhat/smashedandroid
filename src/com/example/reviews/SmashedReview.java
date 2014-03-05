@@ -329,7 +329,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			mainintent = new Intent(this, MainActivity.class);
 		Intent intent = new Intent("my-event");
   	  // add data
-  	  	intent.putExtra("position", 3);
+  	  	intent.putExtra("position", 2);
   	  	intent.putExtra("bid", oRevData.id);
   	  	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 		

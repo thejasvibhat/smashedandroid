@@ -117,6 +117,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	private ArrayList<ReviewData> m_bkupFsqVenues = new ArrayList<ReviewData>();
 	private String m_query = "";
 	private ArrayList<ReviewData> venueList;
+	String mainStuff = "false";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +127,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         if(gAdapter == null)
         	gAdapter = new GridReviewsAdapter(getApplicationContext());
         String query = getIntent().getStringExtra(SearchManager.QUERY);
+        mainStuff = getIntent().getStringExtra("MAINSTUFF");
         if(query == null)
         {
 	        if(gAdapter.FsqVenues.size() != 0)
@@ -161,7 +163,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
 		// adding nav drawer items to array
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+//		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
 		// Find People
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// Photos
@@ -183,8 +185,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		adapterlist = new NavDrawerListAdapter(getApplicationContext(),
 				navDrawerItems);
 		mDrawerList.setAdapter(adapterlist);
-		mDrawerList.setItemChecked(1, true);
-		mDrawerList.setSelection(1);
+		mDrawerList.setItemChecked(0, true);
+		mDrawerList.setSelection(0);
 
 		// enabling action bar app icon and behaving it as toggle button
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -336,7 +338,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	
 
     private void displayView(int position) {
-    	if(position == 1)
+    	if(position == 0)
     	{
     		mDrawerLayout.closeDrawers();
     		return;
@@ -456,6 +458,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		public void onBackPressed() {	
 			if(m_query == "")
 				doExit();
+			else if(mainStuff.equals("true"))
+			{
+				m_query = "";
+				GetMyLocation();
+				getActionBar().setTitle("Reviews");
+			}
 			else
 				super.onBackPressed();
 		}

@@ -91,7 +91,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private ProgressDialog oPd;
 	private Fragment m_oCreateOverHeard;
 	private Menu optionsMenu;
-	
+	android.support.v4.app.Fragment homefragment = null;	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 		// adding nav drawer items to array
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
 		// Find People
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// Photos
@@ -166,7 +166,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
-			displayView(m_oPosition);
+			//displayView(m_oPosition);
+			displayHome();
 		}
 		// Register mMessageReceiver to receive messages.
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
@@ -177,7 +178,24 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			      new IntentFilter("search-event"));
 	}
 	
-	
+	private void displayHome()
+	{
+		homefragment = new HomeFragment();
+		if (homefragment != null) {
+			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.frame_container, homefragment).addToBackStack( "main" ).commit();
+
+			// update selected item and title, then close the drawer
+			setTitle("Home");
+			mDrawerLayout.closeDrawer(mDrawerList);
+		} else {
+			// error in creating fragment
+			Log.e("MainActivity", "Error in creating fragment");
+		}
+		Singleton.getInstance().ClearAllOptionMenus();
+		Singleton.getInstance().m_bSearchMenuItem = false;
+	}
 
 	/**
 	 * Slide menu item click listener
@@ -191,12 +209,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			displayView(position);
 		}
 	}
-	@Override
-	protected void onNewIntent(Intent intent)
-	{
-		super.onNewIntent(intent);
-	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		this.optionsMenu = menu;
@@ -270,15 +283,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     	mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
 		   if (fragment instanceof CreateOverHeardFragment) {
-		          /*Singleton.getInstance().ClearAllOptionMenus();
-		          FragmentManager fragmentManager = getFragmentManager();
-					fragmentManager.popBackStack();
-					if(Singleton.getInstance().loggedIn == true)
-						Singleton.getInstance().m_bHideLoginMenuItem = true;
-					else
-						Singleton.getInstance().m_bHideLoginMenuItem = false;
-
-				  this.invalidateOptionsMenu();*/
+		    
 				  doExit();
 
 		   }
@@ -420,10 +425,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			fragment = m_oCreateOverHeard;
 		}
 		if (fragment != null) {
+			
 			FragmentManager fragmentManager = getFragmentManager();
 			if(fragmentManager.getBackStackEntryCount() == 0)
 				fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
+					.add(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
 
 		} else {
 			// error in creating fragment
@@ -440,15 +446,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// update the main content by replacing fragments
 		Singleton.getInstance().ClearAllOptionMenus();
 		Singleton.getInstance().m_bSearchMenuItem = false;
-		android.support.v4.app.Fragment fragment = null;
-		switch (position) {
+		
+		switch (position) {		
 		case 0:
-			
-			//m_oRowAddMenuItem.setVisible(false);
-			//m_oSaveMenuItem.setVisible(false);
-			fragment = new HomeFragment();
-			break;
-		case 1:
 			mDrawerLayout.closeDrawer(mDrawerList);
 			mDrawerList.setItemChecked(0, true);
 			mDrawerList.setSelection(0);
@@ -459,7 +459,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
             startActivity(m_reviewIntent);
 
 			return;
-		case 2:
+		case 1:
 			mDrawerLayout.closeDrawer(mDrawerList);
 			mDrawerList.setItemChecked(0, true);
 			mDrawerList.setSelection(0);
@@ -471,7 +471,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 			return;
 			//break;
-		case 3:
+		case 2:
 			if(Singleton.getInstance().loggedIn != true)
 			{
 				Login("create");
@@ -487,31 +487,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			mDrawerLayout.closeDrawer(mDrawerList);
 			return;
 
-		case 4:
-		//	fragment = new PagesFragment();
-			break;
-		case 5:
-		//	fragment = new WhatsHotFragment();
-			break;
-
 		default:
 			break;
 		}
 
-		if (fragment != null) {
-			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-			fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, fragment).addToBackStack( "main" ).commit();
-
-			// update selected item and title, then close the drawer
-			mDrawerList.setItemChecked(position, true);
-			mDrawerList.setSelection(position);
-			setTitle(navMenuTitles[position]);
-			mDrawerLayout.closeDrawer(mDrawerList);
-		} else {
-			// error in creating fragment
-			Log.e("MainActivity", "Error in creating fragment");
-		}
 	}
 	public void onArticleSelected(String id,String url) {
     	FragmentManager fragmentManager = getFragmentManager();
@@ -630,6 +609,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		  public void onReceive(Context context, Intent intent) {
 		    // Extract data included in the Intent
 		    m_oPosition = intent.getIntExtra("position", 0);
+		    //if(m_oCreateOverHeard == null)
+		    	//m_oPosition = m_oPosition + 1;
 		    bid = intent.getStringExtra("bid");
 		    if(bid != null)
 		    	Singleton.getInstance().bid = bid;
@@ -652,6 +633,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			  if(m_reviewIntent == null)
 					m_reviewIntent = new Intent(m_oMainACtivity, ReviewActivity.class);
 			  m_reviewIntent.putExtra(SearchManager.QUERY, query);
+			  m_reviewIntent.putExtra("MAINSTUFF","true");
 			  displayView(1);
 		  }
 

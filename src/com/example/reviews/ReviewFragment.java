@@ -17,6 +17,7 @@ import com.example.async.SmashedAsyncClient.OnResponseListener;
 import com.example.smashed.GridImageSkelAdapter;
 import com.example.smashed.ResponseParser;
 import com.example.smashed.Singleton;
+import com.example.smashedin.MainActivity;
 import com.example.smashedin.R;
 import com.google.android.gms.internal.gh;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,6 +39,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -48,7 +50,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -392,9 +396,64 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			gOhAdapter.mThumbIds.clear();
 			gOhAdapter.mThumbIds.addAll(mRevData.ohdata.ohUrl);
 			ohGrid.setAdapter(gOhAdapter);
+			if(skelThumbs.getLength() == 0)
+			{
+				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.gridparent);
+				TextView oTextView = new TextView(getActivity());
+				oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+				oTextView.setTextColor(0xffffffff);
+				oTextView.setTextSize(32);
+				oTextView.setShadowLayer(2,1,1,Color.BLACK);
+				oTextView.setText("No Overheards found. Click to Create one");
+				oLayout.addView(oTextView);
+				oTextView.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View arg0) {
+						FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.gridparent);
+						for(int i=0; i < oLayout.getChildCount(); i++)
+						{
+							if(oLayout.getChildAt(i) instanceof TextView)
+							{
+								oLayout.removeViewAt(i);
+								break;
+							}
+						}
+
+						CreateOverheardForBar();
+						
+					}
+				});
+
+			}
+			else
+			{
+				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.gridparent);
+				for(int i=0; i < oLayout.getChildCount(); i++)
+				{
+					if(oLayout.getChildAt(i) instanceof TextView)
+					{
+						oLayout.removeViewAt(i);
+						return;
+					}
+				}
+			}
 		}
 		
 
+
+	}
+	private void CreateOverheardForBar()
+	{
+
+		Intent	mainintent = new Intent(getActivity(), MainActivity.class);
+		Intent intent = new Intent("my-event");
+  	  // add data
+  	  	intent.putExtra("position", 2);
+  	  	intent.putExtra("bid", mRevData.id);
+  	  	LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+		
+        startActivity(mainintent);
 
 	}
 
@@ -495,6 +554,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 					  gOhAdapter.mThumbIds.add(url);
 					  ohGrid.setAdapter(gOhAdapter);
 				  }
+
 			  }		   
 		  }
 

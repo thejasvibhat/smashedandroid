@@ -175,7 +175,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 
 		// adding nav drawer items to array
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
 		// Find People
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		// Photos
@@ -197,8 +197,8 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		adapterlist = new NavDrawerListAdapter(getApplicationContext(),
 				navDrawerItems);
 		mDrawerList.setAdapter(adapterlist);
-		mDrawerList.setItemChecked(2, true);
-		mDrawerList.setSelection(2);
+		mDrawerList.setItemChecked(1, true);
+		mDrawerList.setSelection(1);
 
 
 		// enabling action bar app icon and behaving it as toggle button
@@ -299,7 +299,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 	    alertDialog.show();
 	}
     private void displayView(int position) {
-    	if(position == 2)
+    	if(position == 1)
     	{
     		mDrawerLayout.closeDrawers();
     		return;

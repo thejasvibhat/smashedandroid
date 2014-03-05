@@ -64,12 +64,16 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	private SearchView searchView;
 	private String type = "oh";
 	private ArrayList<ReviewData> m_arrReviews = new ArrayList<ReviewData>();
+    FragmentPagerAdapter adapter;
+
+    ViewPager pager;
+
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
  
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        GetPromoOh();
+        
         m_cuFragment = this;
         setHasOptionsMenu(true);
      /*   ImageView img = (ImageView) rootView.findViewById(R.id.searchFs);
@@ -169,6 +173,8 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 	}
 	  @Override
 	  public void onResume() {
+
+			  GetPromoOh();
 		  if(Singleton.getInstance().m_oType == "home")
 		  {
 			  Singleton.getInstance().ClearAllOptionMenus();
@@ -247,10 +253,10 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 			}
 			GetLatestReviews();
 			NUM_PAGES = m_ohpromolist.size();
-	        FragmentPagerAdapter adapter1 = new OhPromoAdapter(getActivity().getSupportFragmentManager());
+	        adapter = new OhPromoAdapter(getActivity().getSupportFragmentManager());
 
-	        final ViewPager pager = (ViewPager)getActivity().findViewById(R.id.ohpager);
-	        pager.setAdapter(adapter1);
+	        pager = (ViewPager)getActivity().findViewById(R.id.ohpager);
+	        pager.setAdapter(adapter);
 	        pager.setOnPageChangeListener(new OnPageChangeListener() {
 				
 				@Override
@@ -294,7 +300,13 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 		}
 		private void ParseJson(String response) throws JSONException
 		{
-			JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+			JSONObject jsonObj ;
+			try {
+				jsonObj	= (JSONObject) new JSONTokener(response).nextValue();	
+			} catch (Exception e) {
+				return;
+			}
+			
 			
 			JSONArray items = (JSONArray) jsonObj.getJSONArray("reviews");		
 			int length			= items.length();
@@ -312,7 +324,7 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 				}
 			}
 			NUM_PAGES_REVIEWS = m_arrReviews.size();
-	        FragmentPagerAdapter adapter1 = new ReviewPromoAdapter(getActivity().getSupportFragmentManager());
+			FragmentPagerAdapter adapter1 = new ReviewPromoAdapter(getActivity().getSupportFragmentManager());
 
 	        final ViewPager pager1 = (ViewPager)getActivity().findViewById(R.id.reviewpager);
 	        pager1.setAdapter(adapter1);

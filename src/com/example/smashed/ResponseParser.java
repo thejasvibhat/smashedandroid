@@ -77,6 +77,8 @@ public class ResponseParser {
 	        @Override
 	        protected void onPostExecute(Document n_oDocument) 
 	        {
+	        	if(n_oDocument == null)
+	        		return;
 	        	n_oDocument.normalize();
 	        	if(m_Fragment != null)
 	        	{

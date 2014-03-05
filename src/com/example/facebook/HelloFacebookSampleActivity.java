@@ -329,12 +329,12 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
     }
 
 	public void AuthenticateGoogleFromSmashed(String token) {
-		oPd = new ProgressDialog(this);
+		/*oPd = new ProgressDialog(this);
 		oPd.setTitle("Trying to get Smashed...");
 		oPd.setMessage("Please wait.");
 		oPd.setIndeterminate(true);
 		oPd.setCancelable(false);
-		oPd.show();
+		oPd.show();*/
 
 		String accessToken = token;
     	Singleton.getInstance().SetAccessTokenGoogle(accessToken);
