@@ -29,7 +29,7 @@
 			            android:id="@+id/textView1"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:text="Smashing places around  "
+			            android:text="Searching for places near  "
 			            android:fontFamily="impact.eot"
 			            android:textAppearance="?android:attr/textAppearanceMedium" />
 			
@@ -37,7 +37,7 @@
 			            android:id="@+id/locationText"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:text="Bangalore"
+			            android:text=""
 			            android:textColor="@color/orange"
 			            android:fontFamily="impact.eot"
 			            android:paddingBottom="2dp"

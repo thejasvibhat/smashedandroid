@@ -23,7 +23,11 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.async.SmashedAsyncClient.OnResponseListener;
 import com.smashedin.smashed.GridImageSkelAdapter;
+import com.smashedin.smashed.OverHeardFragment;
 import com.smashedin.smashed.ResponseParser;
+import com.smashedin.smashed.Singleton;
+
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,10 +44,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -53,9 +62,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private GridImageSkelAdapter gAdapter = null;
     private GridOverheardReviewAdapter gOhAdapter = null;
     private GridFsReviewsAdapter gReviewsAdapter = null;
+    private LiveFeedAdapter gLiveFeedAdaper = null;
     private PullToRefreshGridView oGrid;
     private PullToRefreshGridView ohGrid;
     private PullToRefreshListView reviewsGrid;
+    private ListView livefeedList;
     private LatLng KIEL = new LatLng(53.551, 9.993);
     private String m_oType = "";
     private String m_StrResponse;
@@ -65,6 +76,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private View infoview;
     private View ohview;
     private View reviewview;
+    private View liveView;
+    Fragment m_OhFragment;
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
         ReviewFragment fragment = new ReviewFragment();
 
@@ -130,6 +143,10 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	{
     		return GetViewForReviews();
     	}
+    	else if(mContent == "LIVEFEED")
+    	{
+    		return GetViewForLiveFeed();
+    	}
     	else
     	{
     		TextView text = new TextView(getActivity());
@@ -173,7 +190,75 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 		return reviewview;
     }
-    private void GetLatestReviews()
+    private View GetViewForLiveFeed()
+    {
+    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
+  		      new IntentFilter("push-event"));
+    	if(liveView != null)
+    		return liveView;
+    	liveView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_livefeed,null,false);
+		livefeedList =  (ListView) liveView.findViewById(R.id.m_oLiveList);
+		
+		if(gLiveFeedAdaper == null)
+			gLiveFeedAdaper = new LiveFeedAdapter(getActivity());
+		if(mRevData.livefeeds != null)
+		{
+			gLiveFeedAdaper.mLiveFeeds.addAll(mRevData.livefeeds);
+			livefeedList.setAdapter(gLiveFeedAdaper);
+		}
+		else
+		{
+			ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
+			oP.setVisibility(View.VISIBLE);
+			
+			livefeedList.setVisibility(View.GONE);
+			GetLatestLiveFeed();
+		}
+		Button sendStatus = (Button)liveView.findViewById(R.id.sendStatus);
+		sendStatus.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				EditText oStatusText = (EditText)liveView.findViewById(R.id.textStatus);
+				String message = oStatusText.getText().toString(); 
+				 UpdateDataGCM(message);
+				 oStatusText.setText("");
+				 LiveData oLive = new LiveData();
+				 oLive.mine = false;
+				 oLive.message = message;
+				 oLive.username = Singleton.getInstance().username;
+				 oLive.mine = true;
+				 mRevData.livefeeds.add(oLive);
+				 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+				 gLiveFeedAdaper.notifyDataSetChanged();
+			}
+		});
+
+		return liveView;
+    }
+    private void UpdateDataGCM(String message)
+    {
+    	Singleton.getInstance().m_oType = "pushGet";
+    	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&message="+message+"&regid="+Singleton.getInstance().regid;
+    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
+    	oAsyncClient.MakeCall(url); 
+    	
+    }
+    private void GetLatestLiveFeed() {
+    	mRevData.livefeeds = new ArrayList<LiveData>();
+    	Singleton.getInstance().m_oType = "push";
+    	String url = "http://www.smashed.in/api/b/gcm/register?regid="+Singleton.getInstance().regid+"&bid="+mRevData.id;
+    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
+    	oAsyncClient.MakeCall(url); 
+		
+
+	}
+
+	private void GetLatestReviews()
     {
     	m_oType = "fsreviews";
 		mRevData.reviews = new ArrayList<SmashedFsReviewsData>();
@@ -203,6 +288,22 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		    	oAsyncClient.SetPersistantStorage(getActivity());
 		    	oAsyncClient.MakeCall(url);   
 
+				
+			}
+		});
+		ohGrid.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				if(m_OhFragment == null)
+					m_OhFragment = new FsOverHeardFragment();
+				 Bundle bundle = new Bundle();
+                 bundle.putString("url", mRevData.ohdata.ohUrl.get(arg2));
+				 m_OhFragment.setArguments(bundle);
+     			android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+     			fragmentManager.beginTransaction()
+     					.replace(R.id.frame_container_each, m_OhFragment).addToBackStack( "new" ).commit();
 				
 			}
 		});
@@ -294,7 +395,27 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         this.mRevData = oRevData;
 		
 	}
-	
+	private void ParseJsonLiveFeed(String response) throws JSONException
+	{
+		gLiveFeedAdaper.mLiveFeeds.clear();
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+		JSONArray items = (JSONArray) jsonObj.getJSONArray("messages");	
+		for (int i = 0; i < items.length(); i++) {
+			LiveData oData = new LiveData();
+			
+			JSONObject liveItem = (JSONObject)items.get(i);
+			oData.message = liveItem.getString("message");
+			oData.username = liveItem.getString("username");
+			mRevData.livefeeds.add(oData);
+
+		}
+		gLiveFeedAdaper.mLiveFeeds.addAll(mRevData.livefeeds);
+		livefeedList =  (ListView) liveView.findViewById(R.id.m_oLiveList);
+		ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
+		oP.setVisibility(View.GONE);			
+		livefeedList.setVisibility(View.VISIBLE);
+		livefeedList.setAdapter(gLiveFeedAdaper);
+	}
 	private void ParseJsonReviews(String response) throws JSONException
 	{
 		gReviewsAdapter.mReviews.clear();
@@ -318,7 +439,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			oTextView.setTextColor(0xffffffff);
 			oTextView.setTextSize(32);
 			oTextView.setShadowLayer(2,1,1,Color.BLACK);
-			oTextView.setText("No other user reviews found. Click to add one more");
+			oTextView.setText("No user reviews found. Click to add one");
 			oLayout.addView(oTextView);
 			oTextView.setOnClickListener(new OnClickListener() {
 				
@@ -330,7 +451,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 						if(oLayout.getChildAt(i) instanceof TextView)
 						{
 							TextView oText = (TextView) oLayout.getChildAt(i);
-							oText.setText("Thank you for reviewing. I am sure it wil help");
+							oText.setText("Thank you for reviewing. I am sure it will help");
 							//oLayout.removeViewAt(i);
 							break;
 						}
@@ -460,6 +581,63 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 	@Override
 	public void OnResponse(String response) {
+		if(Singleton.getInstance().m_oType == "push")
+		{
+			Singleton.getInstance().m_oType = "";
+			if(liveView == null)
+				return;
+			if(Singleton.getInstance().loggedIn == false)
+			{
+				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
+				TextView oTextView = new TextView(getActivity());
+				oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+				oTextView.setTextColor(0xffffffff);
+				oTextView.setTextSize(32);
+				oTextView.setShadowLayer(2,1,1,Color.BLACK);
+				oTextView.setText("Please login to follow live feeds at this place. Click to login");
+				oLayout.addView(oTextView);
+				Button oBut = (Button) oLayout.findViewById(R.id.sendStatus);
+				oBut.setEnabled(false);
+
+				oTextView.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View arg0) {
+						FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
+						Button oBut = (Button) getActivity().findViewById(R.id.sendStatus);
+						oBut.setEnabled(true);
+						for(int i=0; i < oLayout.getChildCount(); i++)
+						{
+							if(oLayout.getChildAt(i) instanceof TextView)
+							{
+								oLayout.removeViewAt(i);
+								break;
+							}
+						}
+
+						Intent loginintent = new Intent("custom-login-event");
+						LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(loginintent);
+
+						
+					}
+				});
+
+
+			}
+			try {
+				ParseJsonLiveFeed(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
+		if(Singleton.getInstance().m_oType == "pushGet")
+		{
+			Singleton.getInstance().m_oType = "";
+			return;
+		}
+
 		if(m_oType == "fs")
 			oGrid.onRefreshComplete();
 		if(m_oType == "oh")
@@ -570,4 +748,39 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		
 	}
+
+	public void RefreshReviews(SmashedFsReviewsData oRev) {
+		mRevData.reviews.add(oRev);
+		gReviewsAdapter.mReviews.add(oRev);
+		reviewsGrid.setAdapter(gReviewsAdapter);
+		FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
+		for(int i=0; i < oLayout.getChildCount(); i++)
+		{
+			if(oLayout.getChildAt(i) instanceof TextView)
+			{
+				oLayout.removeViewAt(i);
+				break;
+			}
+		}
+
+		
+		
+	}
+	private BroadcastReceiver mGcmMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+			 String message = Singleton.getInstance().m_strMessageGcm;
+			 LiveData oLive = new LiveData();
+			 oLive.mine = false;
+			 oLive.message = message;
+			 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+			 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+			 mRevData.livefeeds.add(oLive);
+			 gLiveFeedAdaper.notifyDataSetChanged();
+			 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+		  }
+
+	};
+
 }

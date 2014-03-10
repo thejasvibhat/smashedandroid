@@ -1,0 +1,65 @@
+<FrameLayout android:id="@+id/livefeedparent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<RelativeLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@color/grey"
+	    android:orientation="vertical" >
+	
+	    <LinearLayout
+	        android:id="@+id/bottom_write_bar"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:background="@drawable/message_bar" >
+	
+	        <EditText
+	            android:id="@+id/textStatus"
+	            android:layout_width="fill_parent"
+	            android:layout_height="fill_parent"
+	            android:layout_margin="5sp"
+	            android:layout_weight="1"
+	            android:background="@drawable/message_field"
+	            android:hint="Write here"
+	            android:padding="5sp"
+	            android:textColor="@color/textFieldColor" />
+	
+	        <Button android:id="@+id/sendStatus"
+	            android:layout_width="wrap_content"
+	            android:layout_height="fill_parent"
+	            android:layout_margin="5sp"
+	            android:background="@drawable/send_button"
+	            android:paddingBottom="5sp"
+	            android:paddingLeft="15sp"
+	            android:paddingRight="15sp"
+	            android:paddingTop="5sp"
+	            android:text="Send"
+	            android:textColor="#FFF" />
+	    </LinearLayout>
+	
+	    <ListView
+	        android:id="@+id/m_oLiveList"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0dip"
+	        android:layout_above="@id/bottom_write_bar"
+	        android:layout_alignParentTop="true"
+	        android:cacheColorHint="#00000000"
+	        android:divider="#00000000"
+	        android:listSelector="#00000000" >
+	    </ListView>
+	
+	   <ProgressBar
+	          android:gravity="center"
+	          android:layout_gravity="center"
+	       android:id="@+id/progressImagelive"
+	       android:visibility="gone"
+	       style="?android:attr/progressBarStyleLarge"
+	       android:layout_width="wrap_content"
+	       android:layout_height="50dp" />
+	
+	</RelativeLayout>
+    
+</FrameLayout>
+	

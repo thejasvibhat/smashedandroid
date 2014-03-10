@@ -26,6 +26,11 @@
           android:icon="@drawable/ic_login"
           android:showAsAction="collapseActionView|ifRoom"
           />
+    	<item android:id="@+id/shareohrev"
+          android:icon="@drawable/ic_share"
+          android:title="Share"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
  
 
 </menu>

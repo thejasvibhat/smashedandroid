@@ -357,6 +357,8 @@ public class HomeFragment extends android.support.v4.app.Fragment implements OnR
 
 		@Override
 		public void OnResponse(String response) {
+			if(getActivity() == null)
+				return;
 			ProgressBar oProg = (ProgressBar) getActivity().findViewById(R.id.progressHome);
 	    	oProg.setVisibility(View.GONE);
 	    	if(type == "rev")

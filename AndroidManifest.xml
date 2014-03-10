@@ -28,7 +28,25 @@
      <uses-permission android:name="com.smashedin.smashedin.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
   
-    
+     <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--
+     Creates a custom permission so only this app can receive its messages.
+
+     NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
+           where PACKAGE is the application's package name.
+    -->
+    <permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" />
+
+    <!-- This app has permission to register and receive data message. -->
+    <uses-permission
+        android:name="com.google.android.c2dm.permission.RECEIVE" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/slogosmall"
@@ -93,7 +111,17 @@
 <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id" />
   <meta-data android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCXt7JyUB8NGUmzRMEWVdfsunXqzmzC-Qo" />
-
+ <receiver
+            android:name=".GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".GcmIntentService" />
+         <meta-data android:name="com.google.android.gms.version"
+           android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

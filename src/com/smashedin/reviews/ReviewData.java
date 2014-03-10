@@ -16,5 +16,6 @@ public class ReviewData {
 	public OverheardData ohdata;
 	public ArrayList<SmashedFsReviewsData> reviews;
 	public ArrayList<String> photos;
+	public ArrayList<LiveData> livefeeds;
 
 }

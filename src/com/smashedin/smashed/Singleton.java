@@ -23,6 +23,8 @@ public class Singleton {
 	public boolean m_bSearchOverheardSkel = true;
 	public boolean m_bHideLoginMenuItem = true;
 	public boolean m_bDrawerClosed = false;
+	public boolean m_bCreateReviewMenuItem = true;
+	public boolean m_bCreateReviewOhMenuItem = true;
 	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
 	public SharedPreferences m_LocalStorage;
@@ -34,6 +36,9 @@ public class Singleton {
 	public String bid = "";
 	public String username = "Anonymous";
 	public String usericonurl = "";
+	public String regid;
+	public String m_strMessageGcm;
+	public String m_strMessageGcmUser;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }
@@ -88,6 +93,8 @@ public class Singleton {
     	m_bSearchOverheardSkel = true;
     	m_bHideLoginMenuItem = true;
     	m_bDrawerClosed = false;
+    	m_bCreateReviewMenuItem = true;
+    	m_bCreateReviewOhMenuItem = true;
     }
 	public void parseJsonUserDetails(String response) {
 		JSONObject jsonObj;
