@@ -11,12 +11,16 @@ import com.smashedin.async.SmashedAsyncClient.OnResponseListener;
 import com.smashedin.common.NavDrawerItem;
 import com.smashedin.common.NavDrawerListAdapter;
 import com.smashedin.facebook.HelloFacebookSampleActivity;
+import com.smashedin.reviews.LiveData;
 import com.smashedin.reviews.ReviewActivity;
 import com.smashedin.smashed.*;
 import com.smashedin.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.w3c.dom.Document;
@@ -30,6 +34,8 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -45,6 +51,7 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -57,6 +64,9 @@ import android.widget.TextView;
 
 
 public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
+    public static final int NOTIFICATION_ID = 1;
+    private NotificationManager mNotificationManager;
+    NotificationCompat.Builder builder;
     private Intent m_ohIntent;
     private Intent m_reviewIntent;
 	private DrawerLayout mDrawerLayout;
@@ -87,7 +97,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     public static final String PROPERTY_REG_ID = "APA91bFV1y_1rYpLaw_yPWSrm7PqMdw5emsZsslqG54nxNwgE2CiEguIL2j7KfoClF9gO3eoX-9Z0_rGDlcnPkVWSkRlNFi7X0GyMCno81UBIfyyb7vz3pGJNix2-yvGF4sHcRjruQwvJ4GNrf1Vd_ba5O8hxv4SP0HyY-YowjCaCMcPgOAdKdA";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
+    
     /**
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
@@ -109,7 +119,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+		Singleton.getInstance().m_bAppHidden = false;
 		m_oMainACtivity = this;
 		super.onCreate(savedInstanceState);
 		Singleton.getInstance().SetApplicationContext(getApplicationContext());
@@ -146,7 +156,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		adapter = new NavDrawerListAdapter(getApplicationContext(),
 				navDrawerItems);
 		mDrawerList.setAdapter(adapter);
-
+		
 		// enabling action bar app icon and behaving it as toggle button
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
@@ -182,6 +192,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			      new IntentFilter("exit-event"));
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mSearchReviewMessageReceiver,
 			      new IntentFilter("search-event"));
+	    	LocalBroadcastManager.getInstance(this).registerReceiver(mGcmMessageReceiver,
+	    		      new IntentFilter("push-event"));
 		  
 		  context = getApplicationContext();
 
@@ -372,7 +384,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	        @Override
 	        public void onClick(DialogInterface dialog, int which) {
 	        	
-	            finish();
+	            //finish();
+	        	Singleton.getInstance().m_bAppHidden = true;
+	        	moveTaskToBack(true);
 
 	        }
 	    });
@@ -647,7 +661,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private BroadcastReceiver mExitMessageReceiver = new BroadcastReceiver() {
 		  @Override
 		  public void onReceive(Context context, Intent intent) {
-			  finish();
+	        	Singleton.getInstance().m_bAppHidden = true;
+	        	moveTaskToBack(true);
+
 		  }
 
 	};
@@ -849,5 +865,52 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		Singleton.getInstance().regid = regid;
 
     }
-	
+	private BroadcastReceiver mGcmMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+			 if(Singleton.getInstance().m_bAppHidden == true)
+			 {
+				 HashSet<String> stringSet = Singleton.getInstance().GetFollowingBids();
+				 if(stringSet.contains(Singleton.getInstance().m_strMessageGcmBid))
+				 {
+					 String message = Singleton.getInstance().m_strMessageGcm;
+					 LiveData oLive = new LiveData();
+					 oLive.mine = false;
+					 try {
+							message = URLEncoder.encode(message,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					 oLive.message = message;
+					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+					 oLive.bid = Singleton.getInstance().m_strMessageGcmBid;
+					 Singleton.getInstance().m_arrListGcmMessages.add(oLive);
+					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
+				 }
+				 
+			 }
+		  }
+
+	};
+    private void sendNotification(String msg) {
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+        .setSmallIcon(R.drawable.ic_follow)
+        .setContentTitle("Instants Received")
+        .setStyle(new NotificationCompat.BigTextStyle()
+        .bigText(msg))
+        .setContentText(msg);
+
+        mBuilder.setContentIntent(contentIntent);
+        mBuilder.setAutoCancel(true);
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }	
 }

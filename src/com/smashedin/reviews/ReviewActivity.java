@@ -192,6 +192,11 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
     	GetMyLocation();
+    	if(Singleton.getInstance().m_arrListGcmMessages.size() != 0)
+    	{
+    		FromNotification();
+    		return;
+    	}
     }
     @Override
     public void onResume()
@@ -468,6 +473,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
 		
 	}
+	
 	private void ParseJson(String response) throws JSONException
 	{
 		venueList = new ArrayList<ReviewData>();//.getInstance().venueList;
@@ -489,6 +495,24 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		gAdapter.FsqVenues = venueList;
 		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	}
+	private void ParseJsonBid(String response) throws JSONException
+	{
+		venueList = new ArrayList<ReviewData>();//.getInstance().venueList;
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+		
+		JSONObject groups	= (JSONObject) jsonObj.getJSONObject("response");
+		JSONObject item = (JSONObject)groups.getJSONObject("venue");
+		ReviewData oRevData = ParseJsonObjectItem(item);
+		Singleton.getInstance().mRevData = oRevData;
+        Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
+        Bundle b = new Bundle();
+        b.putInt("position",0);
+        b.putString("bid", oRevData.id);
+        intent.putExtras(b);
+        startActivity(intent);
+        
+	}
+
 	private ReviewData ParseJsonObjectItem(JSONObject item) throws JSONException
 	{
 		ReviewData venue = new ReviewData();
@@ -551,6 +575,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	            Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
 	            Bundle b = new Bundle();
 	            b.putInt("position", location);
+	            b.putString("bid", "");
 	            intent.putExtras(b);
 	            startActivity(intent);
 				
@@ -558,12 +583,39 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
 	}
+	public void FromNotification()
+	{
+		/*String bid = Singleton.getInstance().m_arrListGcmMessages.remove(0).bid;
+    	String url 	= "https://api.foursquare.com/v2/venues/"+bid+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&v=20140305&venuePhotos=1&offset=0&limit=50";
+    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(m_oRevActivity);
+    	//oAsyncClient.SetPersistantStorage(getApplicationContext());
+    	oAsyncClient.MakeCallWithTag(url, "notify");*/
+        Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
+        Bundle b = new Bundle();
+        b.putInt("position",0);
+        b.putString("bid", "theju");
+        intent.putExtras(b);
+        startActivity(intent);
+
+
+
+	}
 	
 	@Override
 	public void OnResponse(String response,String tag) {
 		if(oPd != null)
 			oPd.dismiss();
-		
+		if(tag == "notify")
+		{
+			try {
+				ParseJsonBid(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 		if(Singleton.getInstance().m_oType == "reviews")
 		{
 			try {

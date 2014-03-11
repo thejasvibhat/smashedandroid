@@ -43,6 +43,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -100,9 +103,39 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         }
 		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
 			      new IntentFilter("bidoh"));
-
+		  setHasOptionsMenu(true);
     }
+    @Override
+    public void onResume()
+    {
+    	super.onResume();
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
+    	super.onCreateOptionsMenu(menu, inflater);
+    }
+	@Override 
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	  
+	    case R.id.followinstant:
+	    	FollowThread();
+	    	break;
+	    }
+		return super.onOptionsItemSelected(item);
+	}
+	public void FollowThread()
+	{
+		String id = mRevData.id;
+		Singleton.getInstance().SetFollowBid(id);
+		Singleton.getInstance().mRevData = mRevData;
+        Toast.makeText(
+                getActivity(),
+                "Instants of this place will be shown in your notification,even you close this app",
+                Toast.LENGTH_SHORT).show();
 
+	}
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         m_curFragment = this;
@@ -285,7 +318,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private void UpdateDataGCM(String message)
     {
     	Singleton.getInstance().m_oType = "pushGet";
-    	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&message="+message+"&regid="+Singleton.getInstance().regid;
+    	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&bname="+mRevData.name+"&message="+message+"&regid="+Singleton.getInstance().regid;
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());

@@ -70,6 +70,8 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
             	Singleton.getInstance().m_strMessageGcm = extras.getString("live", "");
             	Singleton.getInstance().m_strMessageGcmUser = extras.getString("username", "");
+            	Singleton.getInstance().m_strMessageGcmBid = extras.getString("bid", "");
+            	Singleton.getInstance().m_strMessageGcmBname = extras.getString("bname", "");
                 // This loop represents the service doing some work.
                 // Post notification of received message.
                 //sendNotification("Received: " + extras.toString());
@@ -94,8 +96,8 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-        //.setSmallIcon(R.drawable.ic_stat_gcm)
-        .setContentTitle("GCM Notification")
+        .setSmallIcon(R.drawable.ic_follow)
+        .setContentTitle("Instants Received")
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))
         .setContentText(msg);

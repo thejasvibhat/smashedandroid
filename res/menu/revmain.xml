@@ -21,16 +21,21 @@
           android:title="Write Review"
           android:showAsAction="collapseActionView|ifRoom"
           />
-    <item android:id="@+id/login"
-          android:title="Login"
-          android:icon="@drawable/ic_login"
-          android:showAsAction="collapseActionView|ifRoom"
-          />
     	<item android:id="@+id/shareohrev"
           android:icon="@drawable/ic_share"
           android:title="Share"
           android:showAsAction="collapseActionView|ifRoom"
           />
- 
+     	<item android:id="@+id/followinstant"
+          android:icon="@drawable/ic_follow"
+          android:title="Follow Instant"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+    <item android:id="@+id/login"
+          android:title="Login"
+          android:icon="@drawable/ic_login"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+     		
 
 </menu>

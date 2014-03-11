@@ -1,10 +1,18 @@
 package com.smashedin.smashed;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.loopj.android.http.PersistentCookieStore;
 import com.smashedin.async.SmashedAsyncClient;
+import com.smashedin.reviews.LiveData;
+import com.smashedin.reviews.ReviewData;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
@@ -25,6 +33,7 @@ public class Singleton {
 	public boolean m_bDrawerClosed = false;
 	public boolean m_bCreateReviewMenuItem = true;
 	public boolean m_bCreateReviewOhMenuItem = true;
+	public boolean m_bCreateFollowMenuItem = true;
 	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
 	public SharedPreferences m_LocalStorage;
@@ -39,6 +48,15 @@ public class Singleton {
 	public String regid;
 	public String m_strMessageGcm;
 	public String m_strMessageGcmUser;
+
+	public String m_strMessageGcmBid;
+	public ArrayList<LiveData> m_arrListGcmMessages = new ArrayList<LiveData>();
+
+	public String m_strMessageGcmBname;
+
+	public ReviewData mRevData;
+
+	public boolean m_bAppHidden = false;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }
@@ -64,6 +82,21 @@ public class Singleton {
     	editor.putString("access", oAccessToken);
     	editor.putString("provider", "facebook");
     	editor.commit();
+    }
+    public void SetFollowBid(String bid)
+    {    	
+    	Set<String> stringSet = new HashSet<String>();
+    	stringSet = m_LocalStorage.getStringSet("follow", stringSet);
+    	stringSet.add(bid);
+    	SharedPreferences.Editor editor = m_LocalStorage.edit();
+    	editor.putStringSet("follow", stringSet);
+    	editor.commit();
+    }
+    public HashSet<String> GetFollowingBids()
+    {
+    	Set<String> stringSet = new HashSet<String>();
+    	stringSet = m_LocalStorage.getStringSet("follow", stringSet);
+    	return (HashSet<String>) stringSet;
     }
     public void SetAccessTokenGoogle(String oAccessToken)
     {
@@ -95,6 +128,7 @@ public class Singleton {
     	m_bDrawerClosed = false;
     	m_bCreateReviewMenuItem = true;
     	m_bCreateReviewOhMenuItem = true;
+    	m_bCreateFollowMenuItem = true;
     }
 	public void parseJsonUserDetails(String response) {
 		JSONObject jsonObj;

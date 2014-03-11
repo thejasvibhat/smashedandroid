@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,22 +61,32 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	private ProgressDialog oPd = null;
 	private String gBid;
 	public ReviewFragment m_oReviewsPageFragment = null;
+	private ViewPager pager;
+	private TabPageIndicator indicator;
+	private FragmentActivity mActivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpage_tabs);
+        mActivity = this;
         Bundle b = getIntent().getExtras();
         int pos = b.getInt("position");
+        String bid = b.getString("bid","");
+        if(bid.equals("") == false)
+        {
+        	oRevData = Singleton.getInstance().mRevData;
+        }
+        else
         oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
 
         FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
 
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
-        TabPageIndicator indicator = (TabPageIndicator)findViewById(R.id.indicator);
+        indicator = (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
-        pager.setOffscreenPageLimit(3); 
+        pager.setOffscreenPageLimit(3);
         getActionBar().setTitle(oRevData.name);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
   		      new IntentFilter("review-event"));
@@ -88,7 +99,35 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     @Override
     public void onResume()
     {
-
+    	indicator.setOnPageChangeListener(new OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				if(arg0 == 1)
+				{
+					Singleton.getInstance().m_bCreateFollowMenuItem = false;
+					mActivity.invalidateOptionsMenu();
+				}
+				else
+				{
+					Singleton.getInstance().m_bCreateFollowMenuItem = true;
+					mActivity.invalidateOptionsMenu();
+				}
+				
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				String x = "x";
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				String x = "x";
+				
+			}
+		});
         Bundle b = getIntent().getExtras();
 
         getActionBar().setTitle(b.getString("name"));
@@ -102,6 +141,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         }
     	Singleton.getInstance().m_bCreateReviewMenuItem = false;
     	Singleton.getInstance().m_bCreateReviewOhMenuItem = false;
+    	Singleton.getInstance().m_bCreateFollowMenuItem = true;
     	Singleton.getInstance().m_bShareMenuItem = true;
     	this.invalidateOptionsMenu();
     	super.onResume();
@@ -114,6 +154,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			   Singleton.getInstance().m_bCreateReviewMenuItem = false;
 		    	Singleton.getInstance().m_bCreateReviewOhMenuItem = false;
 		    	Singleton.getInstance().m_bShareMenuItem = true;
+		    	Singleton.getInstance().m_bCreateFollowMenuItem = false;
 		    	this.invalidateOptionsMenu();
 		    	super.onBackPressed();
 				  return;
@@ -144,6 +185,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		 MenuItem m_oCreateOhMenuItem = menu.findItem(R.id.revoh);
 			if(Singleton.getInstance().m_bCreateReviewOhMenuItem == true)
 				m_oCreateOhMenuItem.setVisible(false);
+			MenuItem m_oFollowMenuItem = menu.findItem(R.id.followinstant);
+				if(Singleton.getInstance().m_bCreateFollowMenuItem == true)
+					m_oFollowMenuItem.setVisible(false);
+
 		return true;
 	}
 
@@ -422,7 +467,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
         @Override
         public Fragment getItem(int position) {
-        	if(position == 1) //reviews page
+        	if(position == 2) //reviews page
         	{
         		m_oReviewsPageFragment = ReviewFragment.newInstance(CONTENT[position % CONTENT.length],oRevData);           	 
                 return m_oReviewsPageFragment;

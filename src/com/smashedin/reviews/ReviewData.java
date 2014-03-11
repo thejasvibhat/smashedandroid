@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class ReviewData {
 	public String id;
+	public boolean m_bFromNotification = false;
 	public String name;
 	public String rating;
 	public String contact;
