@@ -9,8 +9,12 @@
     <color name="red">#ffff0000</color>
     <color name="green">#ff00ff00</color>
     <color name="white">#ffffffff</color>
-    <color name="grey">#ffCCCCCC</color>
-    <color name="orange">#FFd48c37</color>
+    <color name="grey">#ffF4F4F4</color>
+    <color name="lightgrey">#ff707070</color>
+    <color name="subtlegrey">#ffdddddd</color>
+    <color name="orange">#FF2B2B2B</color>
+    <color name="orangereal">#FFd48c37</color>
+    <color name="green">#FF689154</color>  
 	<color name="textColor">#FFF</color>
 	<color name="textFieldColor">#000</color>
 	<color name="textShadow">#FFF</color>

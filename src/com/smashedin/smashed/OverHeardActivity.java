@@ -396,7 +396,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		
 	}
 	@Override
-	public void OnResponse(String response) {
+	public void OnResponse(String response,String tag) {
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;

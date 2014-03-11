@@ -172,7 +172,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		
 
 		if (savedInstanceState == null) {
-			displayHome();
+			//displayHome();
+			displayView(0);
 		}
 		// Register mMessageReceiver to receive messages.
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
@@ -468,7 +469,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		// update the main content by replacing fragments
 		Singleton.getInstance().ClearAllOptionMenus();
 		Singleton.getInstance().m_bSearchMenuItem = false;
-		homefragment.getView().setVisibility(View.INVISIBLE);
+		//homefragment.getView().setVisibility(View.INVISIBLE);
 		switch (position) {		
 		case 0:
 			mDrawerLayout.closeDrawer(mDrawerList);
@@ -612,7 +613,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     }
 
 	@Override
-	public void OnResponse(String response) {
+	public void OnResponse(String response,String tag) {
 		if(Singleton.getInstance().m_oType == "push")
 		{
 			Singleton.getInstance().m_oType = "oh";

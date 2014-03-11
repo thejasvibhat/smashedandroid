@@ -216,7 +216,7 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
     }
 
 	@Override
-	public void OnResponse(String response) {
+	public void OnResponse(String response,String tag) {
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().parseJsonUserDetails(response);

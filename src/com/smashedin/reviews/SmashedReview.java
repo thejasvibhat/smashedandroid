@@ -52,8 +52,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
     
 	
-	//private static final String[] CONTENT = new String[] { "INFO", "LIVEFEED","REVIEWS","OVERHEARDS", "PHOTOS" };
-	private static final String[] CONTENT = new String[] { "INFO", "LIVEFEED","REVIEWS","OVERHEARDS" };
+	private static final String[] CONTENT = new String[] { "INFO", "INSTANTS","REVIEWS","OVERHEARDS", "PHOTOS" };
     private ReviewData oRevData = null;
     private Intent mainintent;
     private int m_rating = 0;
@@ -443,14 +442,14 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         }
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-        	container.removeView((View) object);
-            super.destroyItem(container, position, object);
+        	//container.removeView((View) object);
+           // super.destroyItem(container, position, object);
         }
 
     }
 
 	@Override
-	public void OnResponse(String response) {
+	public void OnResponse(String response,String tag) {
 		if(Singleton.getInstance().m_oType == "login")
 		{
 			Singleton.getInstance().m_oType = "reviews";

@@ -10,12 +10,13 @@ import com.smashedin.smashed.Singleton;
 public class SmashedAsyncClient{
 	private AsyncHttpClient m_oAsyncClient;
 	private OnResponseListener oListenerCallback;
+	private String m_strTag = "";
 	public SmashedAsyncClient()
 	{
 		m_oAsyncClient = new AsyncHttpClient();
 	}
 	public interface OnResponseListener {
-        public void OnResponse(String response);
+        public void OnResponse(String response,String tag);
         public void OnFailure();
     }
 	public void SetPersistantStorage(Context oContext)
@@ -44,7 +45,7 @@ public class SmashedAsyncClient{
 		m_oAsyncClient.post(url, params, new AsyncHttpResponseHandler(){
     		@Override
 		    public void onSuccess(String response) {
-    			oListenerCallback.OnResponse(response);
+    			oListenerCallback.OnResponse(response,m_strTag);
 	        }
     		@Override
     		public void onFailure(Throwable error, String content)
@@ -56,25 +57,11 @@ public class SmashedAsyncClient{
 	public void MakeCall(String url)
 	{
 		m_oAsyncClient.setCookieStore(Singleton.getInstance().myCookieStore);
-//		List<Cookie> cookies = Singleton.getInstance().myCookieStore.getCookies();
-//        String authVal = "";
-//        for(Cookie oCookie:cookies)
-//        {
-//        	String name = oCookie.getName();
-//        	String value = oCookie.getValue();
-//        	if(name.equalsIgnoreCase("auth"))
-//        	{
-//        		value = '"'+value+'"';
-//        		authVal = value;
-//        		break;
-//        	}
-//        }
-//        m_oAsyncClient.addHeader("Cookie", "auth="+authVal);
 		
 		m_oAsyncClient.get(url, new AsyncHttpResponseHandler(){
     		@Override
 		    public void onSuccess(String response) {
-    			oListenerCallback.OnResponse(response);
+    			oListenerCallback.OnResponse(response,m_strTag);
 	        }
     		@Override
     		public void onFailure(Throwable error, String content)
@@ -82,5 +69,10 @@ public class SmashedAsyncClient{
     			oListenerCallback.OnFailure();
     		}		        
 		 });
+	}
+	public void MakeCallWithTag(String url,String tag)
+	{
+		m_strTag = tag;
+		MakeCall(url);
 	}
 }

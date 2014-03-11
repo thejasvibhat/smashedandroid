@@ -560,7 +560,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	
 	@Override
-	public void OnResponse(String response) {
+	public void OnResponse(String response,String tag) {
 		if(oPd != null)
 			oPd.dismiss();
 		

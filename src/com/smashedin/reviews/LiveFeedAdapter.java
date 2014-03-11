@@ -1,5 +1,8 @@
 package com.smashedin.reviews;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import com.smashedin.smashed.Singleton;
@@ -55,17 +58,21 @@ public class LiveFeedAdapter extends BaseAdapter {
 			holder.message = (TextView) convertView.findViewById(R.id.message_text);
 			holder.usertext = (TextView) convertView.findViewById(R.id.message_name);
 			holder.oContainer = (LinearLayout) convertView.findViewById(R.id.containerStatus);
-			holder.oDivider = (View) convertView.findViewById(R.id.dividername);
 			convertView.setTag(holder);
 		}
 		else
 			holder = (ViewHolder) convertView.getTag();
 		
-		holder.message.setText(message);
+		try {
+			String decodeMessage = URLDecoder.decode(message,"UTF-8");
+			holder.message.setText(decodeMessage);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			holder.message.setText("");
+			e.printStackTrace();
+		}
 		
 		LayoutParams lp = (LayoutParams) holder.oContainer.getLayoutParams();
-		LayoutParams lpiewV = (LayoutParams) holder.oDivider.getLayoutParams();
-		
 		
 		//Check whether message is mine to show green background and align to right
 		if(mLiveFeeds.get(position).mine == true)
@@ -83,8 +90,6 @@ public class LiveFeedAdapter extends BaseAdapter {
 		holder.oContainer.setLayoutParams(lp);
 		holder.message.setTextColor(0xFF000000);	
 		holder.usertext.setText(mLiveFeeds.get(position).username);
-		lpiewV.width = holder.usertext.getWidth();
-		holder.oDivider.setLayoutParams(lpiewV);
 		return convertView;
 	}
 	private static class ViewHolder
@@ -92,7 +97,6 @@ public class LiveFeedAdapter extends BaseAdapter {
 		TextView message;
 		TextView usertext;
 		LinearLayout oContainer;
-		View oDivider;
 	}
     public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

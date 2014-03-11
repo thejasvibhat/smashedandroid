@@ -50,7 +50,10 @@
 	        android:listSelector="#00000000" >
 	    </ListView>
 	
-	   <ProgressBar
+	   
+	
+	</RelativeLayout>
+    <ProgressBar
 	          android:gravity="center"
 	          android:layout_gravity="center"
 	       android:id="@+id/progressImagelive"
@@ -58,8 +61,5 @@
 	       style="?android:attr/progressBarStyleLarge"
 	       android:layout_width="wrap_content"
 	       android:layout_height="50dp" />
-	
-	</RelativeLayout>
-    
 </FrameLayout>
 	

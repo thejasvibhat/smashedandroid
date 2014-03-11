@@ -26,7 +26,7 @@
         <item name="android:textColor">#FFFFFFFF</item>
     </style>
 	<style name="MyActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
-	    <item name="android:background">#FFef8405</item>
+	    <item name="android:background">@color/green</item>
 	     <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
 	</style>
 	<style name="MyActionBarTab" parent="android:style/Widget.Holo.ActionBar.TabView">

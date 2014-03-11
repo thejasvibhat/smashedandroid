@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
  
 public class GridReviewsAdapter extends BaseAdapter {
@@ -45,7 +46,15 @@ public class GridReviewsAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.revieweachitem,null,false);
         }
         String distance = FsqVenues.get(position).location.distance;
-        
+        LinearLayout oBack = (LinearLayout) convertView.findViewById(R.id.itemRevBack);
+        if(position % 2 == 0)
+        {
+        	oBack.setBackgroundColor(0xffffffff);
+        }
+        else
+        {
+        	oBack.setBackgroundColor(0xfff4f4f4);
+        }
         ((TextView)convertView.findViewById(R.id.revname)).setText(FsqVenues.get(position).name);
         ((TextView)convertView.findViewById(R.id.revadd)).setText(FsqVenues.get(position).location.address);
         ((TextView)convertView.findViewById(R.id.revdist)).setText(distance);

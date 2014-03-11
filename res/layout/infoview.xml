@@ -46,7 +46,8 @@
 		                android:layout_marginLeft="10dp"
 		                android:layout_marginTop="10dp"
 		                android:text="Name"
-		                android:textSize="16dp" />
+		                android:textColor="@color/lightgrey"
+		                android:textSize="14dp" />
 		            
 		            <TextView
 		                android:id="@+id/revinfocitystate"
@@ -57,7 +58,8 @@
 		                android:layout_marginLeft="10dp"
 		                android:layout_marginTop="10dp"
 		                android:text="Name"
-		                android:textSize="16dp" />
+		                android:textColor="@color/lightgrey"
+		                android:textSize="14dp" />
 		                        
 		        </LinearLayout>
 		
@@ -65,8 +67,8 @@
 		<View
 		    android:layout_width="fill_parent"
 		    android:layout_marginTop="10dp"
-		    android:layout_height="2dp"
-		    android:background="@android:color/darker_gray"/>
+		    android:layout_height="1dp"
+		    android:background="@color/subtlegrey"/>
 		</LinearLayout>
 		<TextView
 		        android:id="@+id/revinfodist"
@@ -129,8 +131,8 @@
 		<View
 		    android:layout_width="fill_parent"
 		    android:layout_marginTop="10dp"
-		    android:layout_height="2dp"
-		    android:background="@android:color/darker_gray"/>
+		    android:layout_height="1dp"
+		    android:background="@color/subtlegrey"/>
 		</LinearLayout>
 	</RelativeLayout>
 	<RelativeLayout 
@@ -172,7 +174,8 @@
 		                android:layout_marginLeft="10dp"
 		                android:layout_marginTop="10dp"
 		                android:text="Name"
-		                android:textSize="16dp" />
+		                android:textColor="@color/lightgrey"
+		                android:textSize="14dp" />
 		            
 		                        
 		        </LinearLayout>
@@ -181,8 +184,8 @@
 		<View
 		    android:layout_width="fill_parent"
 		    android:layout_marginTop="10dp"
-		    android:layout_height="2dp"
-		    android:background="@android:color/darker_gray"/>
+		    android:layout_height="1dp"
+		    android:background="@color/subtlegrey"/>
 		</LinearLayout>
 	</RelativeLayout>
 	<fragment

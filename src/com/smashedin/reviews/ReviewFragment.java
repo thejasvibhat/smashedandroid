@@ -1,5 +1,7 @@
 package com.smashedin.reviews;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,7 +108,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         m_curFragment = this;
     	if(mRevData != null)
     	{
-    		return GetView();
+    		return GetView(inflater);
     	}
     	else
     	{
@@ -125,27 +127,27 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	}
     }
     
-    private View GetView() {
+    private View GetView(LayoutInflater inflater) {
 		// TODO Auto-generated method stub
     	if(mContent == "INFO")
     	{
-    		return GetViewForInfo();
+    		return GetViewForInfo(inflater);
     	}
     	else if(mContent == "PHOTOS")
     	{
-    		return GetViewForPhotos();
+    		return GetViewForPhotos(inflater);
     	}
     	else if(mContent == "OVERHEARDS")
     	{
-    		return GetViewForOverheards();
+    		return GetViewForOverheards(inflater);
     	}
     	else if(mContent == "REVIEWS")
     	{
-    		return GetViewForReviews();
+    		return GetViewForReviews(inflater);
     	}
-    	else if(mContent == "LIVEFEED")
+    	else if(mContent == "INSTANTS")
     	{
-    		return GetViewForLiveFeed();
+    		return GetViewForLiveFeed(inflater);
     	}
     	else
     	{
@@ -164,11 +166,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	}
 		
 	}
-    private View GetViewForReviews()
+    private View GetViewForReviews(LayoutInflater inflater)
     {
     	if(reviewview != null)
     		return reviewview;
-    	reviewview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_reviews,null,false);
+    	reviewview = inflater.inflate(R.layout.fragment_reviews,null);
 		reviewsGrid = (PullToRefreshListView) reviewview.findViewById(R.id.m_oReviewsList);
 		if(gReviewsAdapter == null)
 			gReviewsAdapter = new GridFsReviewsAdapter(getActivity());
@@ -190,13 +192,13 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 		return reviewview;
     }
-    private View GetViewForLiveFeed()
+    private View GetViewForLiveFeed(LayoutInflater inflater)
     {
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
   		      new IntentFilter("push-event"));
     	if(liveView != null)
     		return liveView;
-    	liveView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_livefeed,null,false);
+    	liveView = inflater.inflate(R.layout.fragment_livefeed,null);
 		livefeedList =  (ListView) liveView.findViewById(R.id.m_oLiveList);
 		
 		if(gLiveFeedAdaper == null)
@@ -221,19 +223,63 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			public void onClick(View arg0) {
 				EditText oStatusText = (EditText)liveView.findViewById(R.id.textStatus);
 				String message = oStatusText.getText().toString(); 
+				try {
+					message = URLEncoder.encode(message,"utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				 UpdateDataGCM(message);
 				 oStatusText.setText("");
 				 LiveData oLive = new LiveData();
-				 oLive.mine = false;
+				 oLive.mine = false;				
 				 oLive.message = message;
 				 oLive.username = Singleton.getInstance().username;
 				 oLive.mine = true;
 				 mRevData.livefeeds.add(oLive);
 				 gLiveFeedAdaper.mLiveFeeds.add(oLive);
 				 gLiveFeedAdaper.notifyDataSetChanged();
+				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
 			}
 		});
+		if(Singleton.getInstance().loggedIn == false)
+		{
+			FrameLayout oLayout = (FrameLayout) liveView.findViewById(R.id.livefeedparent);
+			TextView oTextView = new TextView(getActivity());
+			oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+			oTextView.setTextColor(0xffffffff);
+			oTextView.setTextSize(32);
+			oTextView.setShadowLayer(2,1,1,Color.BLACK);
+			oTextView.setText("Please login to follow live feeds at this place. Click to login");
+			oLayout.addView(oTextView);
+			Button oBut = (Button) oLayout.findViewById(R.id.sendStatus);
+			oBut.setEnabled(false);
 
+			oTextView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
+					Button oBut = (Button) getActivity().findViewById(R.id.sendStatus);
+					oBut.setEnabled(true);
+					for(int i=0; i < oLayout.getChildCount(); i++)
+					{
+						if(oLayout.getChildAt(i) instanceof TextView)
+						{
+							oLayout.removeViewAt(i);
+							break;
+						}
+					}
+
+					Intent loginintent = new Intent("custom-login-event");
+					LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(loginintent);
+
+					
+				}
+			});
+
+
+		}
 		return liveView;
     }
     private void UpdateDataGCM(String message)
@@ -243,7 +289,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
-    	oAsyncClient.MakeCall(url); 
+    	oAsyncClient.MakeCallWithTag(url,"pushGet"); 
     	
     }
     private void GetLatestLiveFeed() {
@@ -253,7 +299,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
-    	oAsyncClient.MakeCall(url); 
+    	oAsyncClient.MakeCallWithTag(url,"push"); 
 		
 
 	}
@@ -266,14 +312,14 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(mainFragment);
     	oAsyncClient.SetPersistantStorage(getActivity());
-    	oAsyncClient.MakeCall(url);   
+    	oAsyncClient.MakeCallWithTag(url,"fsreviews");   
 
     }
-    private View GetViewForOverheards()
+    private View GetViewForOverheards(LayoutInflater inflater)
     {
     	if(ohview != null)
     		return ohview;
-        ohview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
+        ohview = inflater.inflate(R.layout.fragment_skelview,null);
 		ohGrid = (PullToRefreshGridView) ohview.findViewById(R.id.grid_view_skels);
 		ohGrid.setOnRefreshListener(new OnRefreshListener<GridView>() {
 
@@ -286,7 +332,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
 		    	oAsyncClient.Attach(mainFragment);
 		    	oAsyncClient.SetPersistantStorage(getActivity());
-		    	oAsyncClient.MakeCall(url);   
+		    	oAsyncClient.MakeCallWithTag(url, "oh");   
 
 				
 			}
@@ -323,18 +369,18 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
 	    	oAsyncClient.Attach(mainFragment);
 	    	oAsyncClient.SetPersistantStorage(getActivity());
-	    	oAsyncClient.MakeCall(url);   
+	    	oAsyncClient.MakeCallWithTag(url,"oh");   
 
 		}
 		return ohview;
 
     }
     
-	private View GetViewForInfo() {
+	private View GetViewForInfo(LayoutInflater inflater) {
 
 		if(infoview != null)
 			return infoview;
-        infoview = LayoutInflater.from(getActivity()).inflate(R.layout.infoview,null,false);
+        infoview = inflater.inflate(R.layout.infoview,null);
         ((TextView)infoview.findViewById(R.id.revinfoname)).setText(mRevData.name);
         ((TextView)infoview.findViewById(R.id.revinfoaddress)).setText(mRevData.location.address);
         ((TextView)infoview.findViewById(R.id.revinfocitystate)).setText(mRevData.location.city+","+mRevData.location.state);
@@ -352,11 +398,11 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	    map.moveCamera(CameraUpdateFactory.newLatLngZoom(KIEL, 15));
 		return infoview;
 	}
-	private View GetViewForPhotos()
+	private View GetViewForPhotos(LayoutInflater inflater)
 	{
 		if(photosview != null)
 			return photosview;
-        photosview = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_skelview,null,false);
+        photosview = inflater.inflate(R.layout.fragment_skelview,null);
 		if(gAdapter == null)
 			gAdapter = new GridImageSkelAdapter(getActivity());
 		GetPhotos(mRevData.id);
@@ -384,7 +430,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		String url 	= "https://api.foursquare.com/v2/venues/"+id+"/photos?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815";
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
 		oAsyncClient.Attach(mainFragment);
-		oAsyncClient.MakeCall(url);        	
+		oAsyncClient.MakeCallWithTag(url,"fs");        	
 	}
 	@Override
     public void onSaveInstanceState(Bundle outState) {
@@ -415,6 +461,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		oP.setVisibility(View.GONE);			
 		livefeedList.setVisibility(View.VISIBLE);
 		livefeedList.setAdapter(gLiveFeedAdaper);
+		livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
 	}
 	private void ParseJsonReviews(String response) throws JSONException
 	{
@@ -580,50 +627,13 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	}
 
 	@Override
-	public void OnResponse(String response) {
-		if(Singleton.getInstance().m_oType == "push")
+	public void OnResponse(String response,String tag) {
+		if(tag == "push")
 		{
 			Singleton.getInstance().m_oType = "";
 			if(liveView == null)
 				return;
-			if(Singleton.getInstance().loggedIn == false)
-			{
-				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
-				TextView oTextView = new TextView(getActivity());
-				oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-				oTextView.setTextColor(0xffffffff);
-				oTextView.setTextSize(32);
-				oTextView.setShadowLayer(2,1,1,Color.BLACK);
-				oTextView.setText("Please login to follow live feeds at this place. Click to login");
-				oLayout.addView(oTextView);
-				Button oBut = (Button) oLayout.findViewById(R.id.sendStatus);
-				oBut.setEnabled(false);
-
-				oTextView.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View arg0) {
-						FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
-						Button oBut = (Button) getActivity().findViewById(R.id.sendStatus);
-						oBut.setEnabled(true);
-						for(int i=0; i < oLayout.getChildCount(); i++)
-						{
-							if(oLayout.getChildAt(i) instanceof TextView)
-							{
-								oLayout.removeViewAt(i);
-								break;
-							}
-						}
-
-						Intent loginintent = new Intent("custom-login-event");
-						LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(loginintent);
-
-						
-					}
-				});
-
-
-			}
+			
 			try {
 				ParseJsonLiveFeed(response);
 			} catch (JSONException e) {
@@ -632,15 +642,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			}
 			return;
 		}
-		if(Singleton.getInstance().m_oType == "pushGet")
+		if(tag == "pushGet")
 		{
 			Singleton.getInstance().m_oType = "";
 			return;
 		}
 
-		if(m_oType == "fs")
+		if(tag == "fs")
 			oGrid.onRefreshComplete();
-		if(m_oType == "oh")
+		if(tag == "oh")
 		{
 			ohGrid.onRefreshComplete();
 			m_StrResponse = response;
@@ -698,7 +708,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	        background.start();  //After call start method thread called run Methods
 
 		}
-		else if(m_oType == "fsreviews")
+		else if(tag == "fsreviews")
 		{
 			reviewsGrid.onRefreshComplete();
 			try {
@@ -773,6 +783,12 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			 String message = Singleton.getInstance().m_strMessageGcm;
 			 LiveData oLive = new LiveData();
 			 oLive.mine = false;
+			 try {
+					message = URLEncoder.encode(message,"utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			 oLive.message = message;
 			 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 			 gLiveFeedAdaper.mLiveFeeds.add(oLive);
