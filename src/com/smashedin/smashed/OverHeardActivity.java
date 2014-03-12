@@ -221,7 +221,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		}
 		else
 		{
-			if(oPd == null)
+			/*if(oPd == null)
 			{
 				oPd = new ProgressDialog(this);
 				oPd.setTitle("Trying to get Smashed...");
@@ -235,7 +235,8 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
         	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
         	oAsyncClient.Attach(this);
         	oAsyncClient.SetPersistantStorage(getApplicationContext());
-        	oAsyncClient.MakeCall(url);        	
+        	oAsyncClient.MakeCall(url); */ 
+			Singleton.getInstance().loggedIn = true;
 		}
 	}
 	@Override
@@ -399,7 +400,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 	public void OnResponse(String response,String tag) {
 		if(oPd != null)
 			oPd.dismiss();
-		Singleton.getInstance().loggedIn = true;
+		//Singleton.getInstance().loggedIn = true;
 		if(Singleton.getInstance().m_oType == "overheard")
 		{
 			if(myUploadFragment == null)

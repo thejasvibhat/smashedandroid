@@ -67,10 +67,17 @@ public class Singleton {
         }
         return mInstance;
     }
+    public void restoreUserDetails()
+    {
+    	username = m_LocalStorage.getString("username", "Anonymous");
+    	usericonurl = m_LocalStorage.getString("usericonurl", "");
+    	loggedIn = m_LocalStorage.getBoolean("loggedin", false);
+    }
     public void SetApplicationContext(Context oContext)
     {
     	mContext = oContext;
     	m_LocalStorage = mContext.getSharedPreferences("", Context.MODE_PRIVATE);
+    	restoreUserDetails();
     }
     public float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
@@ -136,6 +143,13 @@ public class Singleton {
 			jsonObj = (JSONObject) new JSONTokener(response).nextValue();			
 			username = jsonObj.getString("username");
 			usericonurl = jsonObj.getString("avatar");
+			
+			SharedPreferences.Editor editor = m_LocalStorage.edit();
+	    	editor.putString("username", username);
+	    	editor.putString("usericonurl", usericonurl);
+	    	editor.putBoolean("loggedin", true);
+	    	editor.commit();
+	    	
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

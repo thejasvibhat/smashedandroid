@@ -103,6 +103,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         }
 		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
 			      new IntentFilter("bidoh"));
+		  
 		  setHasOptionsMenu(true);
     }
     @Override
@@ -132,13 +133,14 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		Singleton.getInstance().mRevData = mRevData;
         Toast.makeText(
                 getActivity(),
-                "Instants of this place will be shown in your notification,even you close this app",
+                "Following "+mRevData.name,
                 Toast.LENGTH_SHORT).show();
 
 	}
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         m_curFragment = this;
+        getActivity().getActionBar().setTitle(mRevData.name);
     	if(mRevData != null)
     	{
     		return GetView(inflater);
@@ -240,6 +242,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		{
 			gLiveFeedAdaper.mLiveFeeds.addAll(mRevData.livefeeds);
 			livefeedList.setAdapter(gLiveFeedAdaper);
+			livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
 		}
 		else
 		{

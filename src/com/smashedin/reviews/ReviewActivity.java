@@ -76,7 +76,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	// slide menu items
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
-	Location m_olocation;
+	Location m_olocation = null;
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private ReviewListAdapter m_oRevAdapter;
 	private NavDrawerListAdapter adapterlist;
@@ -87,6 +87,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	private String m_query = "";
 	private ArrayList<ReviewData> venueList;
 	String mainStuff = "false";
+	LocationListener locationListener = null;
+	String localArea = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,7 +161,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
 		// enabling action bar app icon and behaving it as toggle button
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		//getActionBar().setHomeButtonEnabled(true);
+		//getActionBar().setHomeAsUpIndicator(R.id.buttonLoginLogout);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, //nav menu toggle icon
@@ -191,17 +194,31 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				GetMyLocation();
 			}
 		});
-    	GetMyLocation();
-    	if(Singleton.getInstance().m_arrListGcmMessages.size() != 0)
-    	{
-    		FromNotification();
-    		return;
-    	}
+    	
     }
     @Override
     public void onResume()
     {
-    
+    	if(gAdapter != null)
+    	{
+    		
+        	if(Singleton.getInstance().m_arrListGcmMessages.size() != 0)
+        	{
+        		FromNotification();
+        		super.onResume();
+        		return;
+        	}
+    		if(gAdapter.FsqVenues.size() != 0)
+    			SetGridItems((GridView) findViewById(R.id.reviewsGrid));
+    		else
+    		{
+    			GetMyLocation();
+    		}
+    	}
+    	else
+    	{
+    		GetMyLocation();
+    	}
     	super.onResume();
     }
     private void GetMyLocation()
@@ -215,35 +232,47 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		ProgressBar oPG= (ProgressBar) findViewById(R.id.progressImageGrid);
 		oPG.setVisibility(View.VISIBLE);
     	// Define a listener that responds to location updates
-    	LocationListener locationListener = new LocationListener() {
-    	    public void onLocationChanged(Location olocation) {
-    	    	m_olocation = olocation;
-    	      // Called when a new location is found by the network location provider.
-    	      makeUseOfNewLocation(olocation);
-				ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
-				oP.setVisibility(View.GONE);
-				ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
-				oV.setVisibility(View.VISIBLE);
-
-    	    }
-
-    	    
-
-			public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-    	    public void onProviderEnabled(String provider) {}
-
-    	    public void onProviderDisabled(String provider) {}
-    	  };
+		if(locationListener == null)
+		{
+	    	locationListener = new LocationListener() {
+	    	    public void onLocationChanged(Location olocation) {
+	    	    	if(m_olocation != null)
+	    	    	{
+		    	    	float distance = m_olocation.distanceTo(olocation);
+		    	    	if(distance < 50)
+		    	    	{
+		    	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
+		    	    		return;
+		    	    	}
+	    	    	}
+	    	    	m_olocation = olocation;
+	    	      // Called when a new location is found by the network location provider.
+	    	      makeUseOfNewLocation(olocation);
+					ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
+					oP.setVisibility(View.GONE);
+					ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
+					oV.setVisibility(View.VISIBLE);
+	
+	    	    }
+	
+	    	    
+	
+				public void onStatusChanged(String provider, int status, Bundle extras) {}
+	
+	    	    public void onProviderEnabled(String provider) {}
+	
+	    	    public void onProviderDisabled(String provider) {}
+	    	  };
+		}
 
     	// Register the listener with the Location Manager to receive location updates
-    	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 50000, 50000, locationListener);
+    	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 50, locationListener);
     }
     private void makeUseOfNewLocation(Location location) {
 		// TODO Auto-generated method stub
     	Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
     	StringBuilder builder = new StringBuilder();
-    	String localArea = null;
+    	
     	try {
     	    List<Address> address = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
     	    int maxLines = address.get(0).getMaxAddressLineIndex();
@@ -417,7 +446,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					 finish();
+				//	 finish();
 			        	Intent intent = new Intent("exit-event");
 			      	  	LocalBroadcastManager.getInstance(m_oRevActivity).sendBroadcast(intent);
 					

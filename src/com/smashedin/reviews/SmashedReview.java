@@ -64,21 +64,17 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	private ViewPager pager;
 	private TabPageIndicator indicator;
 	private FragmentActivity mActivity;
+	private boolean m_bFromNotification = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	m_bFromNotification = false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpage_tabs);
         mActivity = this;
         Bundle b = getIntent().getExtras();
         int pos = b.getInt("position");
         String bid = b.getString("bid","");
-        if(bid.equals("") == false)
-        {
-        	oRevData = Singleton.getInstance().mRevData;
-        }
-        else
-        oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
-
+       
         FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
 
         pager = (ViewPager)findViewById(R.id.pager);
@@ -87,6 +83,15 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         indicator = (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
         pager.setOffscreenPageLimit(3);
+        if(bid.equals("") == false)
+        {
+        	m_bFromNotification = true;
+        	oRevData = Singleton.getInstance().mRevData;
+        	pager.setCurrentItem(1);
+        }
+        else
+        oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
+
         getActionBar().setTitle(oRevData.name);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
   		      new IntentFilter("review-event"));
@@ -141,7 +146,13 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         }
     	Singleton.getInstance().m_bCreateReviewMenuItem = false;
     	Singleton.getInstance().m_bCreateReviewOhMenuItem = false;
-    	Singleton.getInstance().m_bCreateFollowMenuItem = true;
+    	if(m_bFromNotification == true)
+    	{
+    		Singleton.getInstance().m_bCreateFollowMenuItem = false;
+    		m_bFromNotification = false;
+    	}
+    	else
+    		Singleton.getInstance().m_bCreateFollowMenuItem = true;
     	Singleton.getInstance().m_bShareMenuItem = true;
     	this.invalidateOptionsMenu();
     	super.onResume();
@@ -434,7 +445,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		}
 		else
 		{
-			if(oPd == null)
+		/*	if(oPd == null)
 			{
 				oPd  = new ProgressDialog(this);
 				oPd.setTitle("Trying to get Smashed...");
@@ -448,7 +459,11 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
         	oAsyncClient.Attach(this);
         	oAsyncClient.SetPersistantStorage(getApplicationContext());
-        	oAsyncClient.MakeCall(url);        	
+        	oAsyncClient.MakeCall(url);       */ 	
+			Singleton.getInstance().m_oType = "reviews";
+			Singleton.getInstance().loggedIn = true;
+			Singleton.getInstance().m_bHideLoginMenuItem = true;
+			this.invalidateOptionsMenu();
 		}
 	}
 	/* *
@@ -495,7 +510,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
 	@Override
 	public void OnResponse(String response,String tag) {
-		if(Singleton.getInstance().m_oType == "login")
+/*		if(Singleton.getInstance().m_oType == "login")
 		{
 			Singleton.getInstance().m_oType = "reviews";
 			Singleton.getInstance().loggedIn = true;
@@ -505,7 +520,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			Singleton.getInstance().m_bHideLoginMenuItem = true;
 			this.invalidateOptionsMenu();
 			return;
-		}
+		}*/
 		SmashedFsReviewsData oRev = new SmashedFsReviewsData();
 		oRev.review = m_review;
 		oRev.rating = String.valueOf(m_rating);

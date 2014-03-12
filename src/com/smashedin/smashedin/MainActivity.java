@@ -183,7 +183,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 		if (savedInstanceState == null) {
 			//displayHome();
-			displayView(0);
+		//	displayView(0);
 		}
 		// Register mMessageReceiver to receive messages.
 		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
@@ -410,7 +410,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 		else
 		{
-			String provider = Singleton.getInstance().GetProvider(); 
+		/*	String provider = Singleton.getInstance().GetProvider(); 
 			if(oPd == null)
 			{
 				oPd = new ProgressDialog(this);
@@ -429,7 +429,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
         	oAsyncClient.Attach(this);
         	oAsyncClient.SetPersistantStorage(getApplicationContext());
-        	oAsyncClient.MakeCall(url);        	
+        	oAsyncClient.MakeCall(url);        	*/
+			Singleton.getInstance().loggedIn = true;
+			if(Singleton.getInstance().m_oType.equals("create") == true)
+			{
+				ShowCreateOverheard();
+			}
 		}
 	}
 	private void ShowCreateOverheard()
@@ -620,7 +625,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	    } 
         else
         {
-        	if(currentPosition != m_oPosition)
+        	//if(currentPosition != m_oPosition)
         		displayView(m_oPosition);
         }
 
