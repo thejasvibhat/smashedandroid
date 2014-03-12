@@ -241,6 +241,10 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		    	    	float distance = m_olocation.distanceTo(olocation);
 		    	    	if(distance < 50)
 		    	    	{
+		    	    		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
+							oP.setVisibility(View.GONE);
+							ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
+							oV.setVisibility(View.VISIBLE);
 		    	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 		    	    		return;
 		    	    	}
