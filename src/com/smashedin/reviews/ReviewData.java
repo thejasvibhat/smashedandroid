@@ -18,5 +18,6 @@ public class ReviewData {
 	public ArrayList<SmashedFsReviewsData> reviews;
 	public ArrayList<String> photos;
 	public ArrayList<LiveData> livefeeds;
+	public boolean m_bfollow = false;
 
 }

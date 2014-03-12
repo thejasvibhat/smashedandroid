@@ -34,6 +34,7 @@ public class Singleton {
 	public boolean m_bCreateReviewMenuItem = true;
 	public boolean m_bCreateReviewOhMenuItem = true;
 	public boolean m_bCreateFollowMenuItem = true;
+	public boolean m_bUnFollowMenuItem = true;
 	public String m_oType = "init";
 	public SmashedAsyncClient oAsyncClient;
 	public SharedPreferences m_LocalStorage;
@@ -57,6 +58,10 @@ public class Singleton {
 	public ReviewData mRevData;
 
 	public boolean m_bAppHidden = false;
+
+	public boolean m_bFromNotification = false;
+	public ArrayList<ReviewData> FsVenues = new ArrayList<ReviewData>();
+
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }
@@ -154,6 +159,16 @@ public class Singleton {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	public void SetUnFollowBid(String id) {
+    	Set<String> stringSet = new HashSet<String>();
+    	stringSet = m_LocalStorage.getStringSet("follow", stringSet);
+    	stringSet.remove(id);
+    	SharedPreferences.Editor editor = m_LocalStorage.edit();
+    	editor.putStringSet("follow", stringSet);
+    	editor.commit();
+
 		
 	}
 

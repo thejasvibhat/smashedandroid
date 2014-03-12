@@ -27,7 +27,13 @@
           android:title="Follow Instant"
           android:showAsAction="collapseActionView|ifRoom"
           />
-    <item android:id="@+id/login"
+     	<item android:id="@+id/unfollowinstant"
+          android:icon="@drawable/ic_unfollow"
+          android:title="UnFollow Instant"
+          android:showAsAction="collapseActionView|ifRoom"
+          />
+     	
+     	<item android:id="@+id/login"
           android:title="Login"
           android:icon="@drawable/ic_login"
           android:showAsAction="collapseActionView|ifRoom"

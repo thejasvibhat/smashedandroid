@@ -77,6 +77,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
 	Location m_olocation = null;
+	Location m_livelocation = null;
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private ReviewListAdapter m_oRevAdapter;
 	private NavDrawerListAdapter adapterlist;
@@ -204,7 +205,10 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     		
         	if(Singleton.getInstance().m_arrListGcmMessages.size() != 0)
         	{
+        		Singleton.getInstance().m_arrListGcmMessages.clear();
+        	
         		FromNotification();
+        		gAdapter.FsqVenues.addAll(Singleton.getInstance().FsVenues);
         		super.onResume();
         		return;
         	}
@@ -231,31 +235,24 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		oV.setVisibility(View.GONE);
 		ProgressBar oPG= (ProgressBar) findViewById(R.id.progressImageGrid);
 		oPG.setVisibility(View.VISIBLE);
+		
+
     	// Define a listener that responds to location updates
 		if(locationListener == null)
 		{
 	    	locationListener = new LocationListener() {
 	    	    public void onLocationChanged(Location olocation) {
-	    	    	if(m_olocation != null)
+	    	    	m_livelocation = olocation;
+	    	    	if(m_olocation == null)
 	    	    	{
-		    	    	float distance = m_olocation.distanceTo(olocation);
-		    	    	if(distance < 50)
-		    	    	{
-		    	    		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
-							oP.setVisibility(View.GONE);
-							ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
-							oV.setVisibility(View.VISIBLE);
-		    	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
-		    	    		return;
-		    	    	}
+		    	    	m_olocation = olocation;
+		    	      // Called when a new location is found by the network location provider.
+		    	      makeUseOfNewLocation(olocation);
+						ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
+						oP.setVisibility(View.GONE);
+						ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
+						oV.setVisibility(View.VISIBLE);
 	    	    	}
-	    	    	m_olocation = olocation;
-	    	      // Called when a new location is found by the network location provider.
-	    	      makeUseOfNewLocation(olocation);
-					ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
-					oP.setVisibility(View.GONE);
-					ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
-					oV.setVisibility(View.VISIBLE);
 	
 	    	    }
 	
@@ -268,9 +265,30 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	    public void onProviderDisabled(String provider) {}
 	    	  };
 		}
-
+		if(m_olocation != null)
+		{
+	    	float distance = m_olocation.distanceTo(m_livelocation);
+	    	if(distance < 50)
+	    	{
+	    		ProgressBar oP1= (ProgressBar) findViewById(R.id.progressImage);
+				oP1.setVisibility(View.GONE);
+				ImageView oV1= (ImageView) findViewById(R.id.refreshLocation);
+				oV1.setVisibility(View.VISIBLE);
+	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
+	    		return;
+	    	}
+	    	else
+	    	{
+    	    	m_olocation = m_livelocation;
+	    	      // Called when a new location is found by the network location provider.
+	    	      makeUseOfNewLocation(m_livelocation);
+	
+	    	}
+		}
+		else
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 50, locationListener);
     	// Register the listener with the Location Manager to receive location updates
-    	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 50, locationListener);
+    	
     }
     private void makeUseOfNewLocation(Location location) {
 		// TODO Auto-generated method stub
@@ -280,13 +298,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	try {
     	    List<Address> address = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
     	    int maxLines = address.get(0).getMaxAddressLineIndex();
+    	    localArea = null;
     	    for (int i=0; i<maxLines; i++) {
     	    String addressStr = address.get(0).getAddressLine(i);
+    	    String[] locations = addressStr.split(",");
     	    if(localArea == null)
-    	    {
-	    	    String[] locations = addressStr.split(",");
-	    	    localArea = locations[locations.length - 1];
-    	    }
+    	    	localArea = locations[locations.length - 1];
     	    builder.append(addressStr);
     	    builder.append(" ");
     	    }
@@ -451,6 +468,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				//	 finish();
+					Singleton.getInstance().FsVenues.addAll(gAdapter.FsqVenues);
 			        	Intent intent = new Intent("exit-event");
 			      	  	LocalBroadcastManager.getInstance(m_oRevActivity).sendBroadcast(intent);
 					

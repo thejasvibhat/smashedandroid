@@ -121,13 +121,30 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	    switch (item.getItemId()) {
 	  
 	    case R.id.followinstant:
-	    	FollowThread();
-	    	break;
+	    		FollowThread();
+	    		break;
+	    case R.id.unfollowinstant:
+    			UnFollowThread();
+    			break;
+
 	    }
 		return super.onOptionsItemSelected(item);
 	}
 	public void FollowThread()
 	{
+		Singleton.getInstance().m_bUnFollowMenuItem = false;
+		Singleton.getInstance().m_bCreateFollowMenuItem = true;
+		getActivity().invalidateOptionsMenu();
+		if(Singleton.getInstance().mRevData != null)
+		{
+			if(Singleton.getInstance().mRevData.m_bfollow == true)
+			{
+				Singleton.getInstance().SetUnFollowBid(Singleton.getInstance().mRevData.id);
+				Singleton.getInstance().mRevData.m_bfollow = false;
+			}
+		}
+
+		mRevData.m_bfollow = true;
 		String id = mRevData.id;
 		Singleton.getInstance().SetFollowBid(id);
 		Singleton.getInstance().mRevData = mRevData;
@@ -137,6 +154,21 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
                 Toast.LENGTH_SHORT).show();
 
 	}
+	public void UnFollowThread()
+	{
+		Singleton.getInstance().m_bUnFollowMenuItem = true;
+		Singleton.getInstance().m_bCreateFollowMenuItem = false;
+		getActivity().invalidateOptionsMenu();
+		Singleton.getInstance().mRevData.m_bfollow = false;
+		mRevData.m_bfollow = false;
+		Singleton.getInstance().SetUnFollowBid(mRevData.id);
+        Toast.makeText(
+                getActivity(),
+                "Stopped following "+mRevData.name,
+                Toast.LENGTH_SHORT).show();
+
+	}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         m_curFragment = this;
@@ -246,11 +278,20 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		else
 		{
-			ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
-			oP.setVisibility(View.VISIBLE);
-			
-			livefeedList.setVisibility(View.GONE);
-			GetLatestLiveFeed();
+			if(Singleton.getInstance().loggedIn == true)
+			{
+				ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
+				oP.setVisibility(View.VISIBLE);
+				
+				livefeedList.setVisibility(View.GONE);
+				GetLatestLiveFeed();
+			}
+			else
+			{
+				mRevData.livefeeds = new ArrayList<LiveData>();
+				gLiveFeedAdaper.mLiveFeeds = new ArrayList<LiveData>();
+				livefeedList.setAdapter(gLiveFeedAdaper);
+			}
 		}
 		Button sendStatus = (Button)liveView.findViewById(R.id.sendStatus);
 		sendStatus.setOnClickListener(new OnClickListener() {
@@ -828,9 +869,12 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			 oLive.message = message;
 			 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 			 gLiveFeedAdaper.mLiveFeeds.add(oLive);
-			 mRevData.livefeeds.add(oLive);
-			 gLiveFeedAdaper.notifyDataSetChanged();
-			 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+			 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
+			 {
+				 mRevData.livefeeds.add(oLive);
+				 gLiveFeedAdaper.notifyDataSetChanged();
+				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+			 }
 		  }
 
 	};
