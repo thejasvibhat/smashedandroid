@@ -3,58 +3,59 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="@color/grey">
+    android:background="#00000000">
 <LinearLayout 
     android:orientation="vertical"
-    android:background="@color/white"
+    android:id="@+id/parent1"
+    android:background="#00000000"
     android:layout_gravity="center_horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">    
 
 	    <LinearLayout
-	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="center_horizontal|left"
-	        android:background="@color/white"
+	        android:background="#00000000"
+	        android:layout_width="fill_parent"
 	        android:orientation="horizontal"
-	        android:padding="20dp" >
+	        android:padding="10dp" >
 
 		<ImageView
 		    android:id="@+id/revrate1"
-		    android:layout_width="30dp"
-		    android:layout_height="50dp"
+		    android:layout_width="15dp"
+		    android:layout_height="25dp"
 		    android:layout_margin="0dp"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/rate" />
 
 		<ImageView
 		    android:id="@+id/revrate2"
-		    android:layout_width="30dp"
-		    android:layout_height="50dp"
+		    android:layout_width="15dp"
+		    android:layout_height="25dp"
 		    android:layout_margin="0dp"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/rate" />
 
 		<ImageView
 		    android:id="@+id/revrate3"
-		    android:layout_width="30dp"
-		    android:layout_height="50dp"
+		    android:layout_width="15dp"
+		    android:layout_height="25dp"
 		    android:layout_margin="0dp"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/rate" />
 
 		<ImageView
 		    android:id="@+id/revrate4"
-		    android:layout_width="30dp"
-		    android:layout_height="50dp"
+		    android:layout_width="15dp"
+		    android:layout_height="25dp"
 		    android:layout_margin="0dp"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/rate" />
 
 		<ImageView
 		    android:id="@+id/revrate5"
-		    android:layout_width="30dp"
-		    android:layout_height="50dp"
+		    android:layout_width="15dp"
+		    android:layout_height="25dp"
 		    android:layout_margin="0dp"
 		    android:scaleType="fitXY"
 		    android:src="@drawable/rate" />
@@ -65,7 +66,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
 
-    android:background="@color/white"
+    android:background="#00000000"
     android:orientation="vertical"
     android:padding="1dp" >
 
@@ -73,34 +74,35 @@
 	    android:id="@+id/fsrevtext"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_marginLeft="20dp"
-	    android:layout_marginTop="10dp"
+	    android:layout_marginLeft="10dp"
+	    android:layout_marginTop="0dp"
 	    android:text="this is a review"
-	    android:textColor="@color/orange"
-	    android:textSize="20dp" />
+	    android:textColor="#FF666666"
+	    android:textSize="16dp" />
 
 	<LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-	    android:layout_marginBottom="10dp"
-	    android:layout_marginLeft="20dp"
+	    android:layout_marginBottom="5dp"
+	    android:layout_marginLeft="10dp"
+	    android:background="#00000000"
 	    android:orientation="horizontal" >
 
 	    <TextView
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="0dp"
-	        android:text="by"
-	        android:textColor="#ff000000"
-	        android:textSize="16dp" />
+	        android:text="By"
+	        android:textColor="#FF666666"
+	        android:textSize="14dp" />
 
 	    <TextView
 	        android:id="@+id/fsrevname"
-	        android:textColor="#ff000000"
+	        android:textColor="#FF666666"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="10dp"
-	        android:textSize="16dp"
+	        android:textSize="14dp"
 	        android:text="ssssssssssssssssssssssss"
 		/>
 	    
@@ -109,8 +111,8 @@
  	</LinearLayout>
  	<View
 		    android:layout_width="fill_parent"
-		    android:layout_marginTop="10dp"
-		    android:layout_height="2dp"
-		    android:background="@android:color/darker_gray"/>
+		    android:layout_marginTop="0dp"
+		    android:layout_height="1dp"
+		    android:background="@color/subtlegrey"/>
 </LinearLayout>
 </FrameLayout>

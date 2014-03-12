@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
  
 public class GridFsReviewsAdapter extends BaseAdapter {
@@ -43,7 +44,12 @@ public class GridFsReviewsAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.fsreviewitem,null,false);
         }
-        
+        LinearLayout oParent = (LinearLayout) convertView.findViewById(R.id.parent1);
+        if (position %2 == 0) {
+        	oParent.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+        } else {
+        	oParent.setBackgroundColor(mContext.getResources().getColor(R.color.grey));
+        }
         ((TextView)convertView.findViewById(R.id.fsrevname)).setText(mReviews.get(position).username);
         ((TextView)convertView.findViewById(R.id.fsrevtext)).setText(mReviews.get(position).review);
         SetRating(convertView, Integer.parseInt(mReviews.get(position).rating));
