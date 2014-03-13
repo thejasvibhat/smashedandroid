@@ -47,17 +47,20 @@ public class GridReviewsAdapter extends BaseAdapter {
         }
         String distance = FsqVenues.get(position).location.distance;
         LinearLayout oBack = (LinearLayout) convertView.findViewById(R.id.itemRevBack);
+        TextView disttext = (TextView)convertView.findViewById(R.id.revdist); 
         if(position % 2 == 0)
         {
         	oBack.setBackgroundColor(0xffffffff);
+        	disttext.setBackgroundColor(0Xfff4f4f4);
         }
         else
         {
         	oBack.setBackgroundColor(0xfff4f4f4);
+        	disttext.setBackgroundColor(0Xffffffff);
         }
         ((TextView)convertView.findViewById(R.id.revname)).setText(FsqVenues.get(position).name);
         ((TextView)convertView.findViewById(R.id.revadd)).setText(FsqVenues.get(position).location.address);
-        ((TextView)convertView.findViewById(R.id.revdist)).setText(distance);
+        (disttext).setText(distance);
         SmartImageView imgview = ((SmartImageView)convertView.findViewById(R.id.m_oRevIcon));
         imgview.setImageUrl(FsqVenues.get(position).photo);
         return convertView;

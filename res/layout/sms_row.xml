@@ -15,7 +15,7 @@
         android:shadowDx="1"
         android:shadowDy="1"
         android:text="Medium Text" 
-        android:textColor="@color/orangereal"
+        android:textColor="@color/green"
         android:textStyle="bold"
         android:paddingTop="2dp"
         android:textSize="14sp" />

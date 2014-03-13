@@ -17,8 +17,8 @@
 	    android:background="@color/grey"
 	    android:horizontalSpacing="1dp"
 	    android:verticalSpacing="1dp"
-	    android:paddingLeft="1dp"
-	    android:paddingRight="1dp"
+	    android:paddingLeft="0dp"
+	    android:paddingRight="0dp"
 	    android:numColumns="3"
 	    android:gravity="center"
 	 > 
