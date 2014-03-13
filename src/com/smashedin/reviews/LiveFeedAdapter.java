@@ -58,6 +58,7 @@ public class LiveFeedAdapter extends BaseAdapter {
 			holder.message = (TextView) convertView.findViewById(R.id.message_text);
 			holder.usertext = (TextView) convertView.findViewById(R.id.message_name);
 			holder.oContainer = (LinearLayout) convertView.findViewById(R.id.containerStatus);
+			holder.atplaceimage = (ImageView) convertView.findViewById(R.id.atplaceimage);
 			convertView.setTag(holder);
 		}
 		else
@@ -71,7 +72,10 @@ public class LiveFeedAdapter extends BaseAdapter {
 			holder.message.setText("");
 			e.printStackTrace();
 		}
-		
+		if(mLiveFeeds.get(position).atplace.equals("true") == true)
+		{
+			holder.atplaceimage.setVisibility(View.VISIBLE);
+		}
 		LayoutParams lp = (LayoutParams) holder.oContainer.getLayoutParams();
 		
 		//Check whether message is mine to show green background and align to right
@@ -97,6 +101,7 @@ public class LiveFeedAdapter extends BaseAdapter {
 		TextView message;
 		TextView usertext;
 		LinearLayout oContainer;
+		ImageView atplaceimage;
 	}
     public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

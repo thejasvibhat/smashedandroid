@@ -306,17 +306,23 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				 UpdateDataGCM(message);
+				float distance = mRevData.location.m_location.distanceTo(Singleton.getInstance().m_livelocation);
+				
 				 oStatusText.setText("");
 				 LiveData oLive = new LiveData();
 				 oLive.mine = false;				
 				 oLive.message = message;
 				 oLive.username = Singleton.getInstance().username;
+				 if(distance < 200)
+				 {
+					 oLive.atplace = "true";
+				 }
 				 oLive.mine = true;
 				 mRevData.livefeeds.add(oLive);
 				 gLiveFeedAdaper.mLiveFeeds.add(oLive);
 				 gLiveFeedAdaper.notifyDataSetChanged();
 				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+				 UpdateDataGCM(oLive);
 			}
 		});
 		if(Singleton.getInstance().loggedIn == false)
@@ -359,10 +365,10 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		return liveView;
     }
-    private void UpdateDataGCM(String message)
+    private void UpdateDataGCM(LiveData oLive)
     {
     	Singleton.getInstance().m_oType = "pushGet";
-    	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&bname="+mRevData.name+"&message="+message+"&regid="+Singleton.getInstance().regid;
+    	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&bname="+mRevData.name+"&message="+oLive.message+"&regid="+Singleton.getInstance().regid+"&atplace="+oLive.atplace;
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
@@ -529,6 +535,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			JSONObject liveItem = (JSONObject)items.get(i);
 			oData.message = liveItem.getString("message");
 			oData.username = liveItem.getString("username");
+			oData.atplace = liveItem.getString("atplace");
 			mRevData.livefeeds.add(oData);
 
 		}

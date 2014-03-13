@@ -5,4 +5,5 @@ public class LiveData {
 	public String message;
 	public boolean mine = false;
 	public String bid;
+	public String atplace = "false";
 }

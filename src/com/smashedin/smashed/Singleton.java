@@ -15,6 +15,7 @@ import com.smashedin.reviews.ReviewData;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
@@ -60,6 +61,7 @@ public class Singleton {
 	public boolean m_bAppHidden = false;
 
 	public boolean m_bFromNotification = false;
+	public Location m_livelocation = null;
 	public ArrayList<ReviewData> FsVenues = new ArrayList<ReviewData>();
 
     private Singleton(){

@@ -8,6 +8,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
 	    android:background="@drawable/calloutself">
+	    <LinearLayout 
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+	    android:background="#00000000">
 	    <TextView
         android:id="@+id/message_name"
         android:layout_width="wrap_content"
@@ -19,6 +24,14 @@
         android:textStyle="bold"
         android:paddingTop="2dp"
         android:textSize="14sp" />
+	    <ImageView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/atplaceimage"
+        android:paddingRight="0dp"
+        android:paddingLeft="2dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_location"/>
+	    </LinearLayout>
 	    	
  <TextView
      android:layout_width="fill_parent"

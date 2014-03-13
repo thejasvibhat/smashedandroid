@@ -3,6 +3,8 @@ package com.smashedin.reviews;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
+
 public class ReviewLocation {
 	public String lat;
 	public String lng;
@@ -11,11 +13,16 @@ public class ReviewLocation {
 	public String distance;
 	public String city;
 	public String state;
+	public Location m_location;
 	
 	public void PopulateData(JSONObject location) throws JSONException
 	{
+		m_location = new Location("hotel");
+		
 		lat = location.getString("lat");
 		lng = location.getString("lng");
+		m_location.setLatitude(Double.valueOf(lat));
+		m_location.setLongitude(Double.valueOf(lng));
 		try {
 			address	= location.getString("address");	
 		} catch (Exception e) {

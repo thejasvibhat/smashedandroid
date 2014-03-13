@@ -45,7 +45,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 
 
 import android.widget.AdapterView;
@@ -55,6 +57,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.SearchView.OnCloseListener;
 import android.widget.TextView;
 
 
@@ -77,7 +80,6 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
 	Location m_olocation = null;
-	Location m_livelocation = null;
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private ReviewListAdapter m_oRevAdapter;
 	private NavDrawerListAdapter adapterlist;
@@ -242,7 +244,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		{
 	    	locationListener = new LocationListener() {
 	    	    public void onLocationChanged(Location olocation) {
-	    	    	m_livelocation = olocation;
+	    	    	Singleton.getInstance().m_livelocation = olocation;
 	    	    	if(m_olocation == null)
 	    	    	{
 		    	    	m_olocation = olocation;
@@ -267,7 +269,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		}
 		if(m_olocation != null)
 		{
-	    	float distance = m_olocation.distanceTo(m_livelocation);
+	    	float distance = m_olocation.distanceTo(Singleton.getInstance().m_livelocation);
 	    	if(distance < 50)
 	    	{
 	    		ProgressBar oP1= (ProgressBar) findViewById(R.id.progressImage);
@@ -279,9 +281,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	}
 	    	else
 	    	{
-    	    	m_olocation = m_livelocation;
+    	    	m_olocation = Singleton.getInstance().m_livelocation;
 	    	      // Called when a new location is found by the network location provider.
-	    	      makeUseOfNewLocation(m_livelocation);
+	    	      makeUseOfNewLocation(Singleton.getInstance().m_livelocation);
 	
 	    	}
 		}
@@ -325,7 +327,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getApplicationContext());
-    	oAsyncClient.MakeCall(url);        	
+    	oAsyncClient.MakeCallWithTag(url,"all");        	
 
 	}
 
@@ -399,22 +401,38 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         MenuItem oSearchMenu = menu.findItem(R.id.searchoverskel);
         oSearchMenu.collapseActionView();
         this.optionsMenu = menu;
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(false);   
-            
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);   
+
+        oSearchMenu.setOnActionExpandListener(new OnActionExpandListener() {
+			
+			@Override
+			public boolean onMenuItemActionExpand(MenuItem item) {
+				// TODO Auto-generated method stub
+				return true;
+			}
+			
+			@Override
+			public boolean onMenuItemActionCollapse(MenuItem item) {
+				// TODO Auto-generated method stub
+				if(m_bkupFsqVenues.size() > 0)
+            	{
+	        		gAdapter.FsqVenues.clear();
+					gAdapter.FsqVenues.addAll(m_bkupFsqVenues);
+	        		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
+	        		oP.setVisibility(View.GONE);
+	        		gAdapter.notifyDataSetChanged();
+            	}
+				return true;
+			}
+		});
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
         {
             @Override
             public boolean onQueryTextChange(String newText) 
             {
                 // this is your adapter that will be filtered
-            	if(m_bkupFsqVenues.size() > 0)
-            	{
-	        		gAdapter.FsqVenues.clear();
-					gAdapter.FsqVenues.addAll(m_bkupFsqVenues);
-	        		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
-	        		oP.setVisibility(View.GONE);
-            	}
+            	
                 return true;
             }
             @Override
@@ -429,7 +447,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
             	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
             	oAsyncClient.Attach(m_oRevActivity);
             	//oAsyncClient.SetPersistantStorage(getApplicationContext());
-            	oAsyncClient.MakeCall(url);
+            	oAsyncClient.MakeCallWithTag(url,"search");
         		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
         		oP.setVisibility(View.VISIBLE);
 
@@ -444,6 +462,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         };
         searchView.setOnQueryTextListener(queryTextListener);
        
+			
+			
 
 		return true;
 	}
@@ -468,6 +488,13 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 				//	 finish();
+					if(m_bkupFsqVenues.size() > 0)
+	            	{
+		        		gAdapter.FsqVenues.clear();
+						gAdapter.FsqVenues.addAll(m_bkupFsqVenues);
+		        		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
+		        		oP.setVisibility(View.GONE);
+	            	}
 					Singleton.getInstance().FsVenues.addAll(gAdapter.FsqVenues);
 			        	Intent intent = new Intent("exit-event");
 			      	  	LocalBroadcastManager.getInstance(m_oRevActivity).sendBroadcast(intent);
@@ -655,29 +682,13 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	
 	@Override
 	public void OnResponse(String response,String tag) {
-		if(oPd != null)
-			oPd.dismiss();
-		if(tag == "notify")
-		{
-			try {
-				ParseJsonBid(response);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return;
+	
+		try {
+			ParseJson(response);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		if(Singleton.getInstance().m_oType == "reviews")
-		{
-			try {
-				ParseJson(response);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		
 	}
 	@Override
 	public void OnFailure() {

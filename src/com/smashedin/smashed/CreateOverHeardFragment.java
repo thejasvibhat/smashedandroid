@@ -50,6 +50,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 import android.widget.NumberPicker.OnValueChangeListener;
 import android.widget.RelativeLayout;
 
@@ -154,6 +155,14 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	}
 	public void AddOverheardText(int position,int width,int height)
 	{
+		if(gAdapter.m_overheardData.mThumbIds.get(position).contains("local"))
+		{
+	        Toast.makeText(
+	                getActivity(),
+	                "Add an image before adding overheard texts!",
+	                Toast.LENGTH_SHORT).show();
+	        return;
+		}
 		m_fEachTextView = new EachOhTextView();
 		m_fEachTextView.setArguments(m_createFragment,position,gAdapter.m_overheardData,width,height);
 		FragmentManager fragmentManager = getFragmentManager();
