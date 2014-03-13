@@ -23,7 +23,7 @@
           android:showAsAction="collapseActionView|ifRoom"
           />
      	<item android:id="@+id/followinstant"
-          android:icon="@drawable/ic_follow"
+          android:icon="@drawable/ic_action_gcm"
           android:title="Follow Instant"
           android:showAsAction="collapseActionView|ifRoom"
           />

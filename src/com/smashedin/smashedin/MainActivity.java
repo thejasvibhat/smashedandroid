@@ -49,6 +49,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
@@ -905,10 +907,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
-
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.notifylargeicon);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.ic_follow)
+        .setSmallIcon(R.drawable.notifysmallicon)
+        .setLargeIcon(largeIcon)
         .setContentTitle("Instants Received")
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))
