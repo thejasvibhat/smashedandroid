@@ -269,7 +269,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     {
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
   		      new IntentFilter("push-event"));
-    	new AsyncTask<Void, Void, String>() {
+/*    	new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 String msg = "";
@@ -291,7 +291,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
                 
             }
         }.execute(null, null, null);
-    	
+*/    	
     	if(liveView != null)
     	{
     		if(Singleton.getInstance().mRevData != null)
