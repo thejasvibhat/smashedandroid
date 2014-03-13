@@ -25,4 +25,5 @@
 	<color name="barDarkColor">#CECECE</color>
 	<color name="barMeduimColor">#DFDEE0</color>
 	<color name="barLightColor">#F2F2F2</color>
+	<color name="transparent">#00000000</color>
 </resources>

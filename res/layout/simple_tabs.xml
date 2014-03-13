@@ -25,7 +25,8 @@
     <FrameLayout
         android:id="@+id/frame_container_oh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/grey" />
 
     <!-- Listview to display slider menu -->
     <ListView

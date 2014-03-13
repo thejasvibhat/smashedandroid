@@ -24,7 +24,7 @@
 	            android:layout_margin="5sp"
 	            android:layout_weight="1"
 	            android:background="@drawable/message_field"
-	            android:hint="Write here"
+	            android:hint="What's up?"
 	            android:padding="5sp"
 	            android:textColor="@color/textFieldColor" />
 	
