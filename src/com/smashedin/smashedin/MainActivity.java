@@ -104,7 +104,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
      */
-    String SENDER_ID = "849208174002";
+    
 
     /**
      * Tag used on log messages.
@@ -112,7 +112,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     static final String TAG = "GCM Demo";
 
     TextView mDisplay;
-    GoogleCloudMessaging gcm;
+    
     AtomicInteger msgId = new AtomicInteger();
     Context context;
 
@@ -201,7 +201,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 	        // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
 	        if (checkPlayServices()) {
-	            gcm = GoogleCloudMessaging.getInstance(this);
+	            Singleton.getInstance().gcm = GoogleCloudMessaging.getInstance(this);
 	            regid = getRegistrationId(context);
 
 	            if (regid.isEmpty()) {
@@ -616,6 +616,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	}
 	@Override
     protected void onResume() {
+		Singleton.getInstance().m_bAppHidden = false;
     	checkPlayServices();
 	    mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);        
 	    if(m_reviewIntent != null)
@@ -768,10 +769,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
             protected String doInBackground(Void... params) {
                 String msg = "";
                 try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
+                    if (Singleton.getInstance().gcm == null) {
+                        Singleton.getInstance().gcm = GoogleCloudMessaging.getInstance(context);
                     }
-                    regid = gcm.register(SENDER_ID);
+                    regid = Singleton.getInstance().gcm.register(Singleton.getInstance().SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
 
                     // You should send the registration ID to your server over HTTP, so it
@@ -813,7 +814,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
                         data.putString("my_message", "Hello World");
                         data.putString("my_action", "com.google.android.gcm.demo.app.ECHO_NOW");
                         String id = Integer.toString(msgId.incrementAndGet());
-                        gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
+                        Singleton.getInstance().gcm.send(Singleton.getInstance().SENDER_ID + "@gcm.googleapis.com", id, data);
                         msg = "Sent message";
                     } catch (IOException ex) {
                         msg = "Error :" + ex.getMessage();
@@ -893,7 +894,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 oLive.message = message;
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 					 oLive.bid = Singleton.getInstance().m_strMessageGcmBid;
-					 Singleton.getInstance().m_arrListGcmMessages.add(oLive);
+					 Singleton.getInstance().m_bGcmMessages = true;
+					 Singleton.getInstance().mRevData.livefeeds.add(oLive);
 					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
 				 }
 				 

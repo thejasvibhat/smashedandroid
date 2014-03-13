@@ -1,8 +1,11 @@
 package com.smashedin.reviews;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.smashedin.smashedin.R;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -35,6 +39,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -83,6 +88,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private View reviewview;
     private View liveView;
     Fragment m_OhFragment;
+    AtomicInteger msgId = new AtomicInteger();
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
         ReviewFragment fragment = new ReviewFragment();
 
@@ -263,8 +269,45 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     {
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
   		      new IntentFilter("push-event"));
+    	new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                String id = Integer.toString(msgId.incrementAndGet());
+				Bundle data = new Bundle();
+				data.putString("my_message", "Hello World");
+				try {
+					Singleton.getInstance().gcm.send(Singleton.getInstance().SENDER_ID + "@gcm.googleapis.com", id, data);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				msg = "Sent message";
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                
+            }
+        }.execute(null, null, null);
+    	
     	if(liveView != null)
+    	{
+    		if(Singleton.getInstance().mRevData != null)
+    		{
+    			if(Singleton.getInstance().mRevData.id.equals(mRevData.id) == true)
+    			{
+    				if(Singleton.getInstance().mRevData.livefeeds.size() > mRevData.livefeeds.size())
+    				{
+    					gLiveFeedAdaper.mLiveFeeds.clear();
+    					gLiveFeedAdaper.mLiveFeeds.addAll(Singleton.getInstance().mRevData.livefeeds);
+    					gLiveFeedAdaper.notifyDataSetChanged();
+    				}
+    			}
+    		}
     		return liveView;
+    	}
     	liveView = inflater.inflate(R.layout.fragment_livefeed,null);
 		livefeedList =  (ListView) liveView.findViewById(R.id.m_oLiveList);
 		
@@ -864,26 +907,29 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		  @Override
 		  public void onReceive(Context context, Intent intent) {
 		    // Extract data included in the Intent
-			 String message = Singleton.getInstance().m_strMessageGcm;
-			 LiveData oLive = new LiveData();
-			 oLive.mine = false;
-			 try {
-					message = URLEncoder.encode(message,"utf-8");
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			 oLive.message = message;
-			 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
-			 gLiveFeedAdaper.mLiveFeeds.add(oLive);
-			 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
-			 {
-				 mRevData.livefeeds.add(oLive);
-				 gLiveFeedAdaper.notifyDataSetChanged();
-				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
-			 }
-		  }
-
+				 if(Singleton.getInstance().m_bAppHidden == false)
+				 {
+					 String message = Singleton.getInstance().m_strMessageGcm;
+					 LiveData oLive = new LiveData();
+					 oLive.mine = false;
+					 try {
+							message = URLEncoder.encode(message,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					 oLive.message = message;
+					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+					 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+					 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
+					 {
+						 mRevData.livefeeds.add(oLive);
+						 gLiveFeedAdaper.notifyDataSetChanged();
+						 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+					 }
+				 }
+		}
+				 
 	};
 
 }

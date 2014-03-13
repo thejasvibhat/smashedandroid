@@ -65,7 +65,7 @@ import android.widget.TextView;
 public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelectedListener,OnResponseListener {
 	SearchView searchView;
 	private Menu optionsMenu = null;
-	private LocationManager locationManager;    
+	private LocationManager locationManager = null;    
     private GridReviewsAdapter gAdapter = null;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -202,12 +202,13 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     @Override
     public void onResume()
     {
+    	Singleton.getInstance().m_bAppHidden = false;
     	if(gAdapter != null)
     	{
     		
-        	if(Singleton.getInstance().m_arrListGcmMessages.size() != 0)
+        	if(Singleton.getInstance().m_bGcmMessages == true)
         	{
-        		Singleton.getInstance().m_arrListGcmMessages.clear();
+        		Singleton.getInstance().m_bGcmMessages = false;
         	
         		FromNotification();
         		gAdapter.FsqVenues.addAll(Singleton.getInstance().FsVenues);
@@ -230,7 +231,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     private void GetMyLocation()
     {
     	// Acquire a reference to the system Location Manager
-    	locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    	if(locationManager == null)
+    		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
 		oP.setVisibility(View.VISIBLE);
 		ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
@@ -270,7 +272,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		if(m_olocation != null)
 		{
 	    	float distance = m_olocation.distanceTo(Singleton.getInstance().m_livelocation);
-	    	if(distance < 50)
+	    	if((distance < 200)&&(gAdapter.FsqVenues.size() != 0))
 	    	{
 	    		ProgressBar oP1= (ProgressBar) findViewById(R.id.progressImage);
 				oP1.setVisibility(View.GONE);
@@ -288,7 +290,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	}
 		}
 		else
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 50, locationListener);
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 200, locationListener);
     	// Register the listener with the Location Manager to receive location updates
     	
     }
@@ -663,21 +665,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	public void FromNotification()
 	{
-		/*String bid = Singleton.getInstance().m_arrListGcmMessages.remove(0).bid;
-    	String url 	= "https://api.foursquare.com/v2/venues/"+bid+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&v=20140305&venuePhotos=1&offset=0&limit=50";
-    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-    	oAsyncClient.Attach(m_oRevActivity);
-    	//oAsyncClient.SetPersistantStorage(getApplicationContext());
-    	oAsyncClient.MakeCallWithTag(url, "notify");*/
         Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
         Bundle b = new Bundle();
         b.putInt("position",0);
         b.putString("bid", "theju");
         intent.putExtras(b);
         startActivity(intent);
-
-
-
 	}
 	
 	@Override

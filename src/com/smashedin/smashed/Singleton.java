@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.PersistentCookieStore;
 import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.reviews.LiveData;
@@ -52,7 +53,7 @@ public class Singleton {
 	public String m_strMessageGcmUser;
 
 	public String m_strMessageGcmBid;
-	public ArrayList<LiveData> m_arrListGcmMessages = new ArrayList<LiveData>();
+	public boolean m_bGcmMessages = false;
 
 	public String m_strMessageGcmBname;
 
@@ -64,6 +65,8 @@ public class Singleton {
 	public Location m_livelocation = null;
 	public ArrayList<ReviewData> FsVenues = new ArrayList<ReviewData>();
 
+	public String SENDER_ID = "849208174002";
+	public GoogleCloudMessaging gcm = null;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     }
