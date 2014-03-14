@@ -43,7 +43,7 @@ public class Singleton {
 	private Context mContext;
 	public PersistentCookieStore myCookieStore;
 	public boolean loggedIn = false;
-	public boolean m_bnevermind = false;
+	public boolean m_bnevermind = true;
 	public String m_strType = "create";
 	public String bid = "";
 	public String username = "Anonymous";

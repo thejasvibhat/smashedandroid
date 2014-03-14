@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import android.view.View.OnClickListener;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,7 +38,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -92,6 +96,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	String mainStuff = "false";
 	LocationListener locationListener = null;
 	String localArea = null;
+	private CountDownTimer oTimer;
+	AtomicInteger msgId = new AtomicInteger();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,6 +204,49 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
     	
+    	
+    }
+    private void StartAlarmGcm()
+    {
+    	if(oTimer != null)
+    		return;
+    	oTimer = new CountDownTimer(5000,5000) {
+			
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onFinish() {
+				//oTimer.start();
+		    	new AsyncTask<Void, Void, String>() {
+		            @Override
+		            protected String doInBackground(Void... params) {
+		                String msg = "";
+		                String id = Integer.toString(msgId.incrementAndGet());
+						Bundle data = new Bundle();
+						data.putString("my_message", "Hello World");
+						try {
+							Singleton.getInstance().gcm.send(Singleton.getInstance().SENDER_ID + "@gcm.googleapis.com", id, data);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						msg = "Sent message";
+		                return msg;
+		            }
+
+		            @Override
+		            protected void onPostExecute(String msg) {
+		            	oTimer.start();
+		            }
+		        }.execute(null, null, null);
+				
+			}
+		};
+		oTimer.start();
     }
     @Override
     public void onResume()
@@ -658,6 +707,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	            b.putString("bid", "");
 	            intent.putExtras(b);
 	            startActivity(intent);
+	            StartAlarmGcm();
 				
 				
 			}

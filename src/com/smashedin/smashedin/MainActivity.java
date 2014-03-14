@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -105,7 +106,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
      * from the API Console, as described in "Getting Started."
      */
     
-
+    
     /**
      * Tag used on log messages.
      */
@@ -113,7 +114,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
     TextView mDisplay;
     
-    AtomicInteger msgId = new AtomicInteger();
+    
     Context context;
 
     String regid;
@@ -208,12 +209,14 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	                registerInBackground();
 	            }
 	            else
-	            {
+	            {	            	
 	            	Singleton.getInstance().regid = regid;
 	            }
 	        } else {
 	            Log.i(TAG, "No valid Google Play Services APK found.");
 	        }
+	        
+	    
 	}
 	
 	private void displayHome()
@@ -801,34 +804,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         }.execute(null, null, null);
     }
 
-    // Send an upstream message.
-    public void onClick(final View view) {
-
-        if (true){//view == findViewById(R.id.send)) {
-            new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    String msg = "";
-                    try {
-                        Bundle data = new Bundle();
-                        data.putString("my_message", "Hello World");
-                        data.putString("my_action", "com.google.android.gcm.demo.app.ECHO_NOW");
-                        String id = Integer.toString(msgId.incrementAndGet());
-                        Singleton.getInstance().gcm.send(Singleton.getInstance().SENDER_ID + "@gcm.googleapis.com", id, data);
-                        msg = "Sent message";
-                    } catch (IOException ex) {
-                        msg = "Error :" + ex.getMessage();
-                    }
-                    return msg;
-                }
-
-                @Override
-                protected void onPostExecute(String msg) {
-                    mDisplay.append(msg + "\n");
-                }
-            }.execute(null, null, null);
-        } 
-    }
+   
 
     @Override
     protected void onDestroy() {
@@ -864,15 +840,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
      * to a server that echoes back the message using the 'from' address in the message.
      */
     private void sendRegistrationIdToBackend() {
-      /*Singleton.getInstance().m_oType = "push";
-  	String url = "http://www.smashed.in/api/b/register?id="+regid;
-	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
-	oAsyncClient.Attach(this);
-	oAsyncClient.SetPersistantStorage(getApplicationContext());
-	oAsyncClient.MakeCall(url); */
+    	
 		Singleton.getInstance().regid = regid;
 
     }
+   
+    
 	private BroadcastReceiver mGcmMessageReceiver = new BroadcastReceiver() {
 		  @Override
 		  public void onReceive(Context context, Intent intent) {

@@ -116,8 +116,51 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     public void onResume()
     {
     	super.onResume();
+    	EnableLoginPageView();
     }
-    
+    private void EnableLoginPageView()
+    {
+    	if(Singleton.getInstance().loggedIn == false)
+		{
+    		if(liveView == null)
+    			return;
+			FrameLayout oLayout = (FrameLayout) liveView.findViewById(R.id.livefeedparent);
+			TextView oTextView = new TextView(getActivity());
+			oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+			oTextView.setTextColor(0xffffffff);
+			oTextView.setTextSize(32);
+			oTextView.setShadowLayer(2,1,1,Color.BLACK);
+			oTextView.setText("Please login to follow live feeds at this place. Click to login");
+			oLayout.addView(oTextView);
+			Button oBut = (Button) oLayout.findViewById(R.id.sendStatus);
+			oBut.setEnabled(false);
+
+			oTextView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
+					Button oBut = (Button) getActivity().findViewById(R.id.sendStatus);
+					oBut.setEnabled(true);
+					for(int i=0; i < oLayout.getChildCount(); i++)
+					{
+						if(oLayout.getChildAt(i) instanceof TextView)
+						{
+							oLayout.removeViewAt(i);
+							break;
+						}
+					}
+
+					Intent loginintent = new Intent("custom-login-event");
+					LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(loginintent);
+
+					
+				}
+			});
+
+
+		}
+    }
     @Override
     public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
     	super.onCreateOptionsMenu(menu, inflater);
@@ -269,29 +312,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     {
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
   		      new IntentFilter("push-event"));
-/*    	new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                String msg = "";
-                String id = Integer.toString(msgId.incrementAndGet());
-				Bundle data = new Bundle();
-				data.putString("my_message", "Hello World");
-				try {
-					Singleton.getInstance().gcm.send(Singleton.getInstance().SENDER_ID + "@gcm.googleapis.com", id, data);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				msg = "Sent message";
-                return msg;
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                
-            }
-        }.execute(null, null, null);
-*/    	
+    	
     	if(liveView != null)
     	{
     		if(Singleton.getInstance().mRevData != null)
@@ -368,44 +389,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				 UpdateDataGCM(oLive);
 			}
 		});
-		if(Singleton.getInstance().loggedIn == false)
-		{
-			FrameLayout oLayout = (FrameLayout) liveView.findViewById(R.id.livefeedparent);
-			TextView oTextView = new TextView(getActivity());
-			oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-			oTextView.setTextColor(0xffffffff);
-			oTextView.setTextSize(32);
-			oTextView.setShadowLayer(2,1,1,Color.BLACK);
-			oTextView.setText("Please login to follow live feeds at this place. Click to login");
-			oLayout.addView(oTextView);
-			Button oBut = (Button) oLayout.findViewById(R.id.sendStatus);
-			oBut.setEnabled(false);
-
-			oTextView.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View arg0) {
-					FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.livefeedparent);
-					Button oBut = (Button) getActivity().findViewById(R.id.sendStatus);
-					oBut.setEnabled(true);
-					for(int i=0; i < oLayout.getChildCount(); i++)
-					{
-						if(oLayout.getChildAt(i) instanceof TextView)
-						{
-							oLayout.removeViewAt(i);
-							break;
-						}
-					}
-
-					Intent loginintent = new Intent("custom-login-event");
-					LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(loginintent);
-
-					
-				}
-			});
-
-
-		}
+		EnableLoginPageView();
 		return liveView;
     }
     private void UpdateDataGCM(LiveData oLive)
