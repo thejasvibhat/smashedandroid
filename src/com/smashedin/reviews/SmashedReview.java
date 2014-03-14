@@ -206,7 +206,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 			slideToTop(oRevAdd);
 		}
 		else
+		{
+			Singleton.getInstance().m_bFirstInstanceReview = true;
 			super.onBackPressed();
+		}
 	}
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {

@@ -69,6 +69,8 @@ public class Singleton {
 	public GoogleCloudMessaging gcm = null;
 
 	public boolean m_bFirstInstance = true;
+
+	public boolean m_bFirstInstanceReview = true;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     } 

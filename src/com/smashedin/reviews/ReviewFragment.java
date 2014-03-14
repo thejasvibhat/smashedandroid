@@ -107,9 +107,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         if ((savedInstanceState != null) && savedInstanceState.containsKey(KEY_CONTENT)) {
             mContent = savedInstanceState.getString(KEY_CONTENT);
         }
-		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-			      new IntentFilter("bidoh"));
-		  
+		  if(Singleton.getInstance().m_bFirstInstanceReview == true)
+		  {
+
+			  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+				      new IntentFilter("bidoh"));
+		    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
+		    		      new IntentFilter("push-event"));
+		    	Singleton.getInstance().m_bFirstInstanceReview = false;
+		  }
 		  setHasOptionsMenu(true);
     }
     @Override
@@ -337,8 +343,6 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     }
     private View GetViewForLiveFeed(LayoutInflater inflater)
     {
-    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
-  		      new IntentFilter("push-event"));
     	
     	if(liveView != null)
     	{
@@ -931,12 +935,16 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 						}
 					 oLive.message = message;
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
-					 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+					 
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
 					 {
-						 mRevData.livefeeds.add(oLive);
-						 gLiveFeedAdaper.notifyDataSetChanged();
-						 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+						 if(gLiveFeedAdaper != null)
+						 {
+							 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+							 mRevData.livefeeds.add(oLive);
+							 gLiveFeedAdaper.notifyDataSetChanged();
+							 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+						 }
 					 }
 				 }
 		}
