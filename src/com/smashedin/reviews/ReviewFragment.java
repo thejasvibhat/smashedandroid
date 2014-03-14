@@ -125,6 +125,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     		if(liveView == null)
     			return;
 			FrameLayout oLayout = (FrameLayout) liveView.findViewById(R.id.livefeedparent);
+			
+			for(int i=0; i < oLayout.getChildCount(); i++)
+			{
+				if(oLayout.getChildAt(i) instanceof TextView)
+				{
+					oLayout.removeViewAt(i);
+					break;
+				}
+			}
 			TextView oTextView = new TextView(getActivity());
 			oTextView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
 			oTextView.setTextColor(0xffffffff);
@@ -160,6 +169,20 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 
 		}
+    	else
+    	{
+    		if(liveView == null)
+    			return;
+    		else
+    		{
+    			ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
+				oP.setVisibility(View.VISIBLE);
+				
+				livefeedList.setVisibility(View.GONE);
+				GetLatestLiveFeed();
+    		}
+    			
+    	}
     }
     @Override
     public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {

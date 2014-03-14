@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -52,6 +53,7 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
@@ -891,9 +893,13 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))
         .setContentText(msg);
-
+       // mBuilder.setLights(Color.BLUE, 500, 500);
+        //long[] pattern = {500,500,500,500,500,500,500,500,500};
+        //mBuilder.setVibrate(pattern);
         mBuilder.setContentIntent(contentIntent);
         mBuilder.setAutoCancel(true);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notify);
+        mBuilder.setSound(sound);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }	
 }
