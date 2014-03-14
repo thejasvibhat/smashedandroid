@@ -249,9 +249,11 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	{
 		m_strTag = tag;
 		displayhide(false);
+		/*
 		Toast.makeText(getActivity(),
                 "Please wait, connecting to server.",
                 Toast.LENGTH_SHORT).show();
+        */
         if(m_strTag != "")
         {
         	 m_StrUrl = m_StrUrl + "&tag=" + m_strTag;

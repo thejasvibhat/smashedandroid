@@ -119,6 +119,7 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
             mEmail = extras.getString(EXTRA_ACCOUNTNAME);
             getTask(HelloFacebookSampleActivity.this, mEmail, SCOPE).execute();
         }
+        /*
         LinearLayout nevermind = (LinearLayout) findViewById(R.id.nevermind);
         nevermind.setOnClickListener(new OnClickListener() {
 			
@@ -129,6 +130,7 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
 				finish();
 			}
 		});
+		*/
     }
 
     @Override

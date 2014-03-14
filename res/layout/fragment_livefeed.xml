@@ -25,7 +25,7 @@
 	            android:layout_weight="1"
 	            android:background="@drawable/message_field"
 	            android:hint="What's up?"
-	            android:padding="5sp"
+	            android:padding="10sp"
 	            android:textColor="@color/textFieldColor" />
 	
 	        <Button android:id="@+id/sendStatus"

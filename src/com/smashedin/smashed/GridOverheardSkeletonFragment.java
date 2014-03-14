@@ -156,9 +156,11 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 								if(Singleton.getInstance().loggedIn != true)
 								{
 									actionBar.selectTab(actionBar.getTabAt(0));
+									/*
 									Toast.makeText(getActivity(),
 							                "Please Login before you can access your uploads.",
 							                Toast.LENGTH_SHORT).show();
+							        */
 
 									return;
 								}

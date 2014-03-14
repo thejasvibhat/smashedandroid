@@ -29,11 +29,43 @@
         android:id="@+id/main_ui_container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/smashedbackground"
+        android:background="@color/grey"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
+        
+        
+        <LinearLayout
+            android:id="@+id/smashedlogo"
+        	android:layout_width="wrap_content"
+       	 	android:layout_height="wrap_content"
+        	android:background="@drawable/slogomed"
+        	android:gravity="center_horizontal"
+        	android:layout_marginTop="100dp"
+        	android:orientation="vertical" >
+            
+        </LinearLayout>
 
-    
+    	<LinearLayout 
+    	    
+    	    android:id="@+id/smashedlogintext"
+        	android:layout_width="wrap_content"
+       	 	android:layout_height="wrap_content"
+        	android:gravity="center_horizontal"
+        	android:layout_marginTop="20dp"
+        	android:orientation="vertical">
+    	    
+	    		<TextView android:layout_width="fill_parent"
+	        	    android:layout_height="fill_parent"
+	        	    android:textColor="#ff666666"
+	        	    android:layout_gravity="center_horizontal"
+	        	    android:gravity="center_horizontal"
+	        	    android:layout_margin="20dp"
+	        	    android:background="@color/white"
+	        	    android:padding="5dp"
+	        	    android:textSize="16dp"
+	        	    android:textStyle="bold"
+	        	    android:text="You need to be signed in to complete this step. Login using one of the following networks."/>
+    	</LinearLayout>
 
        
 
@@ -42,13 +74,13 @@
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_margin="45dp"
+            
             android:layout_height="wrap_content" >
  <com.facebook.widget.LoginButton
             android:id="@+id/login_button"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             facebook:confirm_logout="false"
             facebook:fetch_user_info="true" />
                   <Button
@@ -56,6 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/logingoogle"
+            android:layout_marginTop="10dp"
             android:onClick="greetTheUser"/>
             
         </LinearLayout>
@@ -68,7 +101,7 @@
        android:layout_width="wrap_content"
        android:layout_height="50dp" />
     </LinearLayout>
-
+	<!-- 
     <LinearLayout
         android:id="@+id/nevermind"
         android:layout_width="fill_parent"
@@ -88,6 +121,6 @@
         	    android:textSize="18dp"
         	    android:text="NEVERMIND"/>
         </LinearLayout>
-
+		 -->
 </FrameLayout>
 
