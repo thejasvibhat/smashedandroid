@@ -210,7 +210,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     {
     	if(oTimer != null)
     		return;
-    	oTimer = new CountDownTimer(5000,5000) {
+    	// every 5 minutes refresh socket
+    	oTimer = new CountDownTimer(60000*5,60000*5) {
 			
 			@Override
 			public void onTick(long millisUntilFinished) {
