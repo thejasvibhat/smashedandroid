@@ -252,6 +252,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     @Override
     public void onResume()
     {
+    	Singleton.getInstance().restoreUserDetails();
     	Singleton.getInstance().m_bAppHidden = false;
     	if(gAdapter != null)
     	{
