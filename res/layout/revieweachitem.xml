@@ -49,12 +49,12 @@
 	    <TextView
 	        android:id="@+id/revadd"
 	        android:textColor="#ff707070"
-	        android:layout_width="wrap_content"
+	        android:layout_width="280dp"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentLeft="true"
 	        android:layout_centerVertical="true"
 	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="20dp"
+	        android:layout_marginRight="0dp"
 	        android:textSize="14dp"
 	        android:text="ssssssssssssssssssssssss"
 />
