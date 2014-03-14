@@ -175,11 +175,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     			return;
     		else
     		{
-    			ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
-				oP.setVisibility(View.VISIBLE);
-				
-				livefeedList.setVisibility(View.GONE);
-				GetLatestLiveFeed();
+    			if(gLiveFeedAdaper.mLiveFeeds.size() == 0)
+    			{
+	    			ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
+					oP.setVisibility(View.VISIBLE);
+					
+					livefeedList.setVisibility(View.GONE);
+					
+					GetLatestLiveFeed();
+    			}
     		}
     			
     	}

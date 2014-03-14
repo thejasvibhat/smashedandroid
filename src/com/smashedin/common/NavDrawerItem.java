@@ -5,6 +5,7 @@ public class NavDrawerItem {
 	private String title;
 	private int icon;
 	private String count = "0";
+	public String bid = "";
 	// boolean to set visiblity of the counter
 	private boolean isCounterVisible = false;
 	

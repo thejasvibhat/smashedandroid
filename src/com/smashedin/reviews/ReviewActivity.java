@@ -249,9 +249,39 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		};
 		oTimer.start();
     }
+    private void FillTheFollowingBarData()
+    {
+    	if(Singleton.getInstance().mRevData != null)
+    	{
+    		ReviewData lData = Singleton.getInstance().mRevData;
+    		if(lData.m_bfollow == true)
+    		{
+    			if(adapterlist.navDrawerItems.size() > 3)
+    			{
+        			adapterlist.navDrawerItems.remove(3);
+        			adapterlist.notifyDataSetChanged();
+    				
+    			}
+    			adapterlist.navDrawerItems.add(new NavDrawerItem(lData.name, R.drawable.reviews));
+    			adapterlist.notifyDataSetChanged();
+    		}
+    		else
+    		{
+    			if(adapterlist.navDrawerItems.size() > 3)
+    			{
+        			adapterlist.navDrawerItems.remove(3);
+        			adapterlist.notifyDataSetChanged();
+    				
+    			}
+    		}
+    	}
+		
+    }
     @Override
     public void onResume()
     {
+		mDrawerList.setSelection(0);
+    	FillTheFollowingBarData();
     	Singleton.getInstance().restoreUserDetails();
     	Singleton.getInstance().m_bAppHidden = false;
     	if(gAdapter != null)
@@ -388,6 +418,18 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	if(position == 0)
     	{
     		mDrawerLayout.closeDrawers();
+    		return;
+    	}
+    	else if(position > 2)
+    	{
+    		mDrawerLayout.closeDrawers();    		
+            Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
+            Bundle b = new Bundle();
+            b.putInt("position",0);
+            b.putString("bid", "navdrawer");
+            intent.putExtras(b);
+            startActivity(intent);
+
     		return;
     	}
     	Intent intent = new Intent("my-event");
@@ -534,8 +576,18 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				super.onBackPressed();
 		}
 		private void doExit() {
+			if(m_bkupFsqVenues.size() > 0)
+        	{
+        		gAdapter.FsqVenues.clear();
+				gAdapter.FsqVenues.addAll(m_bkupFsqVenues);
+        		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImageGrid);
+        		oP.setVisibility(View.GONE);
+        	}
+			Singleton.getInstance().FsVenues.addAll(gAdapter.FsqVenues);
+	        	Intent intent = new Intent("exit-event");
+	      	  	LocalBroadcastManager.getInstance(m_oRevActivity).sendBroadcast(intent);
 
-		    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+/*		    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		    alertDialog.setPositiveButton("Yes", new android.content.DialogInterface.OnClickListener() {
 				
 				@Override
@@ -559,7 +611,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
 		    alertDialog.setMessage("Do you want to exit?");
 		    alertDialog.setTitle("SmashedIn");
-		    alertDialog.show();
+		    alertDialog.show();*/
 		}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

@@ -67,9 +67,11 @@ public class Singleton {
 
 	public String SENDER_ID = "849208174002";
 	public GoogleCloudMessaging gcm = null;
+
+	public boolean m_bFirstInstance = true;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
-    }
+    } 
     public static Singleton getInstance(){
         if(mInstance == null)
         {
@@ -79,9 +81,12 @@ public class Singleton {
     }
     public void restoreUserDetails()
     {
-    	username = m_LocalStorage.getString("username", "Anonymous");
-    	usericonurl = m_LocalStorage.getString("usericonurl", "");
-    	loggedIn = m_LocalStorage.getBoolean("loggedin", false);
+    	if(m_LocalStorage != null)
+    	{
+	    	username = m_LocalStorage.getString("username", "Anonymous");
+	    	usericonurl = m_LocalStorage.getString("usericonurl", "");
+	    	loggedIn = m_LocalStorage.getBoolean("loggedin", false);
+    	}
     }
     public void SetApplicationContext(Context oContext)
     {

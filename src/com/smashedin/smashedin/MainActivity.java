@@ -191,14 +191,18 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		//	displayView(0);
 		}
 		// Register mMessageReceiver to receive messages.
-		  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-		      new IntentFilter("my-event"));
-		  LocalBroadcastManager.getInstance(this).registerReceiver(mExitMessageReceiver,
-			      new IntentFilter("exit-event"));
-		  LocalBroadcastManager.getInstance(this).registerReceiver(mSearchReviewMessageReceiver,
-			      new IntentFilter("search-event"));
-	    	LocalBroadcastManager.getInstance(this).registerReceiver(mGcmMessageReceiver,
-	    		      new IntentFilter("push-event"));
+		  if(Singleton.getInstance().m_bFirstInstance == true)
+		  {
+			  LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+			      new IntentFilter("my-event"));
+			  LocalBroadcastManager.getInstance(this).registerReceiver(mExitMessageReceiver,
+				      new IntentFilter("exit-event"));
+			  LocalBroadcastManager.getInstance(this).registerReceiver(mSearchReviewMessageReceiver,
+				      new IntentFilter("search-event"));
+		    	LocalBroadcastManager.getInstance(this).registerReceiver(mGcmMessageReceiver,
+		    		      new IntentFilter("push-event"));
+		    	Singleton.getInstance().m_bFirstInstance = false;
+		  }
 		  
 		  context = getApplicationContext();
 
@@ -384,7 +388,11 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		}
 	private void doExit()
 	{
-	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+    
+    	Singleton.getInstance().m_bAppHidden = true;
+    	moveTaskToBack(true);
+
+/*	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
 	    alertDialog.setPositiveButton("Yes", new OnClickListener() {
 
@@ -402,7 +410,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 
 	    alertDialog.setMessage("Do you want to exit?");
 	    alertDialog.setTitle("SmashedIn");
-	    alertDialog.show();
+	    alertDialog.show();*/
 
 	}
 	private void Login(String type)
@@ -674,6 +682,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 	private BroadcastReceiver mExitMessageReceiver = new BroadcastReceiver() {
 		  @Override
 		  public void onReceive(Context context, Intent intent) {
+
 	        	Singleton.getInstance().m_bAppHidden = true;
 	        	moveTaskToBack(true);
 

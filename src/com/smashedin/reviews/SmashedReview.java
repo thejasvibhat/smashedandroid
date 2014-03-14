@@ -123,8 +123,8 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				}
 				else
 				{
-					Singleton.getInstance().m_bCreateFollowMenuItem = true;
-					Singleton.getInstance().m_bUnFollowMenuItem = true;
+					//Singleton.getInstance().m_bCreateFollowMenuItem = true;
+					//Singleton.getInstance().m_bUnFollowMenuItem = true;
 					mActivity.invalidateOptionsMenu();
 				}
 				
@@ -153,6 +153,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         {
         	Singleton.getInstance().m_bHideLoginMenuItem = false;
         }
+        
     	Singleton.getInstance().m_bCreateReviewMenuItem = false;
     	Singleton.getInstance().m_bCreateReviewOhMenuItem = false;
     	if(Singleton.getInstance().m_bFromNotification == true)
@@ -166,7 +167,21 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     		Singleton.getInstance().m_bCreateFollowMenuItem = true;
     		Singleton.getInstance().m_bUnFollowMenuItem = true;
     	}
-    	
+    	//if(pager.getCurrentItem() == 1)
+    	{
+			if(oRevData.m_bfollow == true)
+			{
+				Singleton.getInstance().m_bUnFollowMenuItem = false;
+				Singleton.getInstance().m_bCreateFollowMenuItem = true;
+			}
+			else
+			{
+				Singleton.getInstance().m_bUnFollowMenuItem = true;
+				Singleton.getInstance().m_bCreateFollowMenuItem = false;
+			}
+			mActivity.invalidateOptionsMenu();
+    		
+    	}
     	Singleton.getInstance().m_bShareMenuItem = true;
     	this.invalidateOptionsMenu();
     	super.onResume();

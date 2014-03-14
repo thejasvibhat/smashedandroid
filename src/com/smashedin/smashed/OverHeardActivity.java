@@ -258,8 +258,11 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 		   
 	}
 	private void doExit() {
+        finish();
+    	Intent intent = new Intent("exit-event");
+  	  	LocalBroadcastManager.getInstance(OverheardActivty).sendBroadcast(intent);
 
-	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+/*	    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
 	    alertDialog.setPositiveButton("Yes", new OnClickListener() {
 
@@ -277,7 +280,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 
 	    alertDialog.setMessage("Do you want to exit?");
 	    alertDialog.setTitle("SmashedIn");
-	    alertDialog.show();
+	    alertDialog.show();*/
 	}
     private void displayView(int position) {
     	if(position == 1)
