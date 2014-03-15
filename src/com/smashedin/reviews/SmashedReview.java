@@ -7,6 +7,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.smashedin.smashedin.R;
 
+import android.R.anim;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
@@ -98,13 +99,13 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         LocalBroadcastManager.getInstance(this).registerReceiver(mLoginMessageReceiver,
     		      new IntentFilter("custom-login-event"));
         
-       
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
     @Override
     public void onResume()
     {
-    	indicator.setOnPageChangeListener(new OnPageChangeListener() {
+    	/*indicator.setOnPageChangeListener(new OnPageChangeListener() {
 			
 			@Override
 			public void onPageSelected(int arg0) {
@@ -123,8 +124,8 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				}
 				else
 				{
-					//Singleton.getInstance().m_bCreateFollowMenuItem = true;
-					//Singleton.getInstance().m_bUnFollowMenuItem = true;
+					Singleton.getInstance().m_bCreateFollowMenuItem = true;
+					Singleton.getInstance().m_bUnFollowMenuItem = true;
 					mActivity.invalidateOptionsMenu();
 				}
 				
@@ -141,7 +142,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				String x = "x";
 				
 			}
-		});
+		});*/
         Bundle b = getIntent().getExtras();
 
         getActionBar().setTitle(b.getString("name"));
@@ -241,6 +242,9 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			onBackPressed();
+			break;
 		case R.id.revoh:
 			CreateOverheardForBar(oRevData.id);
 			break;

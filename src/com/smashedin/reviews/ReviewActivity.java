@@ -1,4 +1,5 @@
 package com.smashedin.reviews;
+import com.google.android.gms.drive.internal.o;
 import com.smashedin.smashedin.R;
 
 import java.io.IOException;
@@ -355,10 +356,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	float distance = m_olocation.distanceTo(Singleton.getInstance().m_livelocation);
 	    	if((distance < 200)&&(gAdapter.FsqVenues.size() != 0))
 	    	{
-	    		ProgressBar oP1= (ProgressBar) findViewById(R.id.progressImage);
-				oP1.setVisibility(View.GONE);
-				ImageView oV1= (ImageView) findViewById(R.id.refreshLocation);
-				oV1.setVisibility(View.VISIBLE);
+	    		oPG.setVisibility(View.GONE);
+				oP.setVisibility(View.GONE);
+				oV.setVisibility(View.VISIBLE);
 	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	    		return;
 	    	}
