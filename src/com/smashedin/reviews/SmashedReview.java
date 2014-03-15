@@ -461,6 +461,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		}
 	private void CreateOverheardForBar(String bid)
 	{
+		Singleton.getInstance().mOhRevData = oRevData;
 		if(mainintent == null)
 			mainintent = new Intent(this, MainActivity.class);
 		Intent intent = new Intent("my-event");

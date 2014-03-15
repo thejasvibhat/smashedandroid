@@ -330,7 +330,20 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		   Fragment fragment = getFragmentManager().findFragmentById(R.id.frame_container);
 		   if (fragment instanceof CreateOverHeardFragment) {
 		    
-				  doExit();
+				  //doExit();
+				if(Singleton.getInstance().bid != "")
+				{
+					Intent intent = new Intent("bidoh");
+			    	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+			    	Singleton.getInstance().bid = "";
+			    	finish();
+
+				}
+				else
+				{
+					doExit();
+				}
+
 
 		   }
 		   else if(fragment instanceof GridOverheardSkeletonFragment)
@@ -457,12 +470,10 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		if(Singleton.getInstance().m_bnevermind == true)
 		{
 			Singleton.getInstance().m_bHideLoginMenuItem = false;
-			Singleton.getInstance().loggedIn = false;
 		}
 		else
 		{
 			Singleton.getInstance().m_bHideLoginMenuItem = true;
-			Singleton.getInstance().loggedIn = true;
 		}
 		Fragment fragment = null;
 		Singleton.getInstance().m_bCameraMenuItem = true;

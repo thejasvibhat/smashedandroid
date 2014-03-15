@@ -71,6 +71,8 @@ public class Singleton {
 	public boolean m_bFirstInstance = true;
 
 	public boolean m_bFirstInstanceReview = true;
+
+	public ReviewData mOhRevData = null;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     } 

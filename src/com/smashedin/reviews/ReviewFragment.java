@@ -110,12 +110,13 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		  if(Singleton.getInstance().m_bFirstInstanceReview == true)
 		  {
 
-			  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-				      new IntentFilter("bidoh"));
 		    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
 		    		      new IntentFilter("push-event"));
 		    	Singleton.getInstance().m_bFirstInstanceReview = false;
 		  }
+		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+			      new IntentFilter("bidoh"));
+
 		  setHasOptionsMenu(true);
     }
     @Override
@@ -373,15 +374,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		else
 		{
-			if(Singleton.getInstance().loggedIn == true)
-			{
-				ProgressBar oP= (ProgressBar) liveView.findViewById(R.id.progressImagelive);
-				oP.setVisibility(View.VISIBLE);
-				
-				livefeedList.setVisibility(View.GONE);
-				GetLatestLiveFeed();
-			}
-			else
+			if(Singleton.getInstance().loggedIn != true)
 			{
 				mRevData.livefeeds = new ArrayList<LiveData>();
 				gLiveFeedAdaper.mLiveFeeds = new ArrayList<LiveData>();
@@ -420,7 +413,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				 UpdateDataGCM(oLive);
 			}
 		});
-		EnableLoginPageView();
+		//EnableLoginPageView();
 		return liveView;
     }
     private void UpdateDataGCM(LiveData oLive)
@@ -879,11 +872,16 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			  if(intent.getAction() == "bidoh")
 			  {
 				  String url = intent.getStringExtra("iconurl");
-				  mRevData.ohdata.ohUrl.add(url);
-				  if(gOhAdapter != null)
-				  {					  
-					  gOhAdapter.mThumbIds.add(url);
-					  ohGrid.setAdapter(gOhAdapter);
+				  if(url != null){
+					  if(Singleton.getInstance().mOhRevData.id == mRevData.id)
+					  {
+						  mRevData.ohdata.ohUrl.add(url);
+						  if(gOhAdapter != null)
+						  {					  
+							  gOhAdapter.mThumbIds.add(url);
+							  ohGrid.setAdapter(gOhAdapter);
+						  }
+					  }
 				  }
 
 			  }		   
