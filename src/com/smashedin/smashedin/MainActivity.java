@@ -687,6 +687,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		    	Singleton.getInstance().bid = bid;
 		    else
 		    	Singleton.getInstance().bid = "";
+
 		  }
 
 	};
@@ -874,6 +875,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		    // Extract data included in the Intent
 			 if(Singleton.getInstance().m_bAppHidden == true)
 			 {
+				 Singleton.getInstance().m_arrInstantQueueMessages.clear();
 				 HashSet<String> stringSet = Singleton.getInstance().GetFollowingBids();
 				 if(stringSet.contains(Singleton.getInstance().m_strMessageGcmBid))
 				 {
@@ -894,6 +896,29 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
 				 }
 				 
+			 }
+			 else
+			 {
+				 if(Singleton.getInstance().mRevData != null)
+				 {
+	
+					 String message = Singleton.getInstance().m_strMessageGcm;
+					 LiveData oLive = new LiveData();
+					 oLive.mine = false;
+					 try {
+							message = URLEncoder.encode(message,"utf-8");
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					 oLive.message = message;
+					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+					 
+					 if(Singleton.getInstance().m_strMessageGcmBid.equals(Singleton.getInstance().mRevData.id) == true)
+					 {
+						 Singleton.getInstance().m_arrInstantQueueMessages.add(oLive);
+					 }
+				 }
 			 }
 		  }
 

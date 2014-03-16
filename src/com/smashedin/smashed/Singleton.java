@@ -54,6 +54,7 @@ public class Singleton {
 
 	public String m_strMessageGcmBid;
 	public boolean m_bGcmMessages = false;
+	public ArrayList<LiveData> m_arrInstantQueueMessages = new ArrayList<LiveData>();
 
 	public String m_strMessageGcmBname;
 
