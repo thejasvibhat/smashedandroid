@@ -877,7 +877,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			 {
 				 Singleton.getInstance().m_arrInstantQueueMessages.clear();
 				 HashSet<String> stringSet = Singleton.getInstance().GetFollowingBids();
-				 if(stringSet.contains(Singleton.getInstance().m_strMessageGcmBid))
+				 //if(stringSet.contains(Singleton.getInstance().m_strMessageGcmBid))
+				 if((Singleton.getInstance().mRevData != null)&&(Singleton.getInstance().mRevData.id.equals(Singleton.getInstance().m_strMessageGcmBid) == true))
 				 {
 					 String message = Singleton.getInstance().m_strMessageGcm;
 					 LiveData oLive = new LiveData();
