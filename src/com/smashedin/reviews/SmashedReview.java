@@ -54,7 +54,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
     
 	
-	private static final String[] CONTENT = new String[] { "INFO", "INSTANTS","REVIEWS","OVERHEARDS", "PHOTOS" };
+	private static final String[] CONTENT = new String[] { "OVERHEARDS", "INSTANTS", "REVIEWS", "INFO" };
     private ReviewData oRevData = null;
     private Intent mainintent;
     private int m_rating = 0;

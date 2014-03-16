@@ -39,7 +39,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 public class HomeFragment extends android.support.v4.app.Fragment implements OnResponseListener{
-	private static final String[] CONTENT = new String[] { "INFO", "REVIEWS","OVERHEARDS", "PHOTOS" };
+	private static final String[] CONTENT = new String[] { "OVERHEARDS", "REVIEWS","INFO", "PHOTOS" };
 	String m_StrResponse;
 	android.support.v4.app.Fragment m_cuFragment;
 	private ArrayList<String> m_ohpromolist;

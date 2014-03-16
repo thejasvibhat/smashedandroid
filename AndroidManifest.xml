@@ -87,7 +87,7 @@
         </activity>
        <activity 
             android:name="com.smashedin.reviews.ReviewActivity"
-            android:label="Reviews"
+            android:label="Places"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
@@ -100,7 +100,7 @@
         </activity>
         <activity
             android:name="com.smashedin.reviews.SmashedReview"
-            android:label="Reviews"
+            android:label="Places"
             android:screenOrientation="portrait"
             android:theme="@style/StyledIndicators">
         </activity>
