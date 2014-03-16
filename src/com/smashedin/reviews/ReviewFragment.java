@@ -88,6 +88,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private View reviewview;
     private View liveView;
     Fragment m_OhFragment;
+    private boolean m_bRegistered = false;
     AtomicInteger msgId = new AtomicInteger();
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
         ReviewFragment fragment = new ReviewFragment();
@@ -107,16 +108,12 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
         if ((savedInstanceState != null) && savedInstanceState.containsKey(KEY_CONTENT)) {
             mContent = savedInstanceState.getString(KEY_CONTENT);
         }
-		  if(Singleton.getInstance().m_bFirstInstanceReview == true)
+		  //if(Singleton.getInstance().m_bFirstInstanceReview == true)
+		  if(mContent == "OVERHEARDS")
 		  {
-
-		    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
-		    		      new IntentFilter("push-event"));
-		    	Singleton.getInstance().m_bFirstInstanceReview = false;
+			  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+				      new IntentFilter("bidoh"));
 		  }
-		  LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-			      new IntentFilter("bidoh"));
-
 		  setHasOptionsMenu(true);
     }
     @Override
@@ -124,6 +121,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     {
     	super.onResume();
     	EnableLoginPageView();
+   		LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGcmMessageReceiver);
+    	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
+    		      new IntentFilter("push-event"));
     }
     private void EnableLoginPageView()
     {
@@ -344,7 +344,15 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     }
     private View GetViewForLiveFeed(LayoutInflater inflater)
     {
-    	
+    	if(Singleton.getInstance().mRevData != null)
+    	{
+    		if(Singleton.getInstance().mRevData.id.equals(mRevData.id) == true)
+    		{
+    			mRevData.livefeeds.addAll(Singleton.getInstance().m_arrInstantQueueMessages);
+    			Singleton.getInstance().m_arrInstantQueueMessages.clear();
+    		}
+    	}
+
     	if(liveView != null)
     	{
     		if(Singleton.getInstance().mRevData != null)
@@ -491,6 +499,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			gOhAdapter = new GridOverheardReviewAdapter(getActivity());
 		if((mRevData.ohdata != null)&&(mRevData.ohdata.ohUrl != null))
 		{
+			gOhAdapter.mThumbIds.clear();
 			gOhAdapter.mThumbIds.addAll(mRevData.ohdata.ohUrl);
 			ohGrid.setAdapter(gOhAdapter);
 		}
@@ -587,6 +596,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			oData.message = liveItem.getString("message");
 			oData.username = liveItem.getString("username");
 			oData.atplace = liveItem.getString("atplace");
+			if(liveItem.getString("self").equals("true") == true)				
+				oData.mine = true;
 			mRevData.livefeeds.add(oData);
 
 		}
@@ -881,6 +892,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 							  gOhAdapter.mThumbIds.add(url);
 							  ohGrid.setAdapter(gOhAdapter);
 						  }
+
 					  }
 				  }
 
@@ -948,5 +960,17 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 				 
 	};
+    @Override
+    public void onDestroy()
+    {
+    	LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGcmMessageReceiver);
+    	super.onDestroy();
+    }
+    @Override
+    public void onPause()
+    {
+		LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGcmMessageReceiver);
+    	super.onPause();
+    }
 
 }
