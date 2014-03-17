@@ -88,7 +88,7 @@ public class HelloFacebookSampleActivity extends FragmentActivity implements OnR
         super.onCreate(savedInstanceState);
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.example.smashedin", 
+                    "com.smashedin.smashedin", 
                     PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
