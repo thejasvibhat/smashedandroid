@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashedin.R;
@@ -59,6 +62,7 @@ public class LiveFeedAdapter extends BaseAdapter {
 			holder.usertext = (TextView) convertView.findViewById(R.id.message_name);
 			holder.oContainer = (LinearLayout) convertView.findViewById(R.id.containerStatus);
 			holder.atplaceimage = (ImageView) convertView.findViewById(R.id.atplaceimage);
+			holder.messageTimestamp = (TextView) convertView.findViewById(R.id.message_timestamp);
 			convertView.setTag(holder);
 		}
 		else
@@ -76,6 +80,23 @@ public class LiveFeedAdapter extends BaseAdapter {
 		{
 			holder.atplaceimage.setVisibility(View.VISIBLE);
 		}
+		long ts = mLiveFeeds.get(position).timestamp;
+		if(mLiveFeeds.get(position).updating == true)
+		{
+			holder.messageTimestamp.setText(">>");
+		}
+		else
+		{
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeZone(TimeZone.getDefault());
+			calendar.setTimeInMillis(ts * 1000);
+
+			int hour = calendar.get(Calendar.HOUR_OF_DAY);
+			int minute = calendar.get(Calendar.MINUTE);	
+			holder.messageTimestamp.setText(hour+":"+minute);
+		}
+		
+		
 		LayoutParams lp = (LayoutParams) holder.oContainer.getLayoutParams();
 		
 		//Check whether message is mine to show green background and align to right
@@ -102,6 +123,7 @@ public class LiveFeedAdapter extends BaseAdapter {
 		TextView usertext;
 		LinearLayout oContainer;
 		ImageView atplaceimage;
+		TextView messageTimestamp;
 	}
     public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

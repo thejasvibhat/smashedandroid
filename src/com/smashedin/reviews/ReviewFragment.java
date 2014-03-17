@@ -405,8 +405,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				float distance = mRevData.location.m_location.distanceTo(Singleton.getInstance().m_livelocation);
 				
 				 oStatusText.setText("");
-				 LiveData oLive = new LiveData();
-				 oLive.mine = false;				
+				 LiveData oLive = new LiveData();				
 				 oLive.message = message;
 				 oLive.username = Singleton.getInstance().username;
 				 if(distance < 200)
@@ -414,11 +413,17 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 					 oLive.atplace = "true";
 				 }
 				 oLive.mine = true;
-				 mRevData.livefeeds.add(oLive);
+				 Long tsLong = System.currentTimeMillis()/1000;
+				 oLive.timestamp = tsLong;
+				 oLive.updating = true; 
 				 gLiveFeedAdaper.mLiveFeeds.add(oLive);
 				 gLiveFeedAdaper.notifyDataSetChanged();
 				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+				 
+				 gLiveFeedAdaper.mLiveFeeds.set(gLiveFeedAdaper.mLiveFeeds.size() - 1,oLive);
+				 mRevData.livefeeds.add(oLive);
 				 UpdateDataGCM(oLive);
+
 			}
 		});
 		//EnableLoginPageView();
@@ -431,7 +436,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
-    	oAsyncClient.MakeCallWithTag(url,"pushGet"); 
+    	oAsyncClient.MakeCallWithTagAndData(url,"pushGet",oLive); 
     	
     }
     private void GetLatestLiveFeed() {
@@ -596,6 +601,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			oData.message = liveItem.getString("message");
 			oData.username = liveItem.getString("username");
 			oData.atplace = liveItem.getString("atplace");
+			oData.timestamp = Integer.parseInt(liveItem.getString("timestamp"));
 			if(liveItem.getString("self").equals("true") == true)				
 				oData.mine = true;
 			mRevData.livefeeds.add(oData);
@@ -773,7 +779,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 	}
 
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object oData) {
 		if(tag == "push")
 		{
 			Singleton.getInstance().m_oType = "";
@@ -791,6 +797,12 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		if(tag == "pushGet")
 		{
 			Singleton.getInstance().m_oType = "";
+			
+			LiveData oLive = (LiveData)oData;
+			int index = mRevData.livefeeds.indexOf(oLive);
+			oLive.updating = false;
+			mRevData.livefeeds.set(index, oLive);
+			gLiveFeedAdaper.notifyDataSetChanged();  
 			return;
 		}
 
@@ -934,6 +946,7 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		    // Extract data included in the Intent
 				 if(Singleton.getInstance().m_bAppHidden == false)
 				 {
+					 Singleton.getInstance().m_arrInstantQueueMessages.clear();
 					 String message = Singleton.getInstance().m_strMessageGcm;
 					 LiveData oLive = new LiveData();
 					 oLive.mine = false;
@@ -945,7 +958,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 						}
 					 oLive.message = message;
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
-					 
+					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
+					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
 					 {
 						 if(gLiveFeedAdaper != null)

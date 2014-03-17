@@ -557,7 +557,7 @@ public class CreateOverHeardFragment extends Fragment implements OnResponseListe
 	    }
 	}
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object obj) {
 		// TODO Auto-generated method stub
 		setRefreshActionButtonState(false);
 		if(totalImages > 0)

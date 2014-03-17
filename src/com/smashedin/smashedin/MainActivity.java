@@ -659,7 +659,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     }
 
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object obj) {
 		if(Singleton.getInstance().m_oType == "push")
 		{
 			Singleton.getInstance().m_oType = "oh";
@@ -892,6 +892,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 oLive.message = message;
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 					 oLive.bid = Singleton.getInstance().m_strMessageGcmBid;
+					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
+					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
 					 Singleton.getInstance().m_bGcmMessages = true;
 					 Singleton.getInstance().mRevData.livefeeds.add(oLive);
 					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
@@ -914,7 +916,8 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 						}
 					 oLive.message = message;
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
-					 
+					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
+					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(Singleton.getInstance().mRevData.id) == true)
 					 {
 						 Singleton.getInstance().m_arrInstantQueueMessages.add(oLive);

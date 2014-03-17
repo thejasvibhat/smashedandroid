@@ -39,6 +39,11 @@
      android:padding="0dp"
      android:background="@layout/underline" />
 	    
+  <LinearLayout 
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+	    android:background="#00000000">
     <TextView
         android:id="@+id/message_text"
         android:layout_width="wrap_content"
@@ -52,6 +57,18 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="14dp" />
+     <TextView
+        android:id="@+id/message_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="@color/textShadow"
+        android:text="10.10"
+        android:textColor="@color/lightgrey"
+        android:paddingRight="0dp"
+        android:paddingLeft="2dp"
+        android:paddingBottom="1dp"
+        android:textSize="6dp" />
+    </LinearLayout>
 	    	   
 	</LinearLayout>
 

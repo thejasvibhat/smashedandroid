@@ -778,7 +778,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 	
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object obj) {
 	
 		try {
 			ParseJson(response);

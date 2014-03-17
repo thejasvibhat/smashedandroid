@@ -11,12 +11,13 @@ public class SmashedAsyncClient{
 	private AsyncHttpClient m_oAsyncClient;
 	private OnResponseListener oListenerCallback;
 	private String m_strTag = "";
+	private Object m_oData = null;
 	public SmashedAsyncClient()
 	{
 		m_oAsyncClient = new AsyncHttpClient();
 	}
 	public interface OnResponseListener {
-        public void OnResponse(String response,String tag);
+        public void OnResponse(String response,String tag,Object data);
         public void OnFailure();
     }
 	public void SetPersistantStorage(Context oContext)
@@ -45,7 +46,7 @@ public class SmashedAsyncClient{
 		m_oAsyncClient.post(url, params, new AsyncHttpResponseHandler(){
     		@Override
 		    public void onSuccess(String response) {
-    			oListenerCallback.OnResponse(response,m_strTag);
+    			oListenerCallback.OnResponse(response,m_strTag,m_oData);
 	        }
     		@Override
     		public void onFailure(Throwable error, String content)
@@ -61,7 +62,7 @@ public class SmashedAsyncClient{
 		m_oAsyncClient.get(url, new AsyncHttpResponseHandler(){
     		@Override
 		    public void onSuccess(String response) {
-    			oListenerCallback.OnResponse(response,m_strTag);
+    			oListenerCallback.OnResponse(response,m_strTag,m_oData);
 	        }
     		@Override
     		public void onFailure(Throwable error, String content)
@@ -72,6 +73,12 @@ public class SmashedAsyncClient{
 	}
 	public void MakeCallWithTag(String url,String tag)
 	{
+		m_strTag = tag;
+		MakeCall(url);
+	}
+	public void MakeCallWithTagAndData(String url,String tag,Object data)
+	{
+		m_oData = data;
 		m_strTag = tag;
 		MakeCall(url);
 	}

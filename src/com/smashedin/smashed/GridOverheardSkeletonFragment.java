@@ -477,7 +477,7 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	}
 
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object obj) {
 		m_StrResponse = response;
 		if(getView() != null)
 		((PullToRefreshGridView) getView().findViewById(R.id.grid_view_skels)).onRefreshComplete();

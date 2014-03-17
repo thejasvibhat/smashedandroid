@@ -54,7 +54,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
     
 	
-	private static final String[] CONTENT = new String[] { "OVERHEARDS", "INSTANTS", "REVIEWS", "INFO" };
+	private static final String[] CONTENT = new String[] {"INSTANTS", "OVERHEARDS","REVIEWS","INFO" };
     private ReviewData oRevData = null;
     private Intent mainintent;
     private int m_rating = 0;
@@ -88,7 +88,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         {
         	Singleton.getInstance().m_bFromNotification = true;
         	oRevData = Singleton.getInstance().mRevData;
-        	pager.setCurrentItem(1);
+        	pager.setCurrentItem(0);
         }
         else
         oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
@@ -549,7 +549,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     }
 
 	@Override
-	public void OnResponse(String response,String tag) {
+	public void OnResponse(String response,String tag,Object obj) {
 /*		if(Singleton.getInstance().m_oType == "login")
 		{
 			Singleton.getInstance().m_oType = "reviews";

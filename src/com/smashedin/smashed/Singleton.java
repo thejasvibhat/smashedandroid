@@ -74,6 +74,9 @@ public class Singleton {
 	public boolean m_bFirstInstanceReview = true;
 
 	public ReviewData mOhRevData = null;
+
+	public String m_strMessageGcmLocation = "false";
+	public long m_iMessageGcmTimestamp = 0;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     } 
