@@ -297,12 +297,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         		super.onResume();
         		return;
         	}
-    		if(gAdapter.FsqVenues.size() != 0)
-    			SetGridItems((GridView) findViewById(R.id.reviewsGrid));
-    		else
-    		{
-    			GetMyLocation();
-    		}
+        	GetMyLocation();
     	}
     	else
     	{
@@ -353,11 +348,12 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		}
 		if(m_olocation != null)
 		{
+			oP.setVisibility(View.GONE);
 	    	float distance = m_olocation.distanceTo(Singleton.getInstance().m_livelocation);
 	    	if((distance < 200)&&(gAdapter.FsqVenues.size() != 0))
 	    	{
 	    		oPG.setVisibility(View.GONE);
-				oP.setVisibility(View.GONE);
+				
 				oV.setVisibility(View.VISIBLE);
 	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	    		return;
