@@ -196,6 +196,16 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		    	Singleton.getInstance().m_bCreateReviewOhMenuItem = false;
 		    	Singleton.getInstance().m_bShareMenuItem = true;
 		    	Singleton.getInstance().m_bCreateFollowMenuItem = false;
+		    	if(oRevData.m_bfollow == true)
+				{
+					Singleton.getInstance().m_bUnFollowMenuItem = false;
+					Singleton.getInstance().m_bCreateFollowMenuItem = true;
+				}
+				else
+				{
+					Singleton.getInstance().m_bUnFollowMenuItem = true;
+					Singleton.getInstance().m_bCreateFollowMenuItem = false;
+				}
 		    	this.invalidateOptionsMenu();
 		    	super.onBackPressed();
 				  return;

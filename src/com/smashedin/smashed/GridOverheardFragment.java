@@ -262,7 +262,7 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity());
-    	oAsyncClient.MakeCall(m_StrUrl);   
+    	oAsyncClient.MakeCallWithTag(m_StrUrl,"public");
 
 	}
 	public void AddFromCamera()
@@ -324,7 +324,7 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
 	}
 
 	public void SetUrl(String string) {
-		m_StrUrl = string;
+		m_StrUrl = string; 
 		
 	}
 

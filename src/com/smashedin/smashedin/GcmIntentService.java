@@ -73,7 +73,7 @@ public class GcmIntentService extends IntentService {
             	Singleton.getInstance().m_strMessageGcmBid = extras.getString("bid", "");
             	Singleton.getInstance().m_strMessageGcmBname = extras.getString("bname", "");
             	Singleton.getInstance().m_strMessageGcmLocation = extras.getString("atplace", "");
-            	Singleton.getInstance().m_iMessageGcmTimestamp = extras.getLong("timestamp");
+            	Singleton.getInstance().m_iMessageGcmTimestamp = Long.valueOf(extras.getString("timestamp")).longValue();
                 // This loop represents the service doing some work.
                 // Post notification of received message.
                 //sendNotification("Received: " + extras.toString());

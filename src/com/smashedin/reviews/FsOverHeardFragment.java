@@ -77,7 +77,7 @@ public class FsOverHeardFragment extends android.support.v4.app.Fragment {
 	@Override 
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-	    case R.id.shareoh:
+	    case R.id.shareohrev:
 	    	ShareOverheard();
 	    default:
 	    	return super.onOptionsItemSelected(item);

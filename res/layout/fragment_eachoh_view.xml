@@ -44,7 +44,7 @@
 		    android:shadowColor="#FF000000"
 		    android:gravity="center_horizontal"
 		    android:layout_gravity="center_horizontal"
-		    android:textSize="14pt" />
+		    android:textSize="16pt" />
 
 		<TextView
 		    android:id="@+id/TextViewBottom"
@@ -59,7 +59,7 @@
 		    android:gravity="center_horizontal"
 		    android:layout_gravity="center_horizontal"
 		    android:textColor="#FFFFFF"
-		    android:textSize="14pt" />
+		    android:textSize="16pt" />
 		
 		
 	

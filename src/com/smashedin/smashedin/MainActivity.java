@@ -336,6 +336,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					Intent intent = new Intent("bidoh");
 			    	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 			    	Singleton.getInstance().bid = "";
+			    	m_oPosition = 0;
 			    	finish();
 
 				}
@@ -648,6 +649,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         super.onResume(); 
         
         if(Singleton.getInstance().m_oType.equals("create") == true) {
+        	Singleton.getInstance().m_oType = "review";
 	    	ShowCreateOverheard();
 	    } 
         else

@@ -396,6 +396,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			public void onClick(View arg0) {
 				EditText oStatusText = (EditText)liveView.findViewById(R.id.textStatus);
 				String message = oStatusText.getText().toString(); 
+				message = message.trim();
+				if(message.equals(""))
+					return;
 				try {
 					message = URLEncoder.encode(message,"utf-8");
 				} catch (UnsupportedEncodingException e) {
@@ -664,13 +667,16 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		}
 		else
 		{
-			FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
-			for(int i=0; i < oLayout.getChildCount(); i++)
+			if(getActivity() != null)
 			{
-				if(oLayout.getChildAt(i) instanceof TextView)
+				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.reviewparent);
+				for(int i=0; i < oLayout.getChildCount(); i++)
 				{
-					oLayout.removeViewAt(i);
-					return;
+					if(oLayout.getChildAt(i) instanceof TextView)
+					{
+						oLayout.removeViewAt(i);
+						return;
+					}
 				}
 			}
 		}
