@@ -41,6 +41,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MenuItem.OnActionExpandListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
@@ -223,26 +224,43 @@ public class GridOverheardSkeletonFragment extends Fragment implements OnRespons
 	public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {
 		optionsMenu = menu;
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        MenuItem oSearchMenu = menu.findItem(R.id.searchoverskel);
+        oSearchMenu.collapseActionView();
         searchView = (SearchView) menu.findItem(R.id.searchoverskel).getActionView();
 
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setIconifiedByDefault(false);   
-
+            oSearchMenu.setOnActionExpandListener(new OnActionExpandListener() {
+    			
+    			@Override
+    			public boolean onMenuItemActionExpand(MenuItem item) {
+    				// TODO Auto-generated method stub
+    				return true;
+    			}
+    			
+    			@Override
+    			public boolean onMenuItemActionCollapse(MenuItem item) {
+    				// TODO Auto-generated method stub
+    				if(m_strbkupSkeletonIds.size() > 0)
+                	{
+    	        		m_galSkeletons.m_strSkeletonIds.clear();
+    	        		m_galSkeletons.m_strSkeletonUrls.clear();
+    	        		gAdapter.mThumbIds.clear();
+    	        		m_galSkeletons.m_strSkeletonUrls.addAll(m_strbkupSkeletonUrls);
+    	        		m_galSkeletons.m_strSkeletonIds.addAll(m_strbkupSkeletonIds);
+    					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
+    					gAdapter.notifyDataSetChanged(); 
+                	}
+    				return true;
+    			}
+    		});
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
         {
             @Override
             public boolean onQueryTextChange(String newText) 
             {
                 // this is your adapter that will be filtered
-            	if(m_strbkupSkeletonIds.size() > 0)
-            	{
-	        		m_galSkeletons.m_strSkeletonIds.clear();
-	        		m_galSkeletons.m_strSkeletonUrls.clear();
-	        		gAdapter.mThumbIds.clear();
-	        		m_galSkeletons.m_strSkeletonUrls.addAll(m_strbkupSkeletonUrls);
-	        		m_galSkeletons.m_strSkeletonIds.addAll(m_strbkupSkeletonIds);
-					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
-            	}
+            	
                 return true;
             }
             @Override

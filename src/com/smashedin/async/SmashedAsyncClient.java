@@ -57,6 +57,7 @@ public class SmashedAsyncClient{
 	}
 	public void MakeCall(String url)
 	{
+		m_oAsyncClient.setTimeout(60000);
 		m_oAsyncClient.setCookieStore(Singleton.getInstance().myCookieStore);
 		
 		m_oAsyncClient.get(url, new AsyncHttpResponseHandler(){

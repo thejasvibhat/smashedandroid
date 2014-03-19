@@ -14,6 +14,7 @@ import com.smashedin.facebook.HelloFacebookSampleActivity;
 import com.smashedin.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
@@ -55,7 +56,7 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 	private android.app.Fragment galleryFragment;
 	private android.app.Fragment myUploadFragment;
 	ArrayList<ReviewItem> itemsList = null;
-	android.app.Fragment m_OhFragment;
+
 	private Tab m_galTab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,8 +205,6 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		if(m_OhFragment == null)
-        	m_OhFragment = new OverHeardFragment();
 
     }
     private void Login(String type)
@@ -390,12 +389,19 @@ public class OverHeardActivity extends FragmentActivity  implements OnHeadlineSe
 	@Override
 	public void onArticleSelected(String id, String url) {
 		//((GridOverheardFragment) galleryFragment).ShowOh(id,url);
-		Bundle bundle = new Bundle();
-        bundle.putString("url", url);
-        m_OhFragment.setArguments(bundle);
+		
+        
 		android.app.FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction()
-				.add(R.id.frame_container_oh, m_OhFragment).addToBackStack( "new" ).commit();
+		Fragment oFrag = fragmentManager.findFragmentByTag("ohview");
+		if(oFrag == null)
+		{
+	        android.app.Fragment	m_OhFragment = new OverHeardFragment();
+			Bundle bundle = new Bundle();
+	        bundle.putString("url", url);
+	        m_OhFragment.setArguments(bundle);
+			fragmentManager.beginTransaction()
+				.add(R.id.frame_container_oh, m_OhFragment).addToBackStack( "ohview" ).commit();
+		}
 
 		
 	}

@@ -306,9 +306,11 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		oText.setText("No Location");
 		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
 		oP.setVisibility(View.GONE);
+		ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
+		oV.setVisibility(View.VISIBLE);
 		Toast.makeText(
                 this,
-                "Can't search nearby Places. You can still use search to get your place.",
+                "Unable to list nearby Places as Location service is disabled. You can continue using Search ",
                 Toast.LENGTH_LONG).show();
 		super.onResume();
     }
@@ -360,8 +362,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	   Singleton.getInstance().m_bLocationOn = false;
 	    	   Builder dialog = new AlertDialog.Builder(this);
 	            dialogAlert = dialog.create();
-	            dialog.setMessage("Location serices disabled on your device. Open Location settings?");
-	            dialog.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+	            dialog.setMessage("SmashedIn uses your current location to suggest nearby Places.It seems location services are disabled on your device.");
+	            dialog.setPositiveButton("Enable", new DialogInterface.OnClickListener() {
 
 	                @Override
 	                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
@@ -429,7 +431,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	if((distance < 200)&&(gAdapter.FsqVenues.size() != 0))
 	    	{
 	    		oPG.setVisibility(View.GONE);
-				
+	    		oV.setVisibility(View.VISIBLE);
 				oV.setVisibility(View.VISIBLE);
 	    		SetGridItems((GridView) findViewById(R.id.reviewsGrid));
 	    		return;
@@ -610,7 +612,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
             	gAdapter.FsqVenues.clear();
             	SetGridItems((GridView) findViewById(R.id.reviewsGrid));
                 // this is your adapter that will be filtered
-            	String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&v=20140305&venuePhotos=1&offset=0&limit=50&query="+query;
+            	String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&section=drinks&v=20140305&venuePhotos=1&offset=0&limit=50&query="+query;
             	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
             	oAsyncClient.Attach(m_oRevActivity);
             	//oAsyncClient.SetPersistantStorage(getApplicationContext());

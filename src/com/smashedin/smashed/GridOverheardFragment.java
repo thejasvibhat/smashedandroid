@@ -35,6 +35,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MenuItem.OnActionExpandListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
@@ -123,20 +124,35 @@ public class GridOverheardFragment extends Fragment implements OnResponseListene
         this.optionsMenu = menu;
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setIconifiedByDefault(false);   
-            
+            oSearchMenu.setOnActionExpandListener(new OnActionExpandListener() {
+    			
+    			@Override
+    			public boolean onMenuItemActionExpand(MenuItem item) {
+    				// TODO Auto-generated method stub
+    				return true;
+    			}
+    			
+    			@Override
+    			public boolean onMenuItemActionCollapse(MenuItem item) {
+    				// TODO Auto-generated method stub
+    				if(m_strBackUpSkeletonUrls.size() > 0)
+                	{
+    	        		m_strSkeletonUrls.clear();
+    	        		gAdapter.mThumbIds.clear();
+    	            	m_strSkeletonUrls.addAll(m_strBackUpSkeletonUrls);
+    					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
+    					gAdapter.notifyDataSetChanged();
+                	}
+    				return true;
+    			}
+    		});
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
         {
             @Override
             public boolean onQueryTextChange(String newText) 
             {
                 // this is your adapter that will be filtered
-            	if(m_strBackUpSkeletonUrls.size() > 0)
-            	{
-	        		m_strSkeletonUrls.clear();
-	        		gAdapter.mThumbIds.clear();
-	            	m_strSkeletonUrls.addAll(m_strBackUpSkeletonUrls);
-					gAdapter.mThumbIds.addAll(m_bkupThumbIds);
-            	}
+            	
                 return true;
             }
             @Override
