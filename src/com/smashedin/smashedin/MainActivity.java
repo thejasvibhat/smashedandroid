@@ -922,7 +922,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(Singleton.getInstance().mRevData.id) == true)
 					 {
+						 Singleton.getInstance().m_bGcmMessages = true;
 						 Singleton.getInstance().m_arrInstantQueueMessages.add(oLive);
+						 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
 					 }
 				 }
 			 }

@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.smashedin.smashedin.MainActivity;
 import com.smashedin.smashedin.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +35,7 @@ import com.smashedin.smashed.ResponseParser;
 import com.smashedin.smashed.Singleton;
 
 import android.app.FragmentManager;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -124,6 +126,20 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
    		LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGcmMessageReceiver);
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
     		      new IntentFilter("push-event"));
+    	CheckForFollowingnotification();
+    }
+    private void CheckForFollowingnotification()
+    {
+    	if(Singleton.getInstance().mRevData != null)
+    	{
+    		if(Singleton.getInstance().mRevData.id.equals(mRevData.id) == true)
+    		{
+				 NotificationManager mNotificationManager = (NotificationManager)
+			                getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+				 mNotificationManager.cancel(MainActivity.NOTIFICATION_ID);
+    		}
+    	}
+
     }
     private void EnableLoginPageView()
     {
@@ -953,6 +969,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 				 if(Singleton.getInstance().m_bAppHidden == false)
 				 {
 					 Singleton.getInstance().m_arrInstantQueueMessages.clear();
+					 NotificationManager mNotificationManager = (NotificationManager)
+				                getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+					 mNotificationManager.cancel(MainActivity.NOTIFICATION_ID);
 					 String message = Singleton.getInstance().m_strMessageGcm;
 					 LiveData oLive = new LiveData();
 					 oLive.mine = false;

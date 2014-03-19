@@ -28,6 +28,7 @@ import com.smashedin.smashed.ReviewListAdapter;
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -43,6 +44,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.SearchRecentSuggestions;
+import android.provider.Settings;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
@@ -62,6 +64,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.TextView;
 
@@ -99,6 +102,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	String localArea = null;
 	private CountDownTimer oTimer;
 	AtomicInteger msgId = new AtomicInteger();
+	 Builder dialog   = null;
+	 AlertDialog dialogAlert = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -278,9 +283,49 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	}
 		
     }
-    @Override
-    public void onResume()
+    public boolean CheckForLocation()
     {
+    	 boolean gps_enabled = false;
+	     boolean network_enabled = false;
+        try{
+        gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }catch(Exception ex){}
+        try{
+        network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        }catch(Exception ex){}
+
+       if(gps_enabled || network_enabled){
+    	   return true;
+       }
+       return false;
+    }
+    private void ShowNoLocationInfo()
+    {
+    	//whatever case
+		TextView oText = (TextView) findViewById(R.id.locationText);
+		oText.setText("No Location");
+		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
+		oP.setVisibility(View.GONE);
+		Toast.makeText(
+                this,
+                "Can't search nearby Places. You can still use search to get your place.",
+                Toast.LENGTH_LONG).show();
+		super.onResume();
+    }
+    @Override
+    public void onResume() 
+    {
+    	if(dialogAlert != null)
+    	{
+    		dialogAlert.dismiss();
+    		dialogAlert = null;
+    		if(CheckForLocation() == false)
+    		{
+    			ShowNoLocationInfo();
+    			return;
+    		}
+    		
+    	}
 		mDrawerList.setSelection(0);
     	FillTheFollowingBarData();
     	Singleton.getInstance().restoreUserDetails();
@@ -310,6 +355,37 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	// Acquire a reference to the system Location Manager
     	if(locationManager == null)
     		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    	    
+	       if(CheckForLocation() == false){
+	    	   Singleton.getInstance().m_bLocationOn = false;
+	    	   Builder dialog = new AlertDialog.Builder(this);
+	            dialogAlert = dialog.create();
+	            dialog.setMessage("Location serices disabled on your device. Open Location settings?");
+	            dialog.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+
+	                @Override
+	                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+	                    // TODO Auto-generated method stub
+	                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
+	                    startActivity(myIntent);
+	                    //get gps
+	                }
+	            });
+	            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+	                @Override
+	                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+	                    // TODO Auto-generated method stub
+	                	Singleton.getInstance().m_bLocationOn = false;
+	                	ShowNoLocationInfo();
+
+	                }
+	            });
+	            dialog.show();
+	            return;
+
+	        }
+	       Singleton.getInstance().m_bLocationOn = true;
 		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
 		oP.setVisibility(View.VISIBLE);
 		ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
