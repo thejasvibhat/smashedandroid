@@ -508,14 +508,19 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				if(m_OhFragment == null)
+				android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+				Fragment oFrag = fragmentManager.findFragmentByTag("fsohs");
+				if(oFrag == null)
+				{
 					m_OhFragment = new FsOverHeardFragment();
-				 Bundle bundle = new Bundle();
-                 bundle.putString("url", mRevData.ohdata.ohUrl.get(arg2));
-				 m_OhFragment.setArguments(bundle);
-     			android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-     			fragmentManager.beginTransaction()
-     					.replace(R.id.frame_container_each, m_OhFragment).addToBackStack( "new" ).commit();
+					 Bundle bundle = new Bundle();
+	                 bundle.putString("url", mRevData.ohdata.ohUrl.get(arg2));
+					 m_OhFragment.setArguments(bundle);
+	     			fragmentManager.beginTransaction()
+	     					.replace(R.id.frame_container_each, m_OhFragment).addToBackStack( "fsohs" ).commit();
+				}
+			
+					
 				
 			}
 		});
