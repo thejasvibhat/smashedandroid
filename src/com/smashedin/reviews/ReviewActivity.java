@@ -43,6 +43,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.provider.SearchRecentSuggestions;
 import android.provider.Settings;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -104,6 +105,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	AtomicInteger msgId = new AtomicInteger();
 	 Builder dialog   = null;
 	 AlertDialog dialogAlert = null;
+	private Handler serviceHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -283,18 +285,27 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	}
 		
     }
+    public boolean checkforgps()
+    {
+    	boolean gps_enabled = false;
+    	try{
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+           }catch(Exception ex){}
+    	return gps_enabled;
+	     
+    }
+    public boolean checkfornetwork()
+    {
+    	boolean network_enabled = false;
+    	try{
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            }catch(Exception ex){}
+    	return network_enabled;
+    }
     public boolean CheckForLocation()
     {
-    	 boolean gps_enabled = false;
-	     boolean network_enabled = false;
-        try{
-        gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }catch(Exception ex){}
-        try{
-        network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        }catch(Exception ex){}
 
-       if(gps_enabled || network_enabled){
+       if(checkfornetwork() || checkforgps()){
     	   return true;
        }
        return false;
@@ -306,6 +317,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		oText.setText("No Location");
 		ProgressBar oP= (ProgressBar) findViewById(R.id.progressImage);
 		oP.setVisibility(View.GONE);
+		ProgressBar oPg= (ProgressBar) findViewById(R.id.progressImageGrid);
+		oPg.setVisibility(View.GONE);
+
 		ImageView oV= (ImageView) findViewById(R.id.refreshLocation);
 		oV.setVisibility(View.VISIBLE);
 		Toast.makeText(
@@ -445,10 +459,32 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	    	}
 		}
 		else
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 200, locationListener);
+		{
+			if(checkfornetwork())
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 200, locationListener);
+			else if(checkforgps())
+			{
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 200, locationListener);
+				serviceHandler = new Handler();
+	            serviceHandler.postDelayed( new timer(),60000L );
+			}
+		}
     	// Register the listener with the Location Manager to receive location updates
     	
     }
+    private void stoplistening()
+    {
+    	if(locationManager != null)
+    		locationManager.removeUpdates(locationListener);
+    	
+    }
+    class timer implements Runnable {
+        public void run() {
+              stoplistening();
+              if(m_olocation == null)
+            	  ShowNoLocationInfo();
+          }
+  }
     private void makeUseOfNewLocation(Location location) {
 		// TODO Auto-generated method stub
     	Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
@@ -474,10 +510,9 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     		  localArea = "Undetermined";
     	  }
     	
-		String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20140305&section=drinks&ll="+location.getLatitude()+","+location.getLongitude()+"&venuePhotos=1&offset=0&limit=50";
+		String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20140305&section=drinks&ll="+location.getLatitude()+","+location.getLongitude()+"&sortByDistance=1&&venuePhotos=1&offset=0&limit=50";
 		if(m_query != "")
 			url = url + "&query="+m_query;
-    	//String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20130815&ll=12.97,77.64&venuePhotos=1&offset=0&limit=50";
 
 		TextView oText = (TextView) findViewById(R.id.locationText);
 		oText.setText(localArea);
@@ -612,7 +647,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
             	gAdapter.FsqVenues.clear();
             	SetGridItems((GridView) findViewById(R.id.reviewsGrid));
                 // this is your adapter that will be filtered
-            	String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&section=drinks&v=20140305&venuePhotos=1&offset=0&limit=50&query="+query;
+            	String url 	= "https://api.foursquare.com/v2/venues/explore?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&ll="+m_olocation.getLatitude()+","+m_olocation.getLongitude()+"&v=20140305&venuePhotos=1&offset=0&limit=50&query="+query;
             	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
             	oAsyncClient.Attach(m_oRevActivity);
             	//oAsyncClient.SetPersistantStorage(getApplicationContext());
