@@ -8,6 +8,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.loopj.android.image.SmartImageTask.OnCompleteListener;
+import com.loopj.android.image.SmartImageView;
+import com.smashedin.smashed.CSmartImageView;
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashedin.R;
 import android.content.Context;
@@ -20,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 public class LiveFeedAdapter extends BaseAdapter {
@@ -53,7 +57,7 @@ public class LiveFeedAdapter extends BaseAdapter {
        
        String message = mLiveFeeds.get(position).message;
 
-		ViewHolder holder; 
+		final ViewHolder holder; 
 		if(convertView == null)
 		{
 			holder = new ViewHolder();
@@ -63,11 +67,57 @@ public class LiveFeedAdapter extends BaseAdapter {
 			holder.oContainer = (LinearLayout) convertView.findViewById(R.id.containerStatus);
 			holder.atplaceimage = (ImageView) convertView.findViewById(R.id.atplaceimage);
 			holder.messageTimestamp = (TextView) convertView.findViewById(R.id.message_timestamp);
+			holder.imgView = (SmartImageView) convertView.findViewById(R.id.imageohinstant);
+			holder.oProgress = (ProgressBar) convertView.findViewById(R.id.progressohinstantLoad);
 			convertView.setTag(holder);
 		}
 		else
 			holder = (ViewHolder) convertView.getTag();
-		
+		android.view.ViewGroup.LayoutParams params = convertView.getLayoutParams();
+		String type =  mLiveFeeds.get(position).type;
+		if(type.equals("image"))
+		{
+			params.height = 500;//android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+			convertView.setLayoutParams(params);
+
+			holder.message.setVisibility(View.GONE);
+			holder.imgView.setVisibility(View.GONE);
+			if(mLiveFeeds.get(position).ohurl.equals(""))
+			{
+				holder.oProgress.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				if(mLiveFeeds.get(position).ohurl.equals("NOTFOUND"))
+				{
+					holder.oProgress.setVisibility(View.GONE);
+					holder.message.setVisibility(View.VISIBLE);
+					message = "Your # was not found";
+				}
+				else
+				{
+	
+					holder.imgView.setImageUrl(mLiveFeeds.get(position).ohurl,new OnCompleteListener() {
+					
+						@Override
+						public void onComplete() {
+							holder.oProgress.setVisibility(View.GONE); 
+							holder.imgView.setVisibility(View.VISIBLE);
+							
+						}
+					});
+				}
+			}
+		}
+		else
+		{
+			params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+			convertView.setLayoutParams(params);
+			holder.message.setVisibility(View.VISIBLE);
+			holder.imgView.setVisibility(View.GONE);
+			holder.oProgress.setVisibility(View.GONE); 
+			
+		}
 		try {
 			String decodeMessage = URLDecoder.decode(message,"UTF-8");
 			holder.message.setText(decodeMessage);
@@ -124,6 +174,8 @@ public class LiveFeedAdapter extends BaseAdapter {
 		LinearLayout oContainer;
 		ImageView atplaceimage;
 		TextView messageTimestamp;
+		SmartImageView imgView;
+		ProgressBar oProgress;
 	}
     public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

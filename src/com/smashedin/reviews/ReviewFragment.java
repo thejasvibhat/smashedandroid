@@ -127,6 +127,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
     		      new IntentFilter("push-event"));
     	CheckForFollowingnotification();
+    	
+		
+
     }
     private void CheckForFollowingnotification()
     {
@@ -380,6 +383,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     					gLiveFeedAdaper.mLiveFeeds.clear();
     					gLiveFeedAdaper.mLiveFeeds.addAll(Singleton.getInstance().mRevData.livefeeds);
     					gLiveFeedAdaper.notifyDataSetChanged();
+    					livefeedList.setSelection(1000);
+    					livefeedList.invalidate();
     				}
     			}
     		}
@@ -394,7 +399,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		{
 			gLiveFeedAdaper.mLiveFeeds.addAll(mRevData.livefeeds);
 			livefeedList.setAdapter(gLiveFeedAdaper);
-			livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+			livefeedList.setSelection(1000);
+			livefeedList.invalidate();
 		}
 		else
 		{
@@ -412,46 +418,119 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			public void onClick(View arg0) {
 				EditText oStatusText = (EditText)liveView.findViewById(R.id.textStatus);
 				String message = oStatusText.getText().toString(); 
-				message = message.trim();
-				if(message.equals(""))
-					return;
-				try {
-					message = URLEncoder.encode(message,"utf-8");
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				float distance = mRevData.location.m_location.distanceTo(Singleton.getInstance().m_livelocation);
-				
+				SendMessage(message);
 				 oStatusText.setText("");
-				 LiveData oLive = new LiveData();				
-				 oLive.message = message;
-				 oLive.username = Singleton.getInstance().username;
-				 if(distance < 200)
-				 {
-					 oLive.atplace = "true";
-				 }
-				 oLive.mine = true;
-				 Long tsLong = System.currentTimeMillis()/1000;
-				 oLive.timestamp = tsLong;
-				 oLive.updating = true; 
-				 gLiveFeedAdaper.mLiveFeeds.add(oLive);
-				 gLiveFeedAdaper.notifyDataSetChanged();
-				 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
-				 
-				 gLiveFeedAdaper.mLiveFeeds.set(gLiveFeedAdaper.mLiveFeeds.size() - 1,oLive);
-				 mRevData.livefeeds.add(oLive);
-				 UpdateDataGCM(oLive);
 
 			}
 		});
 		//EnableLoginPageView();
 		return liveView;
     }
+    public void SendMessageOh(String tag,String top,String bottom)
+    {
+		float distance = mRevData.location.m_location.distanceTo(Singleton.getInstance().m_livelocation);
+		
+
+		 LiveData oLive = new LiveData();				
+		 oLive.toptext = top;
+		 oLive.bottomtext = bottom;
+		 oLive.tag = tag;
+		 oLive.username = Singleton.getInstance().username;
+		 if(distance < 200)
+		 {
+			 oLive.atplace = "true";
+		 }
+		 oLive.message = "Tag doesn't exist";
+		 oLive.mine = true;
+		 Long tsLong = System.currentTimeMillis()/1000;
+		 oLive.timestamp = tsLong;
+		 oLive.updating = true; 
+		 oLive.ohurl = "";
+	     oLive.type = "image";
+		 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+		 gLiveFeedAdaper.notifyDataSetChanged();
+		 livefeedList.setSelection(1000);
+		 livefeedList.invalidate();
+		 gLiveFeedAdaper.mLiveFeeds.set(gLiveFeedAdaper.mLiveFeeds.size() - 1,oLive);
+		 mRevData.livefeeds.add(oLive);
+		 UpdateDataGCM(oLive);
+	
+    }
+    public void SendMessage(String message)
+    {
+    	message = message.trim();
+		if(message.equals(""))
+			return;
+		boolean meme = CheckForOhShortcut(message); 
+			if(meme == false)
+			{
+				try {
+					message = URLEncoder.encode(message,"utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		float distance = mRevData.location.m_location.distanceTo(Singleton.getInstance().m_livelocation);
+		
+
+		 LiveData oLive = new LiveData();				
+		 oLive.message = message;
+		 oLive.username = Singleton.getInstance().username;
+		 if(distance < 200)
+		 {
+			 oLive.atplace = "true";
+		 }
+		 oLive.mine = true;
+		 Long tsLong = System.currentTimeMillis()/1000;
+		 oLive.timestamp = tsLong;
+		 oLive.updating = true; 
+		 if(meme == true)
+			 oLive.type = "image";
+		 gLiveFeedAdaper.mLiveFeeds.add(oLive);
+		 gLiveFeedAdaper.notifyDataSetChanged();
+		 livefeedList.setSelection(1000);
+		 livefeedList.invalidate();
+		 gLiveFeedAdaper.mLiveFeeds.set(gLiveFeedAdaper.mLiveFeeds.size() - 1,oLive);
+		 mRevData.livefeeds.add(oLive);
+		 UpdateDataGCM(oLive);
+    }
+    private boolean CheckForOhShortcut(String message)
+    {
+    	boolean meme = false;
+    	String[] msgs = message.split(" ");
+    	if(msgs.length == 3)
+    	{
+    		for(String msg:msgs)
+    		{
+    			if(msg.contains("#") == true)
+    			{
+    				meme = true;
+    			}
+    			else
+    				meme = false;
+    		}
+    	}
+    	return meme;
+    }
+    private String geturlforinstantoh(LiveData oLive)
+    {
+    	String url = "http://www.smashed.in/api/oh/getohinstant";
+    	url += "?tag="+oLive.tag;
+    	url += "&toptext="+oLive.toptext;
+    	url += "&bottomtext="+oLive.bottomtext;
+    	return url;
+    }
     private void UpdateDataGCM(LiveData oLive)
     {
-    	Singleton.getInstance().m_oType = "pushGet";
+    	Singleton.getInstance().m_oType = "pushGet";    	
     	String url = "http://www.smashed.in/api/b/gcm?bid="+mRevData.id+"&bname="+mRevData.name+"&message="+oLive.message+"&regid="+Singleton.getInstance().regid+"&atplace="+oLive.atplace;
+    	if(oLive.type.equals("image"))
+    	{
+    		
+    		url = geturlforinstantoh(oLive);
+    		url = url + "&bid="+mRevData.id+"&bname="+mRevData.name+"&regid="+Singleton.getInstance().regid+"&atplace="+oLive.atplace;
+    	}
     	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
     	oAsyncClient.Attach(this);
     	oAsyncClient.SetPersistantStorage(getActivity().getApplicationContext());
@@ -626,6 +705,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			oData.username = liveItem.getString("username");
 			oData.atplace = liveItem.getString("atplace");
 			oData.timestamp = Integer.parseInt(liveItem.getString("timestamp"));
+			oData.type = liveItem.getString("instanttype");
+			oData.ohurl = liveItem.getString("ohurl");
 			if(liveItem.getString("self").equals("true") == true)				
 				oData.mine = true;
 			mRevData.livefeeds.add(oData);
@@ -637,7 +718,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 		oP.setVisibility(View.GONE);			
 		livefeedList.setVisibility(View.VISIBLE);
 		livefeedList.setAdapter(gLiveFeedAdaper);
-		livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+		livefeedList.setSelection(1000);
+		livefeedList.invalidate();
 	}
 	private void ParseJsonReviews(String response) throws JSONException
 	{
@@ -821,15 +903,18 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			}
 			return;
 		}
-		if(tag == "pushGet")
+		if(tag == "pushGet") 
 		{
 			Singleton.getInstance().m_oType = "";
 			
 			LiveData oLive = (LiveData)oData;
 			int index = mRevData.livefeeds.indexOf(oLive);
 			oLive.updating = false;
+			oLive.ohurl = response;
 			mRevData.livefeeds.set(index, oLive);
-			gLiveFeedAdaper.notifyDataSetChanged();  
+			gLiveFeedAdaper.notifyDataSetChanged();
+			livefeedList.setSelection(1000);
+			livefeedList.invalidate();
 			return;
 		}
 
@@ -990,6 +1075,9 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
 					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
+					 oLive.ohurl = Singleton.getInstance().m_strOhUrl;
+					 oLive.type = Singleton.getInstance().m_strMessageType;
+
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(mRevData.id) == true)
 					 {
 						 if(gLiveFeedAdaper != null)
@@ -997,7 +1085,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 							 gLiveFeedAdaper.mLiveFeeds.add(oLive);
 							 mRevData.livefeeds.add(oLive);
 							 gLiveFeedAdaper.notifyDataSetChanged();
-							 livefeedList.setSelection(gLiveFeedAdaper.mLiveFeeds.size() - 1);
+							 livefeedList.setSelection(1000);
+							 livefeedList.invalidate();
 						 }
 					 }
 				 }

@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.internal.es;
 import com.smashedin.smashedin.R;
 
 import android.R.anim;
@@ -29,16 +30,20 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.smashedin.async.SmashedAsyncClient;
@@ -62,10 +67,12 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	private ProgressDialog oPd = null;
 	private String gBid;
 	public ReviewFragment m_oReviewsPageFragment = null;
+	public ReviewFragment m_oInstantPageFragment = null;
 	private ViewPager pager;
 	private TabPageIndicator indicator;
 	private FragmentActivity mActivity;
-
+	private View oh;
+	private int currentPageIndex = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	Singleton.getInstance().m_bFromNotification = false;
@@ -100,34 +107,18 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     		      new IntentFilter("custom-login-event"));
         
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		oh = LayoutInflater.from(mActivity).inflate(R.layout.quickinstantoh, null);
+		ViewGroup parentView = (ViewGroup) findViewById(R.id.quickcontainer);
+		parentView.addView(oh);
     }
     @Override
     public void onResume()
     {
-    	/*indicator.setOnPageChangeListener(new OnPageChangeListener() {
+    	indicator.setOnPageChangeListener(new OnPageChangeListener() {
 			
 			@Override
 			public void onPageSelected(int arg0) {
-				if(arg0 == 1)
-				{
-					Singleton.getInstance().m_bCreateFollowMenuItem = false;
-					if(oRevData.m_bfollow == true)
-					{
-						Singleton.getInstance().m_bUnFollowMenuItem = false;	
-					}
-					else
-					{
-						Singleton.getInstance().m_bUnFollowMenuItem = true;
-					}
-					mActivity.invalidateOptionsMenu();
-				}
-				else
-				{
-					Singleton.getInstance().m_bCreateFollowMenuItem = true;
-					Singleton.getInstance().m_bUnFollowMenuItem = true;
-					mActivity.invalidateOptionsMenu();
-				}
+				currentPageIndex = arg0;
 				
 			}
 			
@@ -142,7 +133,7 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				String x = "x";
 				
 			}
-		});*/
+		});
         Bundle b = getIntent().getExtras();
 
         getActionBar().setTitle(b.getString("name"));
@@ -212,14 +203,22 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		   }
 		  
     	LinearLayout oRevAdd = (LinearLayout) findViewById(R.id.addreview);
+    	RelativeLayout oh = (RelativeLayout) findViewById(R.id.quickinstantohid);
 		if(oRevAdd.getVisibility() == View.VISIBLE)
 		{
 			slideToTop(oRevAdd);
 		}
 		else
 		{
-			Singleton.getInstance().m_bFirstInstanceReview = true;
-			super.onBackPressed();
+			if(oh.getVisibility() == View.VISIBLE)
+			{
+				slideToTopOh(oh);
+			}
+			else
+			{
+				Singleton.getInstance().m_bFirstInstanceReview = true;
+				super.onBackPressed();
+			}
 		}
 	}
     @Override
@@ -469,18 +468,138 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	            objectAnimator.setDuration(500);
 	    objectAnimator.start();
 		}
+	public void slideToBottomOh(View view){
+		view.setVisibility(View.VISIBLE);
+		ViewGroup scrollView = (ViewGroup) findViewById(R.id.quickcontainer);
+		scrollView.setVisibility(View.VISIBLE);
+		ViewGroup parentView = (ViewGroup) findViewById(R.id.viewpagetabs);
+		ViewGroup childViewView = (ViewGroup) findViewById(R.id.slideOh);
+		int from = -parentView.getHeight();
+		int to = 0;//parentView.getHeight() - childViewView.getHeight();
+		
+		ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view,
+	            "y", from, to);
+	objectAnimator.addListener(new AnimatorListener() {
+
+	        @Override
+	        public void onAnimationStart(Animator animation) {
+	        	RelativeLayout oh = (RelativeLayout) findViewById(R.id.quickinstantohid);
+	            // TODO Auto-generated method stub
+	        	oh.setVisibility(View.VISIBLE);
+	        }
+
+	        @Override
+	        public void onAnimationRepeat(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+
+	        @Override
+	        public void onAnimationEnd(Animator animation) {
+
+	        }
+
+	        @Override
+	        public void onAnimationCancel(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+	    });
+	            objectAnimator.setDuration(500);
+	    objectAnimator.start();
+		}
+	public void slideToTopOh(View view){
+		view.setVisibility(View.VISIBLE);
+
+		ViewGroup parentView = (ViewGroup) findViewById(R.id.viewpagetabs);
+		ViewGroup childViewView = (ViewGroup) findViewById(R.id.slideOh);
+		//int to = parentView.getHeight();
+		//int from = parentView.getHeight() - childViewView.getHeight();
+		int to = -childViewView.getHeight();
+		int from = 0;
+		
+		ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view,
+	            "y", from, to);
+	objectAnimator.addListener(new AnimatorListener() {
+
+	        @Override
+	        public void onAnimationStart(Animator animation) {
+	        	RelativeLayout oh = (RelativeLayout) findViewById(R.id.quickinstantohid);
+	            // TODO Auto-generated method stub
+	        	oh.setVisibility(View.VISIBLE);
+	        }
+
+	        @Override
+	        public void onAnimationRepeat(Animator animation) {
+	        	
+
+	        }
+
+	        @Override
+	        public void onAnimationEnd(Animator animation) {
+	        	RelativeLayout oh = (RelativeLayout) findViewById(R.id.quickinstantohid);
+	            // TODO Auto-generated method stub
+	        	oh.setVisibility(View.INVISIBLE);
+	    		ViewGroup scrollView = (ViewGroup) findViewById(R.id.quickcontainer);
+	    		scrollView.setVisibility(View.GONE);
+
+	        }
+
+	        @Override
+	        public void onAnimationCancel(Animator animation) {
+	            // TODO Auto-generated method stub
+
+	        }
+	    });
+	            objectAnimator.setDuration(500);
+	    objectAnimator.start();
+		}
 	private void CreateOverheardForBar(String bid)
 	{
-		Singleton.getInstance().mOhRevData = oRevData;
-		if(mainintent == null)
-			mainintent = new Intent(this, MainActivity.class);
-		Intent intent = new Intent("my-event");
-  	  // add data
-  	  	intent.putExtra("position", 2);
-  	  	intent.putExtra("bid", bid);
-  	  	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		if(currentPageIndex == 0)
+		{
+			  ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		                 android.R.layout.simple_dropdown_item_1line, Singleton.getInstance().m_arrTags);
+			AutoCompleteTextView textView = (AutoCompleteTextView)
+	                findViewById(R.id.autocomptag);
+			textView.setAdapter(adapter);
+			Button suboh = (Button) findViewById(R.id.submitphinstant);
+			suboh.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					View oh = LayoutInflater.from(mActivity).inflate(R.layout.quickinstantoh, null);
+					slideToTopOh(oh);
+					EditText toptext = (EditText) findViewById(R.id.topinstanttext);
+					EditText bottomtext = (EditText) findViewById(R.id.bottominstanttext);
+					AutoCompleteTextView oTag = (AutoCompleteTextView) findViewById(R.id.autocomptag);
+					m_oInstantPageFragment.SendMessageOh(oTag.getText().toString(),toptext.getText().toString(),bottomtext.getText().toString());
+				}
+			});
+			if(oh.getVisibility() == View.INVISIBLE)
+			{
+				slideToBottomOh(oh);
+			}
+			else
+			{
+				slideToTopOh(oh);
+			}
+		}
+		else
+		{
+			Singleton.getInstance().mOhRevData = oRevData;
+			if(mainintent == null)
+				mainintent = new Intent(this, MainActivity.class);
+			Intent intent = new Intent("my-event");
+	  	  // add data
+	  	  	intent.putExtra("position", 2);
+	  	  	intent.putExtra("bid", bid);
+	  	  	LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+			
+	        startActivity(mainintent);	
+		}
+
 		
-        startActivity(mainintent);
 
 	}
 	private void Login()
@@ -532,7 +651,12 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 
         @Override
         public Fragment getItem(int position) {
-        	if(position == 2) //reviews page
+        	if(position == 0) //reviews page
+        	{
+        		m_oInstantPageFragment = ReviewFragment.newInstance(CONTENT[position % CONTENT.length],oRevData);           	 
+                return m_oInstantPageFragment;
+        	}
+        	else if(position == 2) //reviews page
         	{
         		m_oReviewsPageFragment = ReviewFragment.newInstance(CONTENT[position % CONTENT.length],oRevData);           	 
                 return m_oReviewsPageFragment;

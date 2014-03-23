@@ -165,4 +165,10 @@
         android:id="@+id/frame_container_each"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:visibility="gone"
+    android:id="@+id/quickcontainer"></ScrollView>
 </FrameLayout>

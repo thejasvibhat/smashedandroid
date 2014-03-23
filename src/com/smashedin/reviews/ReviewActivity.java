@@ -212,7 +212,18 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
     	
-    	
+    	GetTagClouds();
+    }
+    public void GetTagClouds()
+    {
+    	if(Singleton.getInstance().m_arrTags.size() == 0)
+    	{
+    		String url = "http://www.smashed.in/api/oh/gettaglist";
+    		SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        	oAsyncClient.Attach(this); 
+        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        	oAsyncClient.MakeCallWithTag(url,"tagcloud");
+    	}
     }
     private void StartAlarmGcm()
     {
@@ -885,10 +896,30 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         intent.putExtras(b);
         startActivity(intent);
 	}
-	
+	private void ParseJsonTags(String response) throws JSONException
+	{
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+		JSONArray items = (JSONArray) jsonObj.getJSONArray("tags");		
+		for (int i = 0; i < items.length(); i++) {
+			JSONObject tagItem = (JSONObject)items.get(i);
+			Singleton.getInstance().m_arrTags.add(tagItem.getString("tag"));
+		}
+
+	}
+
 	@Override
 	public void OnResponse(String response,String tag,Object obj) {
 	
+		if(tag.equals("tagcloud"))
+		{
+			try {
+				ParseJsonTags(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 		try {
 			ParseJson(response);
 		} catch (JSONException e) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="500px"
     android:orientation="vertical" >
 	<LinearLayout  android:id="@+id/containerStatus"
 	    android:layout_width="wrap_content"
@@ -57,6 +57,21 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="14dp" />
+     <com.loopj.android.image.SmartImageView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageohinstant"
+        android:visibility="gone">
+	        
+	    </com.loopj.android.image.SmartImageView>
+	    			            <ProgressBar
+			                android:gravity="center_vertical"
+			                android:layout_gravity="center_vertical|center_horizontal"
+			                android:visibility="gone"
+				            android:id="@+id/progressohinstantLoad"
+				            style="?android:attr/progressBarStyleSmall"
+				            android:layout_width="500px"
+				            android:layout_height="50px" />
+     
      <TextView
         android:id="@+id/message_timestamp"
         android:layout_width="wrap_content"

@@ -78,6 +78,11 @@ public class Singleton {
 	public String m_strMessageGcmLocation = "false";
 	public long m_iMessageGcmTimestamp = 0;
 	public boolean m_bLocationOn = false;
+	public ArrayList<String> m_arrTags = new ArrayList<String>();
+
+	public String m_strMessageType;
+
+	public String m_strOhUrl;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     } 

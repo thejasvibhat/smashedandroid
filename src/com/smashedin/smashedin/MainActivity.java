@@ -896,6 +896,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 oLive.bid = Singleton.getInstance().m_strMessageGcmBid;
 					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
 					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
+					 oLive.ohurl = Singleton.getInstance().m_strOhUrl;
+					 oLive.type = Singleton.getInstance().m_strMessageType;
+					 if(oLive.type.equals("image") == true)
+					 {
+						 Singleton.getInstance().m_strMessageGcm = "New Overheard";
+					 }
 					 Singleton.getInstance().m_bGcmMessages = true;
 					 Singleton.getInstance().mRevData.livefeeds.add(oLive);
 					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
@@ -920,6 +926,12 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
 					 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
 					 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
+					 oLive.ohurl = Singleton.getInstance().m_strOhUrl;
+					 oLive.type = Singleton.getInstance().m_strMessageType;
+					 if(oLive.type.equals("image") == true)
+					 {
+						 Singleton.getInstance().m_strMessageGcm = "New Overheard";
+					 }
 					 if(Singleton.getInstance().m_strMessageGcmBid.equals(Singleton.getInstance().mRevData.id) == true)
 					 {
 						 Singleton.getInstance().m_bGcmMessages = true;
