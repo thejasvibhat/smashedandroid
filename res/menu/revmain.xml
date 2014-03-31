@@ -32,7 +32,10 @@
           android:title="UnFollow Instant"
           android:showAsAction="collapseActionView|ifRoom"
           />
-     	
+     	<item android:id="@+id/privategroup"
+     	    android:icon="@drawable/ic_private_group"
+     	    android:title="New private group"
+     	    android:showAsAction="collapseActionView|ifRoom"/>
      	<item android:id="@+id/login"
           android:title="Login"
           android:icon="@drawable/ic_login"

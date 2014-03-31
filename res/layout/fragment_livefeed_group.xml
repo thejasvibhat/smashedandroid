@@ -66,10 +66,7 @@
 		    android:layout_height="wrap_content"
 		    android:gravity="right"
 		    >
-		    <ImageButton android:src="@drawable/ic_action_social_add_group_dark"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:id="@+id/mygroup"/>
+	
 		</LinearLayout>
     
 </FrameLayout>

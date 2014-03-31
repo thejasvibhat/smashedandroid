@@ -102,7 +102,14 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/StyledIndicators">
         </activity>
-       
+        <activity
+            android:name="com.smashedin.reviews.ListGroupsFriends"
+            android:label="My Groups"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/StyledIndicators">
+        </activity>
+        
 	    <provider
 		   android:authorities="com.smashedin.search.SampleRecentSuggestionsProvider"
 		   android:name="com.smashedin.search.SampleRecentSuggestionsProvider" >

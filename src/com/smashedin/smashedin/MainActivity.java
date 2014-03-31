@@ -12,7 +12,11 @@ import com.smashedin.common.NavDrawerItem;
 import com.smashedin.common.NavDrawerListAdapter;
 import com.smashedin.facebook.HelloFacebookSampleActivity;
 import com.smashedin.reviews.LiveData;
+import com.smashedin.reviews.MyGroupDataSingleton;
+import com.smashedin.reviews.PrivateGroupData;
 import com.smashedin.reviews.ReviewActivity;
+import com.smashedin.reviews.ReviewData;
+import com.smashedin.reviews.ReviewLocation;
 import com.smashedin.smashed.*;
 import com.smashedin.smashed.GridOverheardSkeletonFragment.OnHeadlineSelectedListener;
 
@@ -20,9 +24,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,6 +44,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.NotificationManager;
@@ -63,13 +74,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
 public class MainActivity extends FragmentActivity implements OnHeadlineSelectedListener,OnResponseListener {
     public static final int NOTIFICATION_ID = 1;
+    public static final int NOTIFICATION_ID_GROUP = 2;
+    public static final int NOTIFICATION_ID_REQUEST = 2;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     private Intent m_ohIntent;
@@ -120,7 +136,6 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     Context context;
 
     String regid;
-
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -201,6 +216,9 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 				      new IntentFilter("search-event"));
 		    	LocalBroadcastManager.getInstance(this).registerReceiver(mGcmMessageReceiver,
 		    		      new IntentFilter("push-event"));
+		    	LocalBroadcastManager.getInstance(this).registerReceiver(mGcmGroupMessageReceiver,
+		    		      new IntentFilter("push-group-event"));
+
 		    	Singleton.getInstance().m_bFirstInstance = false;
 		  }
 		  
@@ -659,6 +677,53 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         }
 
     }
+	private ReviewData ParseJsonObjectItem(JSONObject item) throws JSONException
+	{
+		ReviewData venue = new ReviewData();
+					
+		venue.id 		= item.getString("id");
+		venue.name		= item.getString("name");
+		try {
+			venue.rating    = item.getString("rating");	
+		} catch (Exception e) {
+			venue.rating    = "1.0";
+		}
+		
+		JSONObject location = (JSONObject) item.getJSONObject("location");
+		venue.location = new ReviewLocation();
+		venue.location.PopulateData(location);
+		try {
+			venue.contact = item.getJSONObject("contact").getString("formattedPhone");	
+		} catch (Exception e) {
+			venue.contact = "";
+		} 
+		
+		try {
+			JSONArray photosUrls	= (JSONArray)((JSONObject)((JSONArray) item.getJSONObject("photos").getJSONArray("groups")).get(0)).getJSONArray("items");
+			for(int i = 0; i < photosUrls.length(); i++)
+			{
+				JSONObject pata = (JSONObject)photosUrls.get(i);
+				venue.photo = pata.getString("prefix")+"100x100"+pata.getString("suffix");
+			}
+			
+		} catch (Exception e) {
+			
+		}
+		try {
+			venue.categories = "";
+			JSONArray cats = (JSONArray)item.getJSONArray("categories");
+			for(int i = 0; i < cats.length(); i++)
+			{
+				JSONObject pata = (JSONObject)cats.get(i);
+				venue.categories = venue.categories + " " + pata.getString("name");
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return venue;
+	}
+
 
 	@Override
 	public void OnResponse(String response,String tag,Object obj) {
@@ -667,6 +732,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 			Singleton.getInstance().m_oType = "oh";
 			return;
 		}
+
 		if(oPd != null)
 			oPd.dismiss();
 		Singleton.getInstance().loggedIn = true;
@@ -703,6 +769,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 		  }
 
 	};
+
 	private BroadcastReceiver mSearchReviewMessageReceiver = new BroadcastReceiver() {
 		  @Override
 		  public void onReceive(Context context, Intent intent) {
@@ -904,7 +971,7 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 }
 					 Singleton.getInstance().m_bGcmMessages = true;
 					 Singleton.getInstance().mRevData.livefeeds.add(oLive);
-					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
+					 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm,NOTIFICATION_ID);
 				 }
 				 
 			 }
@@ -936,14 +1003,83 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
 					 {
 						 Singleton.getInstance().m_bGcmMessages = true;
 						 Singleton.getInstance().m_arrInstantQueueMessages.add(oLive);
-						 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm);
+						 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm,NOTIFICATION_ID);
 					 }
 				 }
 			 }
 		  }
 
 	};
-    private void sendNotification(String msg) {
+	private BroadcastReceiver mGcmGroupMessageReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		    // Extract data included in the Intent
+			 for(PrivateGroupData oGroupData:MyGroupDataSingleton.getInstance().m_arrPrivateGroups)
+			 {
+				 if(oGroupData.uniqueId.equals(Singleton.getInstance().uniqueid))
+				 {
+					 if(Singleton.getInstance().m_bAppHidden == true)
+					 {
+						 oGroupData.m_arrInstantQueueMessages.clear();
+						 String message = Singleton.getInstance().m_strMessageGcm;
+						 LiveData oLive = new LiveData();
+						 oLive.mine = false;
+						 try {
+								message = URLEncoder.encode(message,"utf-8");
+							} catch (UnsupportedEncodingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						 oLive.message = message;
+						 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+						 oLive.bid = Singleton.getInstance().m_strMessageGcmBid;
+						 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
+						 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
+						 oLive.ohurl = Singleton.getInstance().m_strOhUrl;
+						 oLive.type = Singleton.getInstance().m_strMessageType;
+						 if(oLive.type.equals("image") == true)
+						 {
+							 Singleton.getInstance().m_strMessageGcm = "New Overheard";
+						 }
+						 if(oGroupData.m_bMine)
+							 oGroupData.mRevData.grouplivefeedsmine.add(oLive);
+						 else
+							 oGroupData.mRevData.grouplivefeedsfriends.add(oLive);
+						 Singleton.getInstance().m_bFromMyGroups = true;
+						 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm,NOTIFICATION_ID_GROUP);
+					 }
+					 else
+					 {
+						 String message = Singleton.getInstance().m_strMessageGcm;
+						 LiveData oLive = new LiveData();
+						 oLive.mine = false;
+						 try {
+								message = URLEncoder.encode(message,"utf-8");
+							} catch (UnsupportedEncodingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						 oLive.message = message;
+						 oLive.username = Singleton.getInstance().m_strMessageGcmUser;
+						 oLive.atplace = Singleton.getInstance().m_strMessageGcmLocation;
+						 oLive.timestamp = Singleton.getInstance().m_iMessageGcmTimestamp;
+						 oLive.ohurl = Singleton.getInstance().m_strOhUrl;
+						 oLive.type = Singleton.getInstance().m_strMessageType;
+						 if(oLive.type.equals("image") == true)
+						 {
+							 Singleton.getInstance().m_strMessageGcm = "New Overheard";
+						 }
+						 oGroupData.m_arrInstantQueueMessages.add(oLive);
+						 Singleton.getInstance().m_bFromMyGroups = true;
+						 sendNotification(Singleton.getInstance().m_strMessageGcmBname+":"+Singleton.getInstance().m_strMessageGcm,NOTIFICATION_ID_GROUP);
+					 }
+				 }
+			 }
+		  }
+
+	};
+	
+    private void sendNotification(String msg,int id) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -965,6 +1101,6 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
         mBuilder.setAutoCancel(true);
         Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notify);
         mBuilder.setSound(sound);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(id, mBuilder.build());
     }	
 }

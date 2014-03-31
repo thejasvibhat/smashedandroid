@@ -1,9 +1,12 @@
 package com.smashedin.reviews;
 import com.google.android.gms.drive.internal.o;
+import com.smashedin.smashedin.MainActivity;
 import com.smashedin.smashedin.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,17 +32,25 @@ import com.smashedin.smashed.Singleton;
 import com.smashedin.smashed.GridOverheardFragment.OnHeadlineSelectedListener;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -48,11 +59,14 @@ import android.provider.SearchRecentSuggestions;
 import android.provider.Settings;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -72,6 +86,12 @@ import android.widget.TextView;
 
 
 public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelectedListener,OnResponseListener {
+	public boolean isVisible = true;
+	private NotificationManager mNotificationManager;
+	private NavDrawerItem mFollowDrawerItem;
+	private NavDrawerItem mGroupFollowItem;
+	private boolean m_bFollowing = false;
+	private boolean m_bMyGroups = false;
 	SearchView searchView;
 	private Menu optionsMenu = null;
 	private LocationManager locationManager = null;    
@@ -106,6 +126,8 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	 Builder dialog   = null;
 	 AlertDialog dialogAlert = null;
 	private Handler serviceHandler;
+	private ArrayList<DialogId> m_arrDialogs = new ArrayList<DialogId>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -213,7 +235,105 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		});
     	
     	GetTagClouds();
+    	LocalBroadcastManager.getInstance(this).registerReceiver(mGroupAcceptReceiver,
+  		      new IntentFilter("group-accept-event"));
+
+
     }
+    private void sendNotification(String msg,int id) {
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.notifylargeicon);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+        .setSmallIcon(R.drawable.notifysmallicon)
+        .setLargeIcon(largeIcon)
+        .setContentTitle("Instants Received")
+        .setStyle(new NotificationCompat.BigTextStyle()
+        .bigText(msg))
+        .setContentText(msg);
+       // mBuilder.setLights(Color.BLUE, 500, 500);
+        //long[] pattern = {500,500,500,500,500,500,500,500,500};
+        //mBuilder.setVibrate(pattern);
+        mBuilder.setContentIntent(contentIntent);
+        mBuilder.setAutoCancel(true);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notify);
+        mBuilder.setSound(sound);
+        mNotificationManager.notify(id, mBuilder.build());
+    }	
+
+	private BroadcastReceiver mGroupAcceptReceiver = new BroadcastReceiver() {
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+			  AlertDialog.Builder builder = new AlertDialog.Builder(m_oRevActivity);
+			  String uniqueid = intent.getStringExtra("uniqueid");
+    		String bname = intent.getStringExtra("bname");
+    		String username = intent.getStringExtra("username");
+    		if(((ReviewActivity)m_oRevActivity).isVisible == false)
+    		{
+    			Singleton.getInstance().m_bRequestGroupNotification = true;
+    			sendNotification("Instant Request",MainActivity.NOTIFICATION_ID_REQUEST);
+    		}
+    		// 2. Chain together various setter methods to set the dialog characteristics
+    		builder.setMessage(username+" has requested you to join instants at "+bname)
+    		       .setTitle("Instant request");
+    		builder.setPositiveButton("Join",new DialogInterface.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) {
+    				// TODO Auto-generated method stub
+    				try {
+    					DialogId newDlg = m_arrDialogs.get(0);
+    					String uniqueid = newDlg.id;
+        				  MyGroupDataSingleton.getInstance().acceptGroupData.uniqueId = uniqueid;
+        				  String url = "http://www.smashed.in/api/b/gcm/groupconfirm?state=in&regid="+Singleton.getInstance().regid+"&uniqueid="+uniqueid;
+        		        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        		        	oAsyncClient.Attach(m_oRevActivity);
+        		        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        		        	oAsyncClient.MakeCallWithTag(url, "accept");        
+
+
+
+        					dialog.cancel();
+
+    				} catch (Exception e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    			}
+    		});
+    		builder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) {
+    				// TODO Auto-generated method stub
+    				try {
+    				} catch (Exception e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    			}
+    		});
+    	               // User cancelled the dialog
+
+    		// 3. Get the AlertDialog from create()
+    		AlertDialog dialog = builder.create();
+    		DialogId newDlg = new DialogId();
+    		newDlg.id = uniqueid;
+    		newDlg.dialog = dialog;
+    		m_arrDialogs.add(newDlg);
+    		  Window window = dialog.getWindow();
+    	        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+    	                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+    	        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    	        dialog.show();
+		  }
+
+	};
+
     public void GetTagClouds()
     {
     	if(Singleton.getInstance().m_arrTags.size() == 0)
@@ -268,6 +388,23 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		};
 		oTimer.start();
     }
+    private void FillTheMyGroupData()
+    {
+    	if(MyGroupDataSingleton.getInstance().m_arrPrivateGroups.size() > 0)
+    	{
+			
+			if(m_bMyGroups)
+			{
+				return;
+			}
+			if(mGroupFollowItem == null)
+				mGroupFollowItem = new NavDrawerItem("My Groups", R.drawable.reviews);
+			adapterlist.navDrawerItems.add(mGroupFollowItem);
+			adapterlist.notifyDataSetChanged();
+    		m_bMyGroups = true;
+    		
+    	}
+    }
     private void FillTheFollowingBarData()
     {
     	if(Singleton.getInstance().mRevData != null)
@@ -275,22 +412,26 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     		ReviewData lData = Singleton.getInstance().mRevData;
     		if(lData.m_bfollow == true)
     		{
-    			if(adapterlist.navDrawerItems.size() > 3)
+    			
+    			if(m_bFollowing)
     			{
-        			adapterlist.navDrawerItems.remove(3);
-        			adapterlist.notifyDataSetChanged();
-    				
+    				adapterlist.navDrawerItems.remove(adapterlist.navDrawerItems.indexOf(mFollowDrawerItem));
+        			adapterlist.notifyDataSetChanged();    				
     			}
-    			adapterlist.navDrawerItems.add(new NavDrawerItem(lData.name, R.drawable.reviews));
+    			m_bFollowing = true;
+    			if(mFollowDrawerItem == null)
+    				mFollowDrawerItem = new NavDrawerItem(lData.name, R.drawable.reviews);
+    			mFollowDrawerItem.setTitle(lData.name);
+    			mFollowDrawerItem.setIcon(R.drawable.reviews);
+    			adapterlist.navDrawerItems.add(mFollowDrawerItem);
     			adapterlist.notifyDataSetChanged();
     		}
     		else
     		{
-    			if(adapterlist.navDrawerItems.size() > 3)
+    			if(m_bFollowing)
     			{
-        			adapterlist.navDrawerItems.remove(3);
-        			adapterlist.notifyDataSetChanged();
-    				
+    				adapterlist.navDrawerItems.remove(adapterlist.navDrawerItems.indexOf(mFollowDrawerItem));
+        			adapterlist.notifyDataSetChanged();    				
     			}
     		}
     	}
@@ -340,8 +481,18 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		super.onResume();
     }
     @Override
+    protected void onPause() {
+      super.onPause();
+      isVisible = false;
+    }
+    @Override
     public void onResume() 
     {
+		 NotificationManager mNotificationManager = (NotificationManager)
+	                this.getSystemService(Context.NOTIFICATION_SERVICE);
+		 mNotificationManager.cancel(MainActivity.NOTIFICATION_ID_REQUEST);
+
+    	isVisible = true;
     	if(dialogAlert != null)
     	{
     		dialogAlert.dismiss();
@@ -355,6 +506,7 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	}
 		mDrawerList.setSelection(0);
     	FillTheFollowingBarData();
+    	FillTheMyGroupData();
     	Singleton.getInstance().restoreUserDetails();
     	Singleton.getInstance().m_bAppHidden = false;
     	if(gAdapter != null)
@@ -364,11 +516,21 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
         	{
         		Singleton.getInstance().m_bGcmMessages = false;
         	
-        		FromNotification();
+        		FromNotification("navdrawer");
         		gAdapter.FsqVenues.addAll(Singleton.getInstance().FsVenues);
         		super.onResume();
         		return;
         	}
+        	if(Singleton.getInstance().m_bFromMyGroups == true)
+        	{
+        		Singleton.getInstance().m_bFromMyGroups = false;
+        	
+        		FromNotification("groupdrawer");
+        		gAdapter.FsqVenues.addAll(Singleton.getInstance().FsVenues);
+        		super.onResume();
+        		return;
+        	}
+        	
         	GetMyLocation();
     	}
     	else
@@ -535,12 +697,13 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	}
 
     private void displayView(int position) {
+    	NavDrawerItem oItem = adapterlist.navDrawerItems.get(position);
     	if(position == 0)
     	{
     		mDrawerLayout.closeDrawers();
     		return;
     	}
-    	else if(position > 2)
+    	else if(oItem == mFollowDrawerItem)
     	{
     		mDrawerLayout.closeDrawers();    		
             Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
@@ -552,6 +715,20 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 
     		return;
     	}
+    	else if(oItem == mGroupFollowItem)
+    	{
+    		mDrawerLayout.closeDrawers();    		
+            Intent intent = new Intent(getApplicationContext(), ListGroupsFriends.class);
+            Bundle b = new Bundle();
+            b.putInt("position",0);
+            b.putString("bid", "groupdrawer");
+
+            intent.putExtras(b);
+            startActivity(intent);
+
+    		return;
+    	}
+
     	Intent intent = new Intent("my-event");
     	  // add data
     	  intent.putExtra("position", position);
@@ -887,14 +1064,34 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			}
 		});
 	}
-	public void FromNotification()
+	public void FromNotification(String type)
 	{
         Intent intent = new Intent(getApplicationContext(), SmashedReview.class);
         Bundle b = new Bundle();
         b.putInt("position",0);
-        b.putString("bid", "theju");
+        b.putString("bid", type);
         intent.putExtras(b);
         startActivity(intent);
+	}
+	private void ParseJsonFriends(String response) throws JSONException
+	{
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();
+		JSONArray items = (JSONArray) jsonObj.getJSONArray("friends");		
+		for (int i = 0; i < items.length(); i++) {
+			JSONObject tagItem = (JSONObject)items.get(i);
+			FacebookFriendsData oFriend = new FacebookFriendsData();
+			oFriend.name = tagItem.getString("name");
+			oFriend.avatar_url = tagItem.getString("avatar");
+			MyGroupDataSingleton.getInstance().acceptGroupData.m_arrParticipants.add(oFriend);
+		}
+
+		String bid = jsonObj.getString("bid");
+		String url 	= "https://api.foursquare.com/v2/venues/"+bid+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20140305&section=drinks&venuePhotos=1&offset=0&limit=50";
+    	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+    	oAsyncClient.Attach(this);
+    	oAsyncClient.SetPersistantStorage(getApplicationContext());
+    	oAsyncClient.MakeCallWithTag(url,"venue");        	
+
 	}
 	private void ParseJsonTags(String response) throws JSONException
 	{
@@ -905,6 +1102,17 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 			Singleton.getInstance().m_arrTags.add(tagItem.getString("tag"));
 		}
 
+	}
+	private void ParseJsonIndpendent(String response) throws JSONException
+	{
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();		
+		JSONObject groups	= (JSONObject) jsonObj.getJSONObject("response");
+		JSONObject item = (JSONObject)groups.getJSONObject("venue");
+		ReviewData oRevData = ParseJsonObjectItem(item);
+		MyGroupDataSingleton.getInstance().acceptGroupData.mRevData = oRevData;
+		MyGroupDataSingleton.getInstance().acceptGroupData.m_bMine = false;
+		MyGroupDataSingleton.getInstance().m_arrPrivateGroups.add(MyGroupDataSingleton.getInstance().acceptGroupData);
+		FillTheMyGroupData();
 	}
 
 	@Override
@@ -918,6 +1126,28 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			return;
+		}
+		if(tag.equals("accept"))
+		{
+			try {
+				ParseJsonFriends(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return;
+		}
+		if(tag.equals("venue"))
+		{
+			try {
+				ParseJsonIndpendent(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			return;
 		}
 		try {

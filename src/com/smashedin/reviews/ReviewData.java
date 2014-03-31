@@ -18,6 +18,8 @@ public class ReviewData {
 	public ArrayList<SmashedFsReviewsData> reviews;
 	public ArrayList<String> photos;
 	public ArrayList<LiveData> livefeeds;
+	public ArrayList<LiveData> grouplivefeedsmine = new ArrayList<LiveData>();
+	public ArrayList<LiveData> grouplivefeedsfriends = new ArrayList<LiveData>();
 	public boolean m_bfollow = false;
 
 }

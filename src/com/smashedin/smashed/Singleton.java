@@ -12,6 +12,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.PersistentCookieStore;
 import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.reviews.LiveData;
+import com.smashedin.reviews.PrivateGroupData;
 import com.smashedin.reviews.ReviewData;
 
 import android.content.Context;
@@ -81,8 +82,16 @@ public class Singleton {
 	public ArrayList<String> m_arrTags = new ArrayList<String>();
 
 	public String m_strMessageType;
+	
+	
 
 	public String m_strOhUrl;
+	public String uniqueid = "";
+	public boolean m_bFromMyGroups = false;
+
+	public boolean m_bPrivateGroupMenuItem = true;
+
+	public boolean m_bRequestGroupNotification = false;
     private Singleton(){
     	oAsyncClient = new SmashedAsyncClient();
     } 
@@ -144,6 +153,8 @@ public class Singleton {
 
     public String getAccessToken()
     {
+    	if(m_LocalStorage == null)
+    		return "NOT_FOUND";
     	return m_LocalStorage.getString("access", "NOT_FOUND");
     }
     public String GetProvider()
@@ -165,6 +176,7 @@ public class Singleton {
     	m_bCreateReviewMenuItem = true;
     	m_bCreateReviewOhMenuItem = true;
     	m_bCreateFollowMenuItem = true;
+    	m_bPrivateGroupMenuItem = true;
     }
 	public void parseJsonUserDetails(String response) {
 		JSONObject jsonObj;
@@ -195,6 +207,7 @@ public class Singleton {
 
 		
 	}
+	
 
 
 }

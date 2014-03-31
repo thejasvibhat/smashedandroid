@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -50,6 +51,7 @@ import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.async.SmashedAsyncClient.OnResponseListener;
 import com.smashedin.facebook.HelloFacebookSampleActivity;
 import com.smashedin.smashed.CreateOverHeardFragment;
+import com.smashedin.smashed.GridOverheardFragment;
 import com.smashedin.smashed.GridOverheardSkeletonFragment;
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashedin.*;
@@ -73,16 +75,18 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 	private FragmentActivity mActivity;
 	private View oh;
 	private int currentPageIndex = 0;
+	private SelectFriendsFragment friendPickerFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	Singleton.getInstance().m_bFromNotification = false;
+    	Singleton.getInstance().m_bFromMyGroups = false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewpage_tabs);
         mActivity = this;
         Bundle b = getIntent().getExtras();
         int pos = b.getInt("position");
         String bid = b.getString("bid","");
-       
+        int position = b.getInt("position", 0);
         FragmentPagerAdapter adapter = new GoogleMusicAdapter(getSupportFragmentManager());
 
         pager = (ViewPager)findViewById(R.id.pager);
@@ -91,12 +95,19 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
         indicator = (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
         pager.setOffscreenPageLimit(3);
-        if(bid.equals("") == false)
+        if(bid.equals("navdrawer") == true)
         {
         	Singleton.getInstance().m_bFromNotification = true;
         	oRevData = Singleton.getInstance().mRevData;
         	pager.setCurrentItem(0);
         }
+        else if(bid.equals("groupdrawer") == true)
+        {
+        	Singleton.getInstance().m_bFromMyGroups = true;
+        	oRevData = MyGroupDataSingleton.getInstance().m_arrPrivateGroups.get(position).mRevData;
+        	pager.setCurrentItem(0);
+        }
+
         else
         oRevData = (ReviewData) ListReviewDataSingleton.getInstance().venueList.get(pos);
 
@@ -153,6 +164,11 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
     		Singleton.getInstance().m_bCreateFollowMenuItem = true;
     		Singleton.getInstance().m_bUnFollowMenuItem = false;
     		Singleton.getInstance().m_bFromNotification = false;
+    	}
+    	else if(Singleton.getInstance().m_bFromMyGroups == true)
+    	{
+    		Singleton.getInstance().m_bCreateFollowMenuItem = true;
+    		Singleton.getInstance().m_bUnFollowMenuItem = false;    		
     	}
     	else
     	{
@@ -245,6 +261,10 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 				if(Singleton.getInstance().m_bUnFollowMenuItem == true)
 					m_oUnFollowMenuItem.setVisible(false);
 
+				MenuItem m_oUnAddGroupMenuItem = menu.findItem(R.id.privategroup);
+				if(Singleton.getInstance().m_bPrivateGroupMenuItem == true)
+					m_oUnAddGroupMenuItem.setVisible(false);
+
 		return true;
 	}
 
@@ -263,10 +283,35 @@ public class SmashedReview extends FragmentActivity implements OnResponseListene
 		case R.id.login:
 			Login();
 			return true;
+		case R.id.privategroup:
+			CreatePrivateGroup();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return true;
+	}
+	private void CreatePrivateGroup()
+	{
+		if(friendPickerFragment == null)
+		{
+			friendPickerFragment = new SelectFriendsFragment();
+			friendPickerFragment.AddData(oRevData);
+		}
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction()
+				.replace(R.id.viewpagetabs, friendPickerFragment).addToBackStack( "main" ).commit();
+		fragmentManager.addOnBackStackChangedListener(new OnBackStackChangedListener() {
+			
+			@Override
+			public void onBackStackChanged() {
+				if(m_oInstantPageFragment.isVisible())
+				{
+					m_oInstantPageFragment.CheckForPrivateGroups();
+				}
+				
+			}
+		});
 	}
 	private void UpdateReview(String id,int rating,String rev, String username)
 	{

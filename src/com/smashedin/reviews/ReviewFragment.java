@@ -62,6 +62,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -90,6 +91,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     private View reviewview;
     private View liveView;
     Fragment m_OhFragment;
+    private PrivateGroupData oMineGroupData;
+    private PrivateGroupData oFriendsGroupData;
     private boolean m_bRegistered = false;
     AtomicInteger msgId = new AtomicInteger();
     public static ReviewFragment newInstance(String content,ReviewData oRevData) {
@@ -102,7 +105,8 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
     private String mContent = "???";
     private ReviewData mRevData = null;
-    private Fragment mainFragment; 
+    private Fragment mainFragment;
+	private MyGroupsFragment myGroupsFragment; 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,9 +131,32 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
     		      new IntentFilter("push-event"));
     	CheckForFollowingnotification();
-    	
+    	if(Singleton.getInstance().m_bFromMyGroups == true)
+    	{
+    		Singleton.getInstance().m_bFromMyGroups = false;
+    		ShowPrivateMessageGroup();
+    	}
 		
+    	CheckForPrivateGroups();
+    	getActivity().invalidateOptionsMenu();
 
+    }
+	public void ShowPrivateMessageGroup() {
+		ShowMyGroup();
+		
+	}
+
+    public void CheckForPrivateGroups()
+    {
+    	ImageButton oMyGroup = (ImageButton) getActivity().findViewById(R.id.mygroup);
+		oMyGroup.setVisibility(View.INVISIBLE);
+		Singleton.getInstance().m_bPrivateGroupMenuItem = false;
+		if(MyGroupDataSingleton.getInstance().CheckForPrivateGroup(mRevData) == true)
+		{
+			oMyGroup.setVisibility(View.VISIBLE);			
+		}
+		if(MyGroupDataSingleton.getInstance().CheckForMyPrivateGroup(mRevData) == true)
+			Singleton.getInstance().m_bPrivateGroupMenuItem = true;
     }
     private void CheckForFollowingnotification()
     {
@@ -423,8 +450,33 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 
 			}
 		});
+		ImageButton oMyGroup = (ImageButton) liveView.findViewById(R.id.mygroup);
+		oMyGroup.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				ShowMyGroup();
+				
+			}
+		});
 		//EnableLoginPageView();
 		return liveView;
+    }
+    private void ShowMyGroup()
+    {
+		if(myGroupsFragment == null)
+		{
+			myGroupsFragment = new MyGroupsFragment();
+		}
+		
+		PrivateGroupData oMineGroup = MyGroupDataSingleton.getInstance().GetMyPrivateGroup(mRevData);
+		PrivateGroupData oFriendsGroup = MyGroupDataSingleton.getInstance().GetFriendsPrivateGroup(mRevData);
+		myGroupsFragment.AddData(oMineGroup,oFriendsGroup);
+
+		android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+		fragmentManager.beginTransaction()
+				.replace(R.id.viewpagetabs, myGroupsFragment).addToBackStack( "mygroups" ).commit();
+
     }
     public void SendMessageOh(String tag,String top,String bottom)
     {

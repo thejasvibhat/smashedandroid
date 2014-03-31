@@ -52,7 +52,7 @@ public class ReviewListAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.reviews_list_item, null);
             holder = new ViewHolder();
-            holder.txtTitle = (TextView) convertView.findViewById(R.id.m_oRevTitle);
+         //   holder.txtTitle = (TextView) convertView.findViewById(R.id.m_oRevTitle);
             holder.imageView = (SmartImageView) convertView.findViewById(R.id.m_oRevIcon);
             convertView.setTag(holder);
         }

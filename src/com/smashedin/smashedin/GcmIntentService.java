@@ -15,21 +15,30 @@
  */
 
 package com.smashedin.smashedin;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashedin.*;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -42,7 +51,6 @@ public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
-
     public GcmIntentService() {
         super("GcmIntentService");
     }
@@ -68,19 +76,54 @@ public class GcmIntentService extends IntentService {
                 sendNotification("Deleted messages on server: " + extras.toString());
             // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-            	Singleton.getInstance().m_strMessageGcm = extras.getString("live", "");
-            	Singleton.getInstance().m_strMessageGcmUser = extras.getString("username", "");
-            	Singleton.getInstance().m_strMessageGcmBid = extras.getString("bid", "");
-            	Singleton.getInstance().m_strMessageGcmBname = extras.getString("bname", "");
-            	Singleton.getInstance().m_strMessageGcmLocation = extras.getString("atplace", "");
-            	Singleton.getInstance().m_iMessageGcmTimestamp = Long.valueOf(extras.getString("timestamp")).longValue();
-            	Singleton.getInstance().m_strMessageType = extras.getString("instanttype","text");
-            	Singleton.getInstance().m_strOhUrl = extras.getString("ohurl","");
-                // This loop represents the service doing some work.
-                // Post notification of received message.
-                //sendNotification("Received: " + extras.toString());
-            	Intent pushintent = new Intent("push-event");
-          	  LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushintent);
+            	String groupType = extras.getString("instanttype","text");
+            	String uniqueid = extras.getString("uniqueid","theju");
+            	if(groupType.equals("request"))
+            	{
+            		String bname = extras.getString("bname", "");
+            		String username = extras.getString("username", "");
+            		uniqueid = extras.getString("uniqueid", "");
+            		Intent groupintent = new Intent("group-accept-event");
+            		groupintent.putExtra("uniqueid", uniqueid);
+            		groupintent.putExtra("bname", bname);
+            		groupintent.putExtra("username", username);
+			  	  	LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(groupintent);
+
+            	}
+            	else if(uniqueid.contains("theju") != true)
+            	{
+	            	Singleton.getInstance().m_strMessageGcm = extras.getString("live", "");
+	            	Singleton.getInstance().m_strMessageGcmUser = extras.getString("username", "");
+	            	Singleton.getInstance().m_strMessageGcmBid = extras.getString("bid", "");
+	            	Singleton.getInstance().m_strMessageGcmBname = extras.getString("bname", "");
+	            	Singleton.getInstance().m_strMessageGcmLocation = extras.getString("atplace", "");
+	            	Singleton.getInstance().m_iMessageGcmTimestamp = Long.valueOf(extras.getString("timestamp")).longValue();
+	            	Singleton.getInstance().m_strMessageType = extras.getString("instanttype","text");
+	            	Singleton.getInstance().m_strOhUrl = extras.getString("ohurl","");
+	            	Singleton.getInstance().uniqueid = uniqueid;
+	                // This loop represents the service doing some work.
+	                // Post notification of received message.
+	                //sendNotification("Received: " + extras.toString());
+	            	Intent pushintent = new Intent("push-group-event");
+	          	  LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushintent);
+            		
+            	}
+            	else
+            	{
+	            	Singleton.getInstance().m_strMessageGcm = extras.getString("live", "");
+	            	Singleton.getInstance().m_strMessageGcmUser = extras.getString("username", "");
+	            	Singleton.getInstance().m_strMessageGcmBid = extras.getString("bid", "");
+	            	Singleton.getInstance().m_strMessageGcmBname = extras.getString("bname", "");
+	            	Singleton.getInstance().m_strMessageGcmLocation = extras.getString("atplace", "");
+	            	Singleton.getInstance().m_iMessageGcmTimestamp = Long.valueOf(extras.getString("timestamp")).longValue();
+	            	Singleton.getInstance().m_strMessageType = extras.getString("instanttype","text");
+	            	Singleton.getInstance().m_strOhUrl = extras.getString("ohurl","");
+	                // This loop represents the service doing some work.
+	                // Post notification of received message.
+	                //sendNotification("Received: " + extras.toString());
+	            	Intent pushintent = new Intent("push-event");
+	          	  LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(pushintent);
+            	}
 
             }
         }
