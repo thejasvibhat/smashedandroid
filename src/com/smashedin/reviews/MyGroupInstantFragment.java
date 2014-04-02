@@ -122,11 +122,26 @@ public final class MyGroupInstantFragment extends Fragment implements OnResponse
    		LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mGcmMessageReceiver);
     	LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mGcmMessageReceiver,
     		      new IntentFilter("push-group-event"));
-		LoadMessages();
     }
-    private void LoadMessages()
+    public void CheckGroupStatus()
     {
-    	
+    	if(oMineGroupData != null && MyGroupDataSingleton.getInstance().GetMyPrivateGroup(oMineGroupData.mRevData) == null)
+    	{
+    		if(groupType.equals("mine"))
+    		{
+    			Button sendStatus = (Button)liveView.findViewById(R.id.sendStatus);
+    			sendStatus.setEnabled(false);
+    		}
+    	}
+    	if(oFriendsGroupData != null && MyGroupDataSingleton.getInstance().GetFriendsPrivateGroup(oFriendsGroupData.mRevData) == null)
+    	{
+    		if(groupType.equals("friends"))
+    		{
+    			Button sendStatus = (Button)liveView.findViewById(R.id.sendStatus);
+    			sendStatus.setEnabled(false);
+    		}
+    		
+    	}
     }
     @Override
     public void onCreateOptionsMenu(Menu menu,MenuInflater inflater) {

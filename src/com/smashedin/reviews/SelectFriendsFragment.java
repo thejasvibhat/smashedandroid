@@ -12,6 +12,7 @@ import org.json.JSONTokener;
 
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -51,6 +52,7 @@ public class SelectFriendsFragment extends android.support.v4.app.Fragment imple
 	// Search EditText
     EditText inputSearch;
     private ReviewData mRevData;
+    ProgressDialog oPd;
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -85,6 +87,15 @@ public class SelectFriendsFragment extends android.support.v4.app.Fragment imple
 	}
 	private void CreateMyPrivateGroup()
 	{
+		if(mFriendsPickedAdapter.mFriends.size() == 0)
+			return;
+    	oPd = new ProgressDialog(getActivity());
+		oPd.setTitle("Creating your group...");
+		oPd.setMessage("Please wait.");
+		oPd.setIndeterminate(true);
+		oPd.setCancelable(false);
+		oPd.show();
+
 		PrivateGroupData oData = new PrivateGroupData();
 		oData.mRevData = mRevData;
 		oData.m_bMine = true;
@@ -219,6 +230,8 @@ public class SelectFriendsFragment extends android.support.v4.app.Fragment imple
 		}
 		else
 		{
+			if(oPd != null)
+				oPd.cancel();
 			MyGroupDataSingleton.getInstance().m_arrPrivateGroups.get(MyGroupDataSingleton.getInstance().m_arrPrivateGroups.size() - 1).uniqueId = response;
 			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 			fragmentManager.popBackStack();

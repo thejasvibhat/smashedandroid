@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -134,7 +135,22 @@ public class MyGroupsFragment extends android.support.v4.app.Fragment implements
 			myFriendListFragment.AddData(mFriendsGroupData);
 		android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 		fragmentManager.beginTransaction()
-		.replace(R.id.viewpagetabs, myFriendListFragment).addToBackStack( "friendlist" ).commit();
+		.add(R.id.viewpagetabs, myFriendListFragment).addToBackStack( "friendlist" ).commit();
+		fragmentManager.addOnBackStackChangedListener(new OnBackStackChangedListener() {
+			
+			@Override
+			public void onBackStackChanged() {
+				if(mMineFragment != null && mMineFragment.isVisible())
+				{
+					mMineFragment.CheckGroupStatus();
+				}
+				if(mFriendsFragment != null && mFriendsFragment.isVisible())
+				{
+					mFriendsFragment.CheckGroupStatus();
+				}
+				
+			}
+		});
 			
 	}
 	  @Override

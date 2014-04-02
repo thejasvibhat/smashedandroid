@@ -905,13 +905,16 @@ public final class ReviewFragment extends Fragment implements OnResponseListener
 			}
 			else
 			{
-				FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.gridparent);
-				for(int i=0; i < oLayout.getChildCount(); i++)
+				if(getActivity() != null)
 				{
-					if(oLayout.getChildAt(i) instanceof TextView)
+					FrameLayout oLayout = (FrameLayout) getActivity().findViewById(R.id.gridparent);
+					for(int i=0; i < oLayout.getChildCount(); i++)
 					{
-						oLayout.removeViewAt(i);
-						return;
+						if(oLayout.getChildAt(i) instanceof TextView)
+						{
+							oLayout.removeViewAt(i);
+							return;
+						}
 					}
 				}
 			}

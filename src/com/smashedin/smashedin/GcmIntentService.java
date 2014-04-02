@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
+import com.smashedin.reviews.MyGroupDataSingleton;
 import com.smashedin.smashed.Singleton;
 import com.smashedin.smashedin.*;
 
@@ -78,7 +79,11 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
             	String groupType = extras.getString("instanttype","text");
             	String uniqueid = extras.getString("uniqueid","theju");
-            	if(groupType.equals("request"))
+            	if(groupType.equals("delete"))
+            	{
+            		MyGroupDataSingleton.getInstance().RemoveGroup(uniqueid);
+            	}
+            	else if(groupType.equals("request"))
             	{
             		String bname = extras.getString("bname", "");
             		String username = extras.getString("username", "");

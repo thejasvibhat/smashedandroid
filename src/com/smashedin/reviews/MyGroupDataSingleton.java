@@ -65,4 +65,16 @@ public class MyGroupDataSingleton {
     	}
     	return null;
 	}
+	public void RemoveGroup(String uniqueid) {
+		for(PrivateGroupData oData:m_arrPrivateGroups)
+		{
+			if(oData.uniqueId.equals(uniqueid))
+			{
+				m_arrPrivateGroups.remove(oData);
+				oData = null;
+				return;
+			}
+		}
+		
+	}
 }
