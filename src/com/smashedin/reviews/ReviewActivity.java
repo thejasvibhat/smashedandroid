@@ -127,10 +127,11 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 	 AlertDialog dialogAlert = null;
 	private Handler serviceHandler;
 	private ArrayList<DialogId> m_arrDialogs = new ArrayList<DialogId>();
-
+	private ArrayList<String> bids;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bids = MyGroupDataSingleton.getInstance().Repopulate();
         m_oRevActivity = this;
         Singleton.getInstance().m_bShareMenuItem = true;
         setContentView(R.layout.reviewmain);
@@ -237,6 +238,17 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
     	GetTagClouds();
     	LocalBroadcastManager.getInstance(this).registerReceiver(mGroupAcceptReceiver,
   		      new IntentFilter("group-accept-event"));
+    	
+        if(bids.size() > 0)
+        {
+    		String url 	= "https://api.foursquare.com/v2/venues/"+bids.remove(bids.size() - 1)+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20140305&section=drinks&venuePhotos=1&offset=0&limit=50";
+        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+        	oAsyncClient.Attach(this);
+        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+        	oAsyncClient.MakeCallWithTag(url,"venuefill");        	
+        	
+        }
+
 
 
     }
@@ -1114,6 +1126,24 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		MyGroupDataSingleton.getInstance().m_arrPrivateGroups.add(MyGroupDataSingleton.getInstance().acceptGroupData);
 		FillTheMyGroupData();
 	}
+	private void ParseJsonIndpendentData(String response) throws JSONException
+	{
+		JSONObject jsonObj 	= (JSONObject) new JSONTokener(response).nextValue();		
+		JSONObject groups	= (JSONObject) jsonObj.getJSONObject("response");
+		JSONObject item = (JSONObject)groups.getJSONObject("venue");
+		ReviewData oRevData = ParseJsonObjectItem(item);
+		MyGroupDataSingleton.getInstance().RefreshPlace(oRevData);
+		FillTheMyGroupData();
+		 if(bids.size() > 0)
+	        {
+	    		String url 	= "https://api.foursquare.com/v2/venues/"+bids.remove(bids.size() - 1)+"?client_id=5MZNWHVUBAKSAYIOD3QZZ5X2IDLCGWKM5DV4P0UJ3PFLM5P2&client_secret=XSZAZ5XHDOEBBGJ331T4UNVGY5S2MHU0XJVEETV2SC5RWERC&v=20140305&section=drinks&venuePhotos=1&offset=0&limit=50";
+	        	SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
+	        	oAsyncClient.Attach(this);
+	        	oAsyncClient.SetPersistantStorage(getApplicationContext());
+	        	oAsyncClient.MakeCallWithTag(url,"venuefill");        	
+	        	
+	        }
+	}
 
 	@Override
 	public void OnResponse(String response,String tag,Object obj) {
@@ -1143,6 +1173,17 @@ public class ReviewActivity extends FragmentActivity  implements OnHeadlineSelec
 		{
 			try {
 				ParseJsonIndpendent(response);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return;
+		}
+		if(tag.equals("venuefill"))
+		{
+			try {
+				ParseJsonIndpendentData(response);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

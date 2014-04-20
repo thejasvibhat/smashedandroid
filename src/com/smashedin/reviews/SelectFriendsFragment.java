@@ -125,6 +125,7 @@ public class SelectFriendsFragment extends android.support.v4.app.Fragment imple
 			String data = obj.toString();
 			SmashedAsyncClient oAsyncClient = new SmashedAsyncClient();
 			oAsyncClient.Attach(this);
+			oAsyncClient.SetPersistantStorage(getActivity());
 			String url = "http://www.smashed.in/api/b/gcm/groupregister";
 	    	RequestParams oParams = new RequestParams();
 	    	oParams.put("users",data);
@@ -233,6 +234,7 @@ public class SelectFriendsFragment extends android.support.v4.app.Fragment imple
 			if(oPd != null)
 				oPd.cancel();
 			MyGroupDataSingleton.getInstance().m_arrPrivateGroups.get(MyGroupDataSingleton.getInstance().m_arrPrivateGroups.size() - 1).uniqueId = response;
+			MyGroupDataSingleton.getInstance().StoreGroup(response);
 			FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 			fragmentManager.popBackStack();
 		}

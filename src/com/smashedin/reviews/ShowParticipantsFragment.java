@@ -127,6 +127,11 @@ public class ShowParticipantsFragment extends android.support.v4.app.Fragment im
 	}
 	  @Override
 	  public void onResume() {
+		  if(mGroupData == null)
+		  {
+			  super.onResume();
+			  return;
+		  }
 		  if(mGroupData.m_bMine == true)
 		  {
 			  resendrequests.setVisibility(View.VISIBLE);

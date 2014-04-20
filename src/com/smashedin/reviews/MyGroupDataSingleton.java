@@ -2,11 +2,14 @@ package com.smashedin.reviews;
 
 import java.util.ArrayList;
 
+import com.smashedin.config.MyDatabaseHelper;
+
 
 public class MyGroupDataSingleton {
     private static MyGroupDataSingleton mInstance = null;
     public ArrayList<PrivateGroupData> m_arrPrivateGroups = new ArrayList<PrivateGroupData>();
     public PrivateGroupData acceptGroupData = new PrivateGroupData();
+    public MyDatabaseHelper dbHelper;
     private MyGroupDataSingleton(){
 
     } 
@@ -25,6 +28,7 @@ public class MyGroupDataSingleton {
 		}
 		return false;
 	}
+    
     public boolean CheckForMyPrivateGroup(ReviewData mRevData2) {
 		for(PrivateGroupData oData:m_arrPrivateGroups)
 		{
@@ -65,13 +69,49 @@ public class MyGroupDataSingleton {
     	}
     	return null;
 	}
+	public ArrayList<String> Repopulate()
+	{
+		ArrayList<String> bids = new ArrayList<String>();
+		if(m_arrPrivateGroups.size() == 0)
+		{
+			m_arrPrivateGroups = dbHelper.GetAllPrivateGroups();
+			for(PrivateGroupData oData:m_arrPrivateGroups)
+			{
+				bids.add(oData.mRevData.id);
+			}
+		}
+		return bids;
+	}
+	public void RefreshPlace(ReviewData oRevdata)
+	{
+		for(PrivateGroupData oData:m_arrPrivateGroups)
+		{
+			if(oRevdata.id.equals(oData.mRevData.id))
+			{
+				oData.mRevData = oRevdata;
+				return;
+			}
+		}
+	}
 	public void RemoveGroup(String uniqueid) {
 		for(PrivateGroupData oData:m_arrPrivateGroups)
 		{
 			if(oData.uniqueId.equals(uniqueid))
 			{
 				m_arrPrivateGroups.remove(oData);
+				dbHelper.Remove(oData);
 				oData = null;
+				return;
+			}
+		}
+		
+	}
+	public void StoreGroup(String uniqueid) {
+		for(PrivateGroupData oData:m_arrPrivateGroups)
+		{
+			if(oData.uniqueId.equals(uniqueid))
+			{
+				dbHelper.Insert(oData);
 				return;
 			}
 		}

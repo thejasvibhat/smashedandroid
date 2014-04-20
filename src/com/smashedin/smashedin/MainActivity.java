@@ -10,6 +10,7 @@ import com.smashedin.async.SmashedAsyncClient;
 import com.smashedin.async.SmashedAsyncClient.OnResponseListener;
 import com.smashedin.common.NavDrawerItem;
 import com.smashedin.common.NavDrawerListAdapter;
+import com.smashedin.config.MyDatabaseHelper;
 import com.smashedin.facebook.HelloFacebookSampleActivity;
 import com.smashedin.reviews.LiveData;
 import com.smashedin.reviews.MyGroupDataSingleton;
@@ -139,13 +140,13 @@ public class MainActivity extends FragmentActivity implements OnHeadlineSelected
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		MyGroupDataSingleton.getInstance().dbHelper = new MyDatabaseHelper(this);
 		Singleton.getInstance().m_bAppHidden = false;
 		m_oMainACtivity = this;
 		super.onCreate(savedInstanceState);
 		Singleton.getInstance().SetApplicationContext(getApplicationContext());
 
 		setContentView(R.layout.activity_main);
-
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
